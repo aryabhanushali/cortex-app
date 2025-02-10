@@ -1,6 +1,4 @@
-Thanks for downloading this template!
+using vite to run
 
-Template Name: FlexStart
-Template URL: https://bootstrapmade.com/flexstart-bootstrap-startup-template/
-Author: BootstrapMade.com
-License: https://bootstrapmade.com/license/
+npm install
+npm run dev
