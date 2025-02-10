@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, message, Steps, theme } from 'antd';
 import { SmileOutlined } from '@ant-design/icons';
 import Uploader from './uploader.tsx';
 import BarChart from './barchart.jsx';
-
 import useBarchartData from './useBarchartData.jsx';
 import useHeatmapData from './useHeatmapData.jsx';
 import Settings from './settings.jsx';
 import Heatmap from './heatmap.jsx';
+import { Client } from "@gradio/client";
+
 
 const { Step } = Steps;
 
@@ -27,18 +28,59 @@ const Stepper: React.FC = () => {
   const [paper, setPaper] = useState('');
   const [participantName, setParticipantName] = useState('');
 
-  const next = () => {
-    setCurrent((prev) => prev + 1);
-  };
+  const [files, setFiles] = useState<File[]>([]);
+  // const [predictionResult, setPredictionResult] = useState(null);
+  const [predictionResult, setPredictionResult] = useState<any>(null);
 
-  const prev = () => {
-    setCurrent((prev) => prev - 1);
-  };
+  const [loading, setLoading] = useState(false);
+
+  const next = () => setCurrent((prev) => prev + 1);
+  const prev = () => setCurrent((prev) => prev - 1);
 
   const onChange = (value: number) => {
-    console.log('onChange:', value);
+    console.log('Step changed:', value);
     setCurrent(value);
   };
+
+  const handleFilesUploaded = (uploadedFiles: File[]) => {
+    setFiles(uploadedFiles);
+  };
+
+  useEffect(() => {
+    console.log("📁 Updated files state:", files);
+  }, [files]);
+
+  const handlePrediction = async () => {
+    if (files.length === 0) {
+      message.error("No files uploaded. Please upload files first.");
+      return;
+    }
+  
+    setLoading(true);
+  
+    try {
+      console.log("📁 Sending files to Gradio:", files);
+  
+      const client = await Client.connect("http://127.0.0.1:7860/");
+      const result = await client.predict("/predict", {
+        images: files,  // Send raw `File` objects directly
+        roi: region || "ffa",
+        dataset: dataset || "murty185",
+      });
+  
+      setPredictionResult(result.data);
+      message.success("Prediction complete!");
+    } catch (error) {
+      message.error("Prediction failed. Check server connection.");
+      console.error("Error in prediction:", error);
+    }
+  
+    setLoading(false);
+  };
+  
+
+  const { barchartData } = useBarchartData();
+  const { heatmapData, originalFilenames, sortedFilenames } = useHeatmapData();
 
   const contentStyle: React.CSSProperties = {
     lineHeight: '260px',
@@ -50,21 +92,14 @@ const Stepper: React.FC = () => {
     marginTop: 16,
   };
 
-  const { barchartData } = useBarchartData();
-
-  const { heatmapData, originalFilenames, sortedFilenames } = useHeatmapData();
-
   const steps = [
     {
       title: 'Upload Stimuli',
-      content: (
-        <div><Uploader /></div>
-      ),
+      content: <Uploader onFilesUploaded={handleFilesUploaded} />,
     },
     {
       title: 'Training Settings',
       content: (
-        <div>
         <Settings
           region={region}
           setRegion={setRegion}
@@ -81,15 +116,15 @@ const Stepper: React.FC = () => {
           paper={paper}
           setPaper={setPaper}
         />
-      </div>
       ),
     },
     {
       title: 'Prediction Results',
       content: (
         <div>
-        <BarChart barChartData={barchartData} height={500}/>
-        <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={1000} height={1000} />
+          <BarChart barChartData={barchartData} height={500}/>
+          <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={1000} height={1000} />
+          {predictionResult && <pre>{JSON.stringify(predictionResult, null, 2)}</pre>}
         </div>
       ),
       icon: <SmileOutlined />,
@@ -103,21 +138,28 @@ const Stepper: React.FC = () => {
           <Step key={item.title} title={item.title} icon={item.icon} />
         ))}
       </Steps>
+
       <div style={contentStyle}>{steps[current].content}</div>
 
       <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end", gap: "8px" }}>
-      {current === 1 && (
-        <Button type="primary" onClick={() => message.info("Run prediction!")}>
-          Predict
-        </Button>
-      )}
-      {current === steps.length - 1 && (
-        <Button type="primary" onClick={() => message.success("Processing complete!")}>
-          Download Data
-        </Button>
-      )}
-    </div>
-
+        {current === 1 && (
+          <Button 
+            type="primary" 
+            onClick={handlePrediction} 
+            disabled={loading || files.length === 0}
+          >
+            {loading ? "Processing..." : "Predict"}
+          </Button>
+        )}
+        {current === steps.length - 1 && (
+          <Button 
+            type="primary" 
+            onClick={() => message.success("Processing complete!")}
+          >
+            Download Data
+          </Button>
+        )}
+      </div>
     </>
   );
 };

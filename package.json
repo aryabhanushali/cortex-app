@@ -1,6 +1,7 @@
 {
   "type": "module",
   "devDependencies": {
+    "@gradio/client": "^1.11.0",
     "@types/d3": "^7.4.3",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",

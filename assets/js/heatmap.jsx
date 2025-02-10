@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { heatmapStyles, styleTooltip } from './heatmapStyles';
+import { heatmapStyles, styleTooltip } from './heatmapstyles';
 
 const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, height }) => {
   const svgRef = useRef();

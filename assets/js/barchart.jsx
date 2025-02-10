@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { interpolateRdBu } from "d3-scale-chromatic";
-import { barchartStyles, createXScale, createYScale, styleTooltip } from './barchartStyles';
+import { barchartStyles, createXScale, createYScale, styleTooltip } from './barchartstyles';
 
 const BarChart = ({ barChartData, height }) => {
   const svgRef = useRef();

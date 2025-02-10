@@ -1,51 +1,63 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../css/main.css';
 import { InboxOutlined } from '@ant-design/icons';
-import type { UploadProps } from 'antd';
+import type { UploadProps, UploadFile } from 'antd';
 import { message, Upload } from 'antd';
 
 const { Dragger } = Upload;
 
-const props: UploadProps = {
-  name: 'file',
-  multiple: true,
-  maxCount: 200,
-  action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
-  onChange(info) {
-    const { status } = info.file;
-    if (status !== 'uploading') {
-      console.log(info.file, info.fileList);
-    }
-    if (status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully.`);
-    } else if (status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-  onDrop(e) {
-    console.log('Dropped files', e.dataTransfer.files);
-  },
-  progress: {
-    strokeColor: {
-      '0%': '#108ee9',
-      '100%': '#87d068',
+interface UploaderProps {
+  onFilesUploaded: (files: File[]) => void; // Callback to pass files to parent
+}
+
+const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded }) => {
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  const props: UploadProps = {
+    name: 'file',
+    multiple: true,
+    maxCount: 200,
+    beforeUpload: (file) => {
+      const newFile: UploadFile = {
+        uid: file.uid || String(Date.now()), // Ensure each file has a unique ID
+        name: file.name,
+        status: 'done',
+        originFileObj: file, // Store original file
+      };
+
+      setFileList((prevList) => {
+        const updatedList = [...prevList, newFile];
+        const rawFiles = updatedList.map(f => f.originFileObj as File);
+        onFilesUploaded(rawFiles); // Ensure parent receives updated file list
+        return updatedList;
+      });
+
+      return false; // Prevent automatic upload
     },
-    strokeWidth: 3,
-    format: (percent) => percent && `${parseFloat(percent.toFixed(2))}%`,
-  },
+    onRemove: (file) => {
+      setFileList((prevList) => {
+        const updatedList = prevList.filter((f) => f.uid !== file.uid);
+        const rawFiles = updatedList.map(f => f.originFileObj as File);
+        onFilesUploaded(rawFiles); // Ensure parent receives updated file list
+        return updatedList;
+      });
+    },
+    onDrop(e) {
+      console.log('Dropped files', e.dataTransfer.files);
+    },
+  };
+
+  return (
+    <Dragger {...props} fileList={fileList}>
+      <p className="ant-upload-drag-icon">
+        <InboxOutlined />
+      </p>
+      <p className="ant-upload-text">Click or drag file to this area to upload</p>
+      <p className="ant-upload-hint">
+        Support for a single or bulk upload.
+      </p>
+    </Dragger>
+  );
 };
 
-const App: React.FC = () => (
-  <Dragger {...props}>
-    <p className="ant-upload-drag-icon">
-      <InboxOutlined />
-    </p>
-    <p className="ant-upload-text">Click or drag file to this area to upload</p>
-    <p className="ant-upload-hint">
-      Support for a single or bulk upload. Strictly prohibited from uploading company data or other
-      banned files.
-    </p>
-  </Dragger>
-);
-
-export default App;
+export default Uploader;
