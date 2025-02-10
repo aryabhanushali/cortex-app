@@ -123,7 +123,7 @@ const BarChart = ({ barChartData, height }) => {
     .on("mouseover", (event, d) => {
       d3.select(event.currentTarget).attr("fill", d3.color(colorScale(d.mean)).darker(0.5));
 
-      const imagePath = `/murty185_images/${d.filename}`;
+      const imagePath = `/assets/data/images_185/${d.filename}`;
 
       tooltip
         .html(
