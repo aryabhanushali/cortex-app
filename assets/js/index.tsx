@@ -13,9 +13,7 @@ function App() {
 const container = document.getElementById('container');
 if (container) {
   createRoot(container).render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
+    <App />
   );
 } else {
   console.error("Failed to find the 'container' element.");

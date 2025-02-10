@@ -24,6 +24,7 @@ export const styleTooltip = (tooltip) => {
     .style("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.2)")
     .style("font-size", "14px")
     .style("display", "none")
-    .style("z-index", "9999") // High z-index to hover over all components
+    .style("opacity", "1 !important")
+    .style("z-index", "1000") // High z-index to hover over all components
     .style("pointer-events", "none") // Prevent tooltip from blocking mouse events
 };

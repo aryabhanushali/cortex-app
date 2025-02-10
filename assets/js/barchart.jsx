@@ -12,6 +12,14 @@ const BarChart = ({ barChartData, height }) => {
 
   // Update container width dynamically
   useEffect(() => {
+
+    setTimeout(() => {
+      document.querySelectorAll('.tooltip').forEach((el) => {
+        el.style.opacity = "1";
+        el.style.visibility = "visible";
+      });
+    }, 100);
+
     const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
         setContainerWidth(entry.contentRect.width);
@@ -85,9 +93,17 @@ const BarChart = ({ barChartData, height }) => {
     //   .attr("class", "tooltip");
     // styleTooltip(tooltip);
 
-    let tooltip = d3.select("body").select(".tooltip");
+    // let tooltip = d3.select("body").select(".tooltip");
+    // if (tooltip.empty()) {
+    //   tooltip = d3.select("body")
+    //     .append("div")
+    //     .attr("class", "tooltip");
+    // }
+    // styleTooltip(tooltip);
+
+    let tooltip = d3.select(containerRef.current).select(".tooltip");
     if (tooltip.empty()) {
-      tooltip = d3.select("body")
+      tooltip = d3.select(containerRef.current)
         .append("div")
         .attr("class", "tooltip");
     }
@@ -119,12 +135,14 @@ const BarChart = ({ barChartData, height }) => {
             style="width: 80px; height: 80px; object-fit: cover; margin-bottom: 5px; border: 1px solid #ccc;">
           </div>`
         )
-        .style("display", "block");
+        .style("display", "block")
+        .style("opacity", "1 !important");
     })
     .on("mousemove", event => {
+      const containerRect = containerRef.current.getBoundingClientRect(); 
       tooltip
-        .style("left", `${event.pageX + 10}px`)
-        .style("top", `${event.pageY - 40}px`);
+        .style("left", `${event.clientX - containerRect.left + 10}px`)
+        .style("top", `${event.clientY - containerRect.top - 40}px`);
     })
     .on("mouseout", (event, d) => {
       d3.select(event.currentTarget).attr("fill", colorScale(d.mean));
