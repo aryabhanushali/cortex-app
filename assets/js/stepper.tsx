@@ -81,6 +81,7 @@ const Stepper: React.FC = () => {
   };
   
 
+
   const { barchartData } = useBarchartData();
   const { heatmapData, originalFilenames, sortedFilenames } = useHeatmapData();
 
@@ -144,6 +145,20 @@ const Stepper: React.FC = () => {
       <div style={contentStyle}>{steps[current].content}</div>
 
       <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+        {current === 0 && (
+          <Button 
+            type="primary" 
+            onClick={() => {
+              message.success("Image Upload complete!");
+              
+              next();  
+            }}
+            disabled={loading || files.length === 0}
+          >
+            {loading ? "Uploading..." : "Next"}
+          </Button>
+        )}
+
         {current === 1 && (
           <Button 
             type="primary" 
