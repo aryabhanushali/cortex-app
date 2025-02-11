@@ -3,14 +3,46 @@ import { Button, message, Steps, theme } from 'antd';
 import { SmileOutlined } from '@ant-design/icons';
 import Uploader from './uploader.tsx';
 import BarChart from './barchart.jsx';
-import useBarchartData from './useBarchartData.jsx';
+// import useBarchartData from './useBarchartData.jsx';
 import useHeatmapData from './useHeatmapData.jsx';
 import Settings from './settings.jsx';
 import Heatmap from './heatmap.jsx';
 import { Client } from "@gradio/client";
+import { useMemo } from "react";
 
 
 const { Step } = Steps;
+
+const useBarchartData = (predictionResult: any) => {
+  console.log("📊 Prediction Result for Bar Chart:", predictionResult);
+  return useMemo(() => {
+    if (!predictionResult || !predictionResult.mean || !predictionResult.sem) {
+      return [];
+    }
+
+    const processedData = Object.keys(predictionResult.mean).map((filename) => {
+      const meanValue = predictionResult.mean[filename];
+      const semValue = predictionResult.sem[filename];
+
+      console.log(`🎯 Processing: ${filename}, Mean: ${meanValue}, SEM: ${semValue}`);
+
+      return {
+        filename,
+        mean: +meanValue, // Convert to number
+        sem: +semValue,   // Convert to number
+      };
+    });
+
+    console.log("✅ Final Processed Bar Chart Data:", processedData);
+    return processedData;
+
+    // return Object.keys(predictionResult.mean).map((filename) => ({
+    //   filename,
+    //   mean: +predictionResult.mean[filename],
+    //   sem: +predictionResult.sem[filename],
+    // }));
+  }, [predictionResult]);
+};
 
 const Stepper: React.FC = () => {
   const { token } = theme.useToken();
@@ -49,9 +81,13 @@ const Stepper: React.FC = () => {
     setFiles(uploadedFiles);
   };
 
+  // useEffect(() => {
+  //   console.log("📁 Updated files state:", files);
+  // }, [files]);
+
   useEffect(() => {
-    console.log("📁 Updated files state:", files);
-  }, [files]);
+    console.log("🔄 predictionResult updated:", predictionResult);
+  }, [predictionResult]);
 
   // ✅ Ensure only the actual file is sent to Gradio
   const handlePrediction = async () => {
@@ -70,9 +106,14 @@ const Stepper: React.FC = () => {
         images: files.map(f => f.file), // Send only File objects, not blobs
         roi: region || "ffa",
         dataset: dataset || "murty185",
+        backbone_name: model || "clip_rn50",
+        rdm: true,
+        mean: true,
+        sem: true,
       });
 
       setPredictionResult(result.data);
+
       message.success("Prediction complete!");
     } catch (error) {
       message.error("Prediction failed. Check server connection.");
@@ -83,9 +124,8 @@ const Stepper: React.FC = () => {
     setPredictstep(2);
   };
   
-
-
-  const { barchartData } = useBarchartData();
+  const barchartData = useBarchartData(predictionResult);
+  console.log("Extract Barchart Data from predictionResult:", barchartData);
   const { heatmapData, originalFilenames, sortedFilenames } = useHeatmapData();
 
   const contentStyle: React.CSSProperties = {
@@ -128,9 +168,12 @@ const Stepper: React.FC = () => {
       title: 'Prediction Results',
       content: (
         <div>
+          <p style={{ textAlign: 'left', fontSize: '1.5rem', marginLeft: '10px'}}>Univariate Analysis</p>
           <BarChart barChartData={barchartData} height={500}/>
+          <p style={{ textAlign: 'left', fontSize: '1.5rem', marginLeft: '10px'}}>Multivariate Analysis</p>
           <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={1000} height={1000} />
-          {predictionResult && <pre>{JSON.stringify(predictionResult, null, 2)}</pre>}
+          {/* print out prediction result for testing */}
+          {/* {predictionResult && <pre>{JSON.stringify(predictionResult, null, 2)}</pre>} */}
         </div>
       ),
       icon: <SmileOutlined />,
@@ -159,7 +202,7 @@ const Stepper: React.FC = () => {
             }}
             disabled={loading || files.length === 0}
           >
-            {loading ? "Uploading..." : "Next"}
+            {loading ? "Uploading..." : "Proceed to Settings"}
           </Button>
         )}
 
@@ -171,14 +214,14 @@ const Stepper: React.FC = () => {
             }}
             disabled={loading || files.length === 0}
           >
-            {loading ? "Processing..." : "Next"} 
+            {loading ? "Processing..." : "Check Prediction Results"} 
           </Button>
         )}
 
         {current === steps.length - 1 && (
           <Button 
             type="primary" 
-            onClick={() => message.success("Processing complete!")}
+            onClick={() => message.success("Downloading complete!")}
           >
             Download Data
           </Button>

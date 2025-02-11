@@ -37,6 +37,7 @@ const BarChart = ({ barChartData, height }) => {
     };
   }, []);
 
+  console.log("barchart.jsx trying to render with :", barChartData);
 
   const getSortedData = () => {
     if (!barChartData) return [];  // If no data, return an empty array.
@@ -77,7 +78,7 @@ const BarChart = ({ barChartData, height }) => {
     const yScale = d3.scaleLinear().domain([yMin, yMax]).range([innerHeight, 0]);
 
     const colorScale = d3.scaleSequential(interpolateRdBu)  // Or another scheme
-    .domain([yMin, yMax]); // Maps values from min to max
+    .domain([yMax, yMin]); // Maps values from min to max
 
     // Append group to SVG
     const g = svg
@@ -197,7 +198,7 @@ const BarChart = ({ barChartData, height }) => {
     }}
   >
     {/* Order By Dropdown */}
-    <div
+    {/* <div
       className="mode-bar"
       style={{
         position: 'absolute',
@@ -217,7 +218,7 @@ const BarChart = ({ barChartData, height }) => {
         <option value="filename">Filename</option>
         <option value="ranking">Ranking</option>
       </select>
-    </div>
+    </div> */}
 
     {/* Bar Chart */}
     <svg ref={svgRef} style={{ marginTop: '20px' }}></svg> {/* Added marginTop */}

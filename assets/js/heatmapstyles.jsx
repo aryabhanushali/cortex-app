@@ -24,6 +24,7 @@ export const styleTooltip = (tooltip) => {
     .style("min-width", "200px") // Ensure a larger tooltip width
     .style("max-width", "400px") // Prevent tooltip from being too wide
     .style("display", "none")
+    .style("opacity", "1 !important")
     .style("z-index", "1000") // High z-index to hover over all components
     .style("pointer-events", "none"); // Prevent tooltip from blocking mouse events
 };

@@ -7,6 +7,33 @@ const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, heigh
   const containerRef = useRef();
   const [order, setOrder] = useState("name");
 
+    // Update container width dynamically
+    useEffect(() => {
+
+      setTimeout(() => {
+        document.querySelectorAll('.tooltip').forEach((el) => {
+          el.style.opacity = "1";
+          el.style.visibility = "visible";
+        });
+      }, 100);
+  
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (let entry of entries) {
+          setContainerWidth(entry.contentRect.width);
+        }
+      });
+  
+      if (containerRef.current) {
+        resizeObserver.observe(containerRef.current);
+      }
+  
+      return () => {
+        if (containerRef.current) {
+          resizeObserver.unobserve(containerRef.current);
+        }
+      };
+    }, []);
+
   useEffect(() => {
 
     if (!heatmapData || heatmapData.length === 0) {
@@ -42,9 +69,9 @@ const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, heigh
     // const tooltip = d3.select("body").append("div").attr("class", "tooltip");
     // styleTooltip(tooltip);
 
-    let tooltip = d3.select("body").select(".tooltip");
+    let tooltip = d3.select(containerRef.current).select(".tooltip");
     if (tooltip.empty()) {
-      tooltip = d3.select("body")
+      tooltip = d3.select(containerRef.current)
         .append("div")
         .attr("class", "tooltip");
     }
@@ -62,17 +89,6 @@ const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, heigh
             .attr("height", Math.min(xScale.bandwidth(), yScale.bandwidth()))
             .attr("fill", d => colorScale(d.value))
             .on("mouseover", (event, d) => {
-
-            //   rects.interrupt().attr("opacity", 1);
-            //   // Fade out all other cells
-            //   rects
-            //     .attr("opacity", 0.5);
-
-            //   // Keep row & column fully visible
-            //   rects.filter(cell => cell.x === d.x || cell.y === d.y)
-            //     .attr("opacity", 1);
-
-
               const imagePath1 = `/murty185_images/${d.x}`;
               const imagePath2 = `/murty185_images/${d.y}`;
               const cellColor = colorScale(d.value);
@@ -101,18 +117,12 @@ const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, heigh
                 `).style("display", "block");
             })
             .on("mousemove", event => {
-              const cursorX = event.clientX, cursorY = event.clientY;
-              tooltip.style("left", `${cursorX + 10}px`).style("top", `${cursorY + 10}px`);
+              const containerRect = containerRef.current.getBoundingClientRect(); 
+              tooltip
+                .style("left", `${event.clientX - containerRect.left + 10}px`)
+                .style("top", `${event.clientY - containerRect.top - 40}px`);
             })
-            .on("mouseout", () => { rects.interrupt().attr("opacity", 1);; tooltip.style("display", "none");}),
-        update =>
-          update.call(update =>
-            update.transition().duration(750)
-              .attr("x", d => xScale(d.x))
-              .attr("y", d => yScale(d.y))
-              .attr("fill", d => colorScale(d.value))
-          ),
-        exit => exit.remove()
+            .on("mouseout", () => {tooltip.style("display", "none");}),
       );
     
     //legend
@@ -165,17 +175,21 @@ const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, heigh
       .style("font-size", "15px")
       .text("distance");
 
+    return () => {
+        d3.select(".tooltip").remove(); // Cleanup tooltip on component unmount
+    };
+
   }, [heatmapData, originalFilenames, sortedFilenames, width, height, order]);
 
   return (
     <div ref={containerRef} style={{ position: 'relative', width, height, backgroundColor: 'transparent' }}>
-      <div className="controls" style={{ position: 'absolute', top: 10, left: 10 }}>
+      {/* <div className="controls" style={{ position: 'absolute', top: 10, left: 10 }}>
         <label htmlFor="order">Order by: </label>
         <select id="order" value={order} onChange={e => setOrder(e.target.value)}>
           <option value="name">Name</option>
           <option value="group">Group</option>
         </select>
-      </div>
+      </div> */}
       <svg ref={svgRef}></svg>
     </div>
   );
