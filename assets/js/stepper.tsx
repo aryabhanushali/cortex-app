@@ -15,6 +15,7 @@ const { Step } = Steps;
 const Stepper: React.FC = () => {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
+  const [predictstep, setPredictstep] = useState(1);
 
   const DEFAULT_REGION = "ffa";
   const DEFAULT_MODEL = "clip_rn50";
@@ -79,6 +80,7 @@ const Stepper: React.FC = () => {
     }
 
     setLoading(false);
+    setPredictstep(2);
   };
   
 
@@ -164,10 +166,12 @@ const Stepper: React.FC = () => {
         {current === 1 && (
           <Button 
             type="primary" 
-            onClick={handlePrediction} 
+            onClick={() => {
+              predictstep === 1 ? handlePrediction() : next();
+            }}
             disabled={loading || files.length === 0}
           >
-            {loading ? "Processing..." : "Predict"}
+            {loading ? "Processing..." : "Next"} 
           </Button>
         )}
 
