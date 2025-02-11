@@ -16,20 +16,20 @@ const Stepper: React.FC = () => {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
 
-  const DEFAULT_MODEL = 'clip_rn50';
-  const DEFAULT_DATASET = 'murty185';
-  const DEFAULT_VOXEL = 'all-participants';
+  const DEFAULT_MODEL = "clip_rn50";
+  const DEFAULT_DATASET = "murty185";
+  const DEFAULT_VOXEL = "all-participants";
 
   const [model, setModel] = useState(DEFAULT_MODEL);
   const [dataset, setDataset] = useState(DEFAULT_DATASET);
-  const [region, setRegion] = useState('');
+  const [region, setRegion] = useState("");
   const [voxelOption, setVoxelOption] = useState(DEFAULT_VOXEL);
-  const [voxelNumber, setVoxelNumber] = useState('');
-  const [paper, setPaper] = useState('');
-  const [participantName, setParticipantName] = useState('');
+  const [voxelNumber, setVoxelNumber] = useState("");
+  const [paper, setPaper] = useState("");
+  const [participantName, setParticipantName] = useState("");
 
-  const [files, setFiles] = useState<File[]>([]);
-  // const [predictionResult, setPredictionResult] = useState(null);
+  // Store both blob and actual file path
+  const [files, setFiles] = useState<{ blobURL: string; file: File }[]>([]);
   const [predictionResult, setPredictionResult] = useState<any>(null);
 
   const [loading, setLoading] = useState(false);
@@ -38,11 +38,12 @@ const Stepper: React.FC = () => {
   const prev = () => setCurrent((prev) => prev - 1);
 
   const onChange = (value: number) => {
-    console.log('Step changed:', value);
+    console.log("Step changed:", value);
     setCurrent(value);
   };
 
-  const handleFilesUploaded = (uploadedFiles: File[]) => {
+  // ✅ Update this function to handle the correct file structure
+  const handleFilesUploaded = (uploadedFiles: { blobURL: string; file: File }[]) => {
     setFiles(uploadedFiles);
   };
 
@@ -50,31 +51,32 @@ const Stepper: React.FC = () => {
     console.log("📁 Updated files state:", files);
   }, [files]);
 
+  // ✅ Ensure only the actual file is sent to Gradio
   const handlePrediction = async () => {
     if (files.length === 0) {
       message.error("No files uploaded. Please upload files first.");
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
-      console.log("📁 Sending files to Gradio:", files);
-  
+      console.log("📁 Sending files to Gradio:", files.map(f => f.file));
+
       const client = await Client.connect("http://127.0.0.1:7860/");
       const result = await client.predict("/predict", {
-        images: files,  // Send raw `File` objects directly
+        images: files.map(f => f.file), // Send only File objects, not blobs
         roi: region || "ffa",
         dataset: dataset || "murty185",
       });
-  
+
       setPredictionResult(result.data);
       message.success("Prediction complete!");
     } catch (error) {
       message.error("Prediction failed. Check server connection.");
       console.error("Error in prediction:", error);
     }
-  
+
     setLoading(false);
   };
   
