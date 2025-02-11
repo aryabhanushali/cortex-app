@@ -16,13 +16,14 @@ const Stepper: React.FC = () => {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
 
+  const DEFAULT_REGION = "ffa";
   const DEFAULT_MODEL = "clip_rn50";
   const DEFAULT_DATASET = "murty185";
   const DEFAULT_VOXEL = "all-participants";
 
   const [model, setModel] = useState(DEFAULT_MODEL);
   const [dataset, setDataset] = useState(DEFAULT_DATASET);
-  const [region, setRegion] = useState("");
+  const [region, setRegion] = useState(DEFAULT_REGION);
   const [voxelOption, setVoxelOption] = useState(DEFAULT_VOXEL);
   const [voxelNumber, setVoxelNumber] = useState("");
   const [paper, setPaper] = useState("");
@@ -145,6 +146,7 @@ const Stepper: React.FC = () => {
       <div style={contentStyle}>{steps[current].content}</div>
 
       <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+
         {current === 0 && (
           <Button 
             type="primary" 
@@ -168,6 +170,7 @@ const Stepper: React.FC = () => {
             {loading ? "Processing..." : "Predict"}
           </Button>
         )}
+
         {current === steps.length - 1 && (
           <Button 
             type="primary" 
