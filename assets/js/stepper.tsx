@@ -4,10 +4,10 @@ import { SmileOutlined } from '@ant-design/icons';
 import Uploader from './uploader.tsx';
 import BarChart from './barchart.jsx';
 // import useBarchartData from './useBarchartData.jsx';
-import useHeatmapData from './useHeatmapData.jsx';
+//import useHeatmapData from './useHeatmapData.jsx';
 import Settings from './settings.jsx';
 import Heatmap from './heatmap.jsx';
-import { Client } from "@gradio/client";
+import { Client, handle_file} from "@gradio/client";
 import { useMemo } from "react";
 
 
@@ -15,34 +15,76 @@ const { Step } = Steps;
 
 const useBarchartData = (predictionResult: any) => {
   console.log("📊 Prediction Result for Bar Chart:", predictionResult);
+
   return useMemo(() => {
-    if (!predictionResult || !predictionResult.mean || !predictionResult.sem) {
+    if (!predictionResult || !Array.isArray(predictionResult) || predictionResult.length === 0) {
+      console.log("❌ predictionResult is invalid or empty:", predictionResult);
       return [];
     }
 
-    const processedData = Object.keys(predictionResult.mean).map((filename) => {
-      const meanValue = predictionResult.mean[filename];
-      const semValue = predictionResult.sem[filename];
+    const data = predictionResult[0]; // Access the first (and only) object in the array
 
-      console.log(`🎯 Processing: ${filename}, Mean: ${meanValue}, SEM: ${semValue}`);
+    if (!data.mean || !data.sem) {
+      console.log("❌ predictionResult is missing required fields:", data);
+      return [];
+    }
 
-      return {
-        filename,
-        mean: +meanValue, // Convert to number
-        sem: +semValue,   // Convert to number
-      };
-    });
+    const processedData = Object.keys(data.mean).map((filename) => ({
+      filename,
+      mean: +data.mean[filename], // Convert to number
+      sem: +data.sem[filename],   // Convert to number
+    }));
 
     console.log("✅ Final Processed Bar Chart Data:", processedData);
-    return processedData;
 
-    // return Object.keys(predictionResult.mean).map((filename) => ({
-    //   filename,
-    //   mean: +predictionResult.mean[filename],
-    //   sem: +predictionResult.sem[filename],
-    // }));
+    return processedData;
   }, [predictionResult]);
 };
+
+const useHeatmapData = (predictionResult: any) => {
+  return useMemo(() => {
+    if (!predictionResult || !Array.isArray(predictionResult) || predictionResult.length === 0) {
+      console.log("❌ predictionResult is invalid or empty:", predictionResult);
+      return { heatmapData: [], originalFilenames: [], sortedFilenames: [] };
+    }
+
+    const data = predictionResult[0];
+
+    if (!data.rdm || !Array.isArray(data.rdm)) {
+      console.log("❌ RDM data is missing or invalid:", data);
+      return { heatmapData: [], originalFilenames: [], sortedFilenames: [] };
+    }
+
+    const rdm = data.rdm;
+    const n = rdm.length;
+
+    // Extract filenames from the mean or sem object
+    const originalFilenames = Object.keys(data.mean || data.sem || {});
+
+    // Create heatmap data with filenames
+    const heatmapData = rdm.flatMap((row, i) => 
+      row.map((value, j) => ({ 
+        x: originalFilenames[i], 
+        y: originalFilenames[j], 
+        value 
+      }))
+    );
+
+    // For now, we'll use the original order for sortedFilenames
+    // You can implement custom sorting logic here if needed
+    const sortedFilenames = [...originalFilenames];
+
+    console.log("✅ Processed Heatmap Data:", {
+      heatmapData: heatmapData.slice(0, 5), // Log first 5 elements
+      originalFilenames,
+      sortedFilenames
+    });
+
+    return { heatmapData, originalFilenames, sortedFilenames };
+  }, [predictionResult]);
+};
+
+
 
 const Stepper: React.FC = () => {
   const { token } = theme.useToken();
@@ -99,11 +141,12 @@ const Stepper: React.FC = () => {
     setLoading(true);
 
     try {
-      console.log("📁 Sending files to Gradio:", files.map(f => f.file));
+      console.log("📁 Sending files to Gradio:", files.map(f => handle_file(f.file)) );
 
       const client = await Client.connect("http://127.0.0.1:7860/");
       const result = await client.predict("/predict", {
-        images: files.map(f => f.file), // Send only File objects, not blobs
+        //images: files.map(f => f.file), // Send only File objects, not blobs
+        images: files.map(f => handle_file(f.file)),
         roi: region || "ffa",
         dataset: dataset || "murty185",
         backbone_name: model || "clip_rn50",
@@ -113,6 +156,7 @@ const Stepper: React.FC = () => {
       });
 
       setPredictionResult(result.data);
+      console.log("Full predictionResult:", JSON.stringify(result.data, null, 2));
 
       message.success("Prediction complete!");
     } catch (error) {
@@ -125,8 +169,10 @@ const Stepper: React.FC = () => {
   };
   
   const barchartData = useBarchartData(predictionResult);
-  console.log("Extract Barchart Data from predictionResult:", barchartData);
-  const { heatmapData, originalFilenames, sortedFilenames } = useHeatmapData();
+
+  const { heatmapData, originalFilenames, sortedFilenames } = useHeatmapData(predictionResult);
+
+  console.log("Extract Heatmap Data from predictionResult:", heatmapData);
 
   const contentStyle: React.CSSProperties = {
     lineHeight: '260px',
@@ -168,9 +214,7 @@ const Stepper: React.FC = () => {
       title: 'Prediction Results',
       content: (
         <div>
-          <p style={{ textAlign: 'left', fontSize: '1.5rem', marginLeft: '10px'}}>Univariate Analysis</p>
           <BarChart barChartData={barchartData} height={500}/>
-          <p style={{ textAlign: 'left', fontSize: '1.5rem', marginLeft: '10px'}}>Multivariate Analysis</p>
           <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={1000} height={1000} />
           {/* print out prediction result for testing */}
           {/* {predictionResult && <pre>{JSON.stringify(predictionResult, null, 2)}</pre>} */}

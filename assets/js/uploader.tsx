@@ -59,7 +59,7 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded }) => {
 
   return (
     <>
-      <Dragger {...props} fileList={fileList}>
+      <Dragger {...props} fileList={fileList} showUploadList={false}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
         </p>
@@ -68,14 +68,14 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded }) => {
       </Dragger>
 
       {/* Display uploaded images using Blob URLs */}
-      <div style={{ marginTop: "20px" }}>
+      {/* <div style={{ marginTop: "20px" }}>
         {fileMappings.map(({ blobURL, file }) => (
           <div key={file.name}>
             <img src={blobURL} alt="Preview" style={{ width: "100px", marginRight: "10px" }} />
             <p>{file.name}</p>
           </div>
         ))}
-      </div>
+      </div> */}
     </>
   );
 };
