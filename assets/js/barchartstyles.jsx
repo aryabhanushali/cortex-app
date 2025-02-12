@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
 export const barchartStyles = {
-  margin: { top: 20, right: 30, bottom: 20, left: 50 },
+  margin: { top: 20, right: 30, bottom: 50, left: 50 },
   barColor: "steelblue", // Default bar color
   barHoverColor: "orange", // Bar color on hover
   axisColor: "#000", // Axis stroke color

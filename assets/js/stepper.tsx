@@ -132,12 +132,10 @@ const Stepper: React.FC = () => {
 
   // Trigger prediction when settings change or files are uploaded
   useEffect(() => {
-    if (files.length > 0) {
       setPredictionResult(null); // Clear previous results
       setPredictstep(1); // Reset button
       handlePrediction();
-    }
-  }, [files, model, dataset, region, voxelOption, voxelNumber, paper, participantName]);
+  }, [model, dataset, region, voxelOption, voxelNumber, paper, participantName]);
 
   useEffect(() => {
     console.log("🔄 predictionResult updated:", predictionResult);
