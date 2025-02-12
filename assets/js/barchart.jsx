@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import { interpolateRdBu } from "d3-scale-chromatic";
 import { barchartStyles, createXScale, createYScale, styleTooltip } from './barchartstyles';
 
-const BarChart = ({ barChartData, height }) => {
+const BarChart = ({ barChartData, height, fileMappings}) => {
   const svgRef = useRef();
   const containerRef = useRef();
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -37,7 +37,6 @@ const BarChart = ({ barChartData, height }) => {
     };
   }, []);
 
-  console.log("barchart.jsx trying to render with :", barChartData);
 
   const getSortedData = () => {
     if (!barChartData) return [];  // If no data, return an empty array.
@@ -51,6 +50,13 @@ const BarChart = ({ barChartData, height }) => {
     return barChartData; // Default case: return as-is.
   };
   
+
+  const getBlobURL = (filename) => {
+    const mapping = fileMappings?.find(mapping => mapping.file.name === filename);
+    return mapping ? mapping.blobURL : null;
+  };
+
+
 
   useEffect(() => {
 
@@ -87,21 +93,6 @@ const BarChart = ({ barChartData, height }) => {
       .append("g")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    // Create a tooltip element
-    // const tooltip = d3
-    //   .select("body")
-    //   .append("div")
-    //   .attr("class", "tooltip");
-    // styleTooltip(tooltip);
-
-    // let tooltip = d3.select("body").select(".tooltip");
-    // if (tooltip.empty()) {
-    //   tooltip = d3.select("body")
-    //     .append("div")
-    //     .attr("class", "tooltip");
-    // }
-    // styleTooltip(tooltip);
-
     let tooltip = d3.select(containerRef.current).select(".tooltip");
     if (tooltip.empty()) {
       tooltip = d3.select(containerRef.current)
@@ -124,7 +115,9 @@ const BarChart = ({ barChartData, height }) => {
     .on("mouseover", (event, d) => {
       d3.select(event.currentTarget).attr("fill", d3.color(colorScale(d.mean)).darker(0.5));
 
-      const imagePath = `/assets/data/images_185/${d.filename}`;
+      // const imagePath = `/assets/data/images_185/${d.filename}`;
+      const blobURL = getBlobURL(d.filename);
+      console.log('Showing image:', blobURL);
 
       tooltip
         .html(
@@ -132,7 +125,7 @@ const BarChart = ({ barChartData, height }) => {
             <p><strong>Filename:</strong> ${d.filename}</p>
             <p><strong>Mean:</strong> ${d.mean.toFixed(4)}</p>
             <p><strong>SEM:</strong> ${d.sem.toFixed(4)}</p>
-            <img src="${imagePath}" alt="Thumbnail" 
+            <img src="${blobURL}" alt="Thumbnail" 
             style="width: 80px; height: 80px; object-fit: cover; margin-bottom: 5px; border: 1px solid #ccc;">
           </div>`
         )
@@ -149,16 +142,6 @@ const BarChart = ({ barChartData, height }) => {
       d3.select(event.currentTarget).attr("fill", colorScale(d.mean));
       tooltip.style("display", "none");
     });
-
-    // Add axes
-    // g.append("g")
-    //   .attr("transform", `translate(0, ${innerHeight})`)
-    //   .call(d3.axisBottom(xScale))
-    //   .selectAll("text")
-    //   .style("text-anchor", "end")
-    //   .attr("dx", "-0.5em")
-    //   .attr("dy", "0.15em")
-    //   .attr("transform", "rotate(-90)")
 
     g.append("g").call(d3.axisLeft(yScale));
 
@@ -181,7 +164,7 @@ const BarChart = ({ barChartData, height }) => {
         d3.select(".tooltip").remove(); // Cleanup tooltip on component unmount
     };
 
-  }, [barChartData, containerWidth, height, order]);
+  }, [barChartData, containerWidth, height, order, fileMappings]);
 
   return (
     <div

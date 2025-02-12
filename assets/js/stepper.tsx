@@ -3,8 +3,6 @@ import { Button, message, Steps, theme } from 'antd';
 import { SmileOutlined } from '@ant-design/icons';
 import Uploader from './uploader.tsx';
 import BarChart from './barchart.jsx';
-// import useBarchartData from './useBarchartData.jsx';
-//import useHeatmapData from './useHeatmapData.jsx';
 import Settings from './settings.jsx';
 import Heatmap from './heatmap.jsx';
 import { Client, handle_file} from "@gradio/client";
@@ -85,7 +83,6 @@ const useHeatmapData = (predictionResult: any) => {
 };
 
 
-
 const Stepper: React.FC = () => {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
@@ -104,8 +101,9 @@ const Stepper: React.FC = () => {
   const [paper, setPaper] = useState("");
   const [participantName, setParticipantName] = useState("");
 
-  // Store both blob and actual file path
   const [files, setFiles] = useState<{ blobURL: string; file: File }[]>([]);
+  const [fileMappings, setFileMappings] = useState<{ blobURL: string; file: File }[]>([]);
+
   const [predictionResult, setPredictionResult] = useState<any>(null);
 
   const [loading, setLoading] = useState(false);
@@ -118,9 +116,12 @@ const Stepper: React.FC = () => {
     setCurrent(value);
   };
 
-  // ✅ Update this function to handle the correct file structure
   const handleFilesUploaded = (uploadedFiles: { blobURL: string; file: File }[]) => {
     setFiles(uploadedFiles);
+  };
+
+  const handleFileMappingsUpdate = (newFileMappings: { blobURL: string; file: File }[]) => {
+    setFileMappings(newFileMappings);
   };
 
   // useEffect(() => {
@@ -187,7 +188,7 @@ const Stepper: React.FC = () => {
   const steps = [
     {
       title: 'Upload Stimuli',
-      content: <Uploader onFilesUploaded={handleFilesUploaded} />,
+      content: <Uploader onFilesUploaded={handleFilesUploaded} onFileMappingsUpdate={handleFileMappingsUpdate} />,
     },
     {
       title: 'Training Settings',
@@ -214,8 +215,8 @@ const Stepper: React.FC = () => {
       title: 'Prediction Results',
       content: (
         <div>
-          <BarChart barChartData={barchartData} height={500}/>
-          <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={1000} height={1000} />
+          <BarChart barChartData={barchartData} height={500} fileMappings={fileMappings}/>
+          <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={1000} height={1000}/>
           {/* print out prediction result for testing */}
           {/* {predictionResult && <pre>{JSON.stringify(predictionResult, null, 2)}</pre>} */}
         </div>

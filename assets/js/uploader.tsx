@@ -7,10 +7,11 @@ import { Upload, Progress, message } from "antd";
 const { Dragger } = Upload;
 
 interface UploaderProps {
-  onFilesUploaded: (files: { blobURL: string; file: File }[]) => void; 
+  onFilesUploaded: (files: { blobURL: string; file: File }[]) => void;
+  onFileMappingsUpdate: (fileMappings: { blobURL: string; file: File }[]) => void;
 }
 
-const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded }) => {
+const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpdate }) => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [fileMappings, setFileMappings] = useState<{ blobURL: string; file: File }[]>([]);
   const [completedCount, setCompletedCount] = useState(0);
@@ -63,6 +64,7 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded }) => {
       setFileMappings((prevMappings) => {
         const updatedMappings = [...prevMappings, { blobURL, file }];
         onFilesUploaded(updatedMappings);
+        onFileMappingsUpdate(updatedMappings);
         return updatedMappings;
       });
 
