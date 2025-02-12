@@ -115,9 +115,7 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
     .on("mouseover", (event, d) => {
       d3.select(event.currentTarget).attr("fill", d3.color(colorScale(d.mean)).darker(0.5));
 
-      // const imagePath = `/assets/data/images_185/${d.filename}`;
       const blobURL = getBlobURL(d.filename);
-      console.log('Showing image:', blobURL);
 
       tooltip
         .html(
@@ -180,29 +178,6 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       paddingTop: '40px' // Add extra space for the dropdown
     }}
   >
-    {/* Order By Dropdown */}
-    {/* <div
-      className="mode-bar"
-      style={{
-        position: 'absolute',
-        top: 10,
-        left: 10,
-        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Slight transparency for better visibility
-        padding: '5px 10px',
-        borderRadius: '5px',
-      }}
-    >
-      <label style={{ marginRight: '5px', fontSize: '14px' }}>Order by:</label>
-      <select
-        value={order}
-        onChange={(e) => setOrder(e.target.value)}
-        style={{ fontSize: '14px', padding: '2px' }}
-      >
-        <option value="filename">Filename</option>
-        <option value="ranking">Ranking</option>
-      </select>
-    </div> */}
-
     {/* Bar Chart */}
     <svg ref={svgRef} style={{ marginTop: '20px' }}></svg> {/* Added marginTop */}
   </div>

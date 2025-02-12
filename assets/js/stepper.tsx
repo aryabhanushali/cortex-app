@@ -216,7 +216,7 @@ const Stepper: React.FC = () => {
       content: (
         <div>
           <BarChart barChartData={barchartData} height={500} fileMappings={fileMappings}/>
-          <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={1000} height={1000}/>
+          <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={1000} height={1000} fileMappings={fileMappings}/>
           {/* print out prediction result for testing */}
           {/* {predictionResult && <pre>{JSON.stringify(predictionResult, null, 2)}</pre>} */}
         </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { heatmapStyles, styleTooltip } from './heatmapstyles';
 
-const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, height }) => {
+const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, height, fileMappings}) => {
   const svgRef = useRef();
   const containerRef = useRef();
   const [order, setOrder] = useState("name");
@@ -33,6 +33,11 @@ const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, heigh
         }
       };
     }, []);
+  
+    const getBlobURL = (filename) => {
+      const mapping = fileMappings?.find(mapping => mapping.file.name === filename);
+      return mapping ? mapping.blobURL : null;
+    };
 
   useEffect(() => {
 
@@ -65,10 +70,6 @@ const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, heigh
     svg.selectAll("*").remove();
     const g = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    // Create a tooltip element
-    // const tooltip = d3.select("body").append("div").attr("class", "tooltip");
-    // styleTooltip(tooltip);
-
     let tooltip = d3.select(containerRef.current).select(".tooltip");
     if (tooltip.empty()) {
       tooltip = d3.select(containerRef.current)
@@ -89,17 +90,18 @@ const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, heigh
             .attr("height", Math.min(xScale.bandwidth(), yScale.bandwidth()))
             .attr("fill", d => colorScale(d.value))
             .on("mouseover", (event, d) => {
-              const imagePath1 = `/murty185_images/${d.x}`;
-              const imagePath2 = `/murty185_images/${d.y}`;
+              const blobURL_imageX = getBlobURL(d.x);
+              const blobURL_imageY = getBlobURL(d.y);
+
               const cellColor = colorScale(d.value);
 
               let imageHtml, labelHtml;
               if (d.x === d.y) {
-                imageHtml = `<img src="${imagePath1}" alt="Thumbnail" style="width: 140px; height: 140px; border-radius: 5px; object-fit: cover; border: 1px solid #ccc;" onerror="this.style.display='none'">`;
+                imageHtml = `<img src="${blobURL_imageX}" alt="Thumbnail" style="width: 140px; height: 140px; border-radius: 5px; object-fit: cover; border: 1px solid #ccc;" onerror="this.style.display='none'">`;
                 labelHtml = `<p><strong>x & y:</strong> ${d.x}</p>`;
               } else {
-                imageHtml = `<img src="${imagePath1}" alt="Thumbnail" style="width: 140px; height: 140px; border-radius: 5px; object-fit: cover; border: 1px solid #ccc;" onerror="this.style.display='none'">
-                             <img src="${imagePath2}" alt="Thumbnail" style="width: 140px; height: 140px; border-radius: 5px; object-fit: cover; border: 1px solid #ccc;" onerror="this.style.display='none'">`;
+                imageHtml = `<img src="${blobURL_imageX}" alt="Thumbnail" style="width: 140px; height: 140px; border-radius: 5px; object-fit: cover; border: 1px solid #ccc;" onerror="this.style.display='none'">
+                             <img src="${blobURL_imageY}" alt="Thumbnail" style="width: 140px; height: 140px; border-radius: 5px; object-fit: cover; border: 1px solid #ccc;" onerror="this.style.display='none'">`;
                 labelHtml = `<div style="display: flex; justify-content: center; gap: 10px;">
                                <p><strong>x:</strong> ${d.x}</p>
                                <p><strong>y:</strong> ${d.y}</p>
@@ -179,7 +181,7 @@ const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, heigh
         d3.select(".tooltip").remove(); // Cleanup tooltip on component unmount
     };
 
-  }, [heatmapData, originalFilenames, sortedFilenames, width, height, order]);
+  }, [heatmapData, originalFilenames, sortedFilenames, width, height, order, fileMappings]);
 
   return (
     <div ref={containerRef} style={{ position: 'relative', width, height, backgroundColor: 'transparent' }}>
