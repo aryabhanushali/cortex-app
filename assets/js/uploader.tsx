@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../css/main.css";
 import { InboxOutlined } from "@ant-design/icons";
 import type { UploadProps, UploadFile } from "antd";
@@ -13,14 +13,26 @@ interface UploaderProps {
 
 const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpdate }) => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [fileMappings, setFileMappings] = useState<{ blobURL: string; file: File }[]>([]);
+  const [localFileMappings, setLocalFileMappings] = useState<{ blobURL: string; file: File }[]>([]); // Changed name to avoid confusion
   const [completedCount, setCompletedCount] = useState(0);
 
   // Calculate overall progress based on how many files have status === 'done'
   const totalFiles = fileList.length;
-  const progressPercent = totalFiles > 0 
-    ? Math.round((completedCount / totalFiles) * 100) 
+  const progressPercent = totalFiles > 0
+    ? Math.round((completedCount / totalFiles) * 100)
     : 0;
+
+  // useEffect to trigger prop updates after local state changes
+  useEffect(() => {
+    // Delay the callback slightly to allow React to finish its current render cycle
+    const timerId = setTimeout(() => {
+      onFilesUploaded(localFileMappings);
+      onFileMappingsUpdate(localFileMappings);
+    }, 0);
+
+    return () => clearTimeout(timerId); // Cleanup on unmount or re-render
+
+  }, [localFileMappings, onFilesUploaded, onFileMappingsUpdate]); // Dependency array:  re-run when localFileMappings changes
 
   // Helper to simulate uploading a file and update statuses
   const simulateUpload = (uploadFile: UploadFile) => {
@@ -60,11 +72,9 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
         return updatedList;
       });
 
-      // Add to fileMappings
-      setFileMappings((prevMappings) => {
+      // Add to localFileMappings  <-- UPDATE LOCAL STATE HERE
+      setLocalFileMappings((prevMappings) => {
         const updatedMappings = [...prevMappings, { blobURL, file }];
-        onFilesUploaded(updatedMappings);
-        onFileMappingsUpdate(updatedMappings);
         return updatedMappings;
       });
 
@@ -85,17 +95,15 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
         return prevList.filter((f) => f.uid !== file.uid);
       });
 
-      setFileMappings((prevMappings) => {
+      // Update localFileMappings  <-- UPDATE LOCAL STATE HERE
+      setLocalFileMappings((prevMappings) => {
         const updatedMappings = prevMappings.filter((f) => f.file.name !== file.name);
-        onFilesUploaded(updatedMappings);
         return updatedMappings;
       });
     },
     onDrop(e) {
       console.log("Dropped files", e.dataTransfer.files);
     },
-    // If you want the Upload list to be hidden, keep showUploadList as false
-    // otherwise you can set showUploadList to true for default antd file list
     showUploadList: false,
   };
 
@@ -108,7 +116,7 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
         <p className="ant-upload-text">Click or drag file to this area to upload</p>
         <p className="ant-upload-hint">Support for a single or bulk upload.</p>
       </Dragger>
-  
+
       <Progress
         className="progress-bar"
         percent={progressPercent}
@@ -117,7 +125,7 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
       />
     </div>
   );
-  
+
 };
 
 export default Uploader;

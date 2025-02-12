@@ -118,6 +118,8 @@ const Stepper: React.FC = () => {
 
   const handleFilesUploaded = (uploadedFiles: { blobURL: string; file: File }[]) => {
     setFiles(uploadedFiles);
+    setPredictionResult(null);
+    setPredictstep(1);
   };
 
   const handleFileMappingsUpdate = (newFileMappings: { blobURL: string; file: File }[]) => {
@@ -127,6 +129,15 @@ const Stepper: React.FC = () => {
   // useEffect(() => {
   //   console.log("📁 Updated files state:", files);
   // }, [files]);
+
+  // Trigger prediction when settings change or files are uploaded
+  useEffect(() => {
+    if (files.length > 0) {
+      setPredictionResult(null); // Clear previous results
+      setPredictstep(1); // Reset button
+      handlePrediction();
+    }
+  }, [files, model, dataset, region, voxelOption, voxelNumber, paper, participantName]);
 
   useEffect(() => {
     console.log("🔄 predictionResult updated:", predictionResult);
@@ -179,9 +190,9 @@ const Stepper: React.FC = () => {
     lineHeight: '260px',
     textAlign: 'center',
     color: token.colorTextTertiary,
-    backgroundColor: token.colorFillAlter,
-    borderRadius: token.borderRadiusLG,
-    border: `1px dashed ${token.colorBorder}`,
+    backgroundColor: 'transparent',
+    borderRadius: 0,
+    border: 'none',
     marginTop: 16,
   };
 
@@ -214,8 +225,8 @@ const Stepper: React.FC = () => {
     {
       title: 'Prediction Results',
       content: (
-        <div>
-          <BarChart barChartData={barchartData} height={500} fileMappings={fileMappings}/>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px'}}>
+          <BarChart barChartData={barchartData} height={600} fileMappings={fileMappings}/>
           <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={1000} height={1000} fileMappings={fileMappings}/>
           {/* print out prediction result for testing */}
           {/* {predictionResult && <pre>{JSON.stringify(predictionResult, null, 2)}</pre>} */}

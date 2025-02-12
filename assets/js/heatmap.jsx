@@ -6,6 +6,7 @@ const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, heigh
   const svgRef = useRef();
   const containerRef = useRef();
   const [order, setOrder] = useState("name");
+  const [containerWidth, setContainerWidth] = useState(0); 
 
     // Update container width dynamically
     useEffect(() => {

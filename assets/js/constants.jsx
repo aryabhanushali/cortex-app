@@ -11,7 +11,7 @@ export const MODEL_OPTIONS = [
   export const REGION_OPTIONS = [
     { value: 'ffa', label: 'FFA' },
     { value: 'eba', label: 'EBA' },
-    { value: 'ppaa', label: 'PPA' },
+    { value: 'ppa', label: 'PPA' },
   ];
   
   export const VOXEL_OPTIONS = [
