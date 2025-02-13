@@ -223,8 +223,10 @@ const Stepper: React.FC = () => {
     {
       title: 'Prediction Results',
       content: (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px'}}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px'}}>
+          <p>Univariate Analysis</p>
           <BarChart barChartData={barchartData} height={600} fileMappings={fileMappings}/>
+          <p>Multivariate Analysis</p>
           <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={1000} height={1000} fileMappings={fileMappings}/>
           {/* print out prediction result for testing */}
           {/* {predictionResult && <pre>{JSON.stringify(predictionResult, null, 2)}</pre>} */}

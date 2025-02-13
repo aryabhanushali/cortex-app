@@ -83,9 +83,6 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
     const yMax = d3.max(barChartData, (d) => d.mean);
     const yScale = d3.scaleLinear().domain([yMin, yMax]).range([innerHeight, 0]);
 
-    // const colorScale = d3.scaleSequential(interpolateRdBu)  // Or another scheme
-    // .domain([yMax, yMin]); // Maps values from min to max
-
     const colorScale = d3.scaleDiverging()
     .domain([yMin, 0, yMax])
     .interpolator(t => d3.interpolateRdBu(1 - t));
@@ -180,8 +177,7 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       display: 'flex',
       flexDirection: 'column', // Stack dropdown above the chart
       alignItems: 'center', // Center align content
-      paddingTop: '40px', // Add extra space for the dropdown
-      paddingBottom: '40px'// Add extra space before next plot
+      paddingTop: '10px', // Add extra space for the dropdown
     }}
   >
     {/* Bar Chart */}
