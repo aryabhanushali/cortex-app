@@ -25,7 +25,7 @@ export default defineConfig({
     host: true,
     strictPort: true,
     port: 5173,
-    hmr: { host: 'localhost' },
+    hmr: { host: 'sunny-weasel-grossly.ngrok-free.app', clientPort: 443 },
   },
   resolve: {
     alias: {

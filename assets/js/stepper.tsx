@@ -8,6 +8,8 @@ import Heatmap from './heatmap.jsx';
 import { Client, handle_file} from "@gradio/client";
 import { useMemo } from "react";
 
+import RegionSelector from './regionselector.jsx';
+import PaperSelector from './paperselector.jsx'; 
 
 const { Step } = Steps;
 
@@ -154,8 +156,8 @@ const Stepper: React.FC = () => {
       console.log("📁 Sending files to Gradio:", files.map(f => handle_file(f.file)) );
 
       const client = await Client.connect("http://127.0.0.1:7860/");
+
       const result = await client.predict("/predict", {
-        //images: files.map(f => f.file), // Send only File objects, not blobs
         images: files.map(f => handle_file(f.file)),
         roi: region || "ffa",
         dataset: dataset || "murty185",
@@ -202,32 +204,40 @@ const Stepper: React.FC = () => {
     {
       title: 'Training Settings',
       content: (
-        <Settings
-          region={region}
-          setRegion={setRegion}
-          model={model}
-          setModel={setModel}
-          dataset={dataset}
-          setDataset={setDataset}
-          voxelOption={voxelOption}
-          setVoxelOption={setVoxelOption}
-          voxelNumber={voxelNumber}
-          setVoxelNumber={setVoxelNumber}
-          participantName={participantName}
-          setParticipantName={setParticipantName}
-          paper={paper}
-          setPaper={setPaper}
-        />
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+        {/* Left Section */}
+        <div style={{ flex: 1, marginRight: '20px' }}>
+          <RegionSelector region={region} setRegion={setRegion} />
+          <Settings
+            model={model}
+            setModel={setModel}
+            dataset={dataset}
+            setDataset={setDataset}
+            voxelOption={voxelOption}
+            setVoxelOption={setVoxelOption}
+            voxelNumber={voxelNumber}
+            setVoxelNumber={setVoxelNumber}
+            participantName={participantName}
+            setParticipantName={setParticipantName}
+          />
+        </div>
+        
+        {/* Right Section */}
+        <div style={{ flex: 1 }}>
+          {/* <img src="/assets/image/region.png" alt="My Image" style={{ maxWidth: '100%', height: 'auto' }}/> */}
+        </div>
+      </div>
       ),
     },
     {
       title: 'Prediction Results',
       content: (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px'}}>
-          <p>Univariate Analysis</p>
+        <div style={{ display: 'flex', flexDirection: 'column'}}>
+          <RegionSelector region={region} setRegion={setRegion} />
+          <p style={{ textAlign: "left", color:"black", fontSize: "20px"}}>Univariate Analysis: Predicted Mean response across one brain region for each image</p>
           <BarChart barChartData={barchartData} height={600} fileMappings={fileMappings}/>
-          <p>Multivariate Analysis</p>
-          <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={1000} height={1000} fileMappings={fileMappings}/>
+          <p style={{ textAlign: "left", color:"black", fontSize: "20px"}}>Multivariate Analysis: Representation Dissimilarity Matrix(RDM) quantifies how different brain responses are among images</p>
+          <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={800} height={800} fileMappings={fileMappings}/>
           {/* print out prediction result for testing */}
           {/* {predictionResult && <pre>{JSON.stringify(predictionResult, null, 2)}</pre>} */}
         </div>

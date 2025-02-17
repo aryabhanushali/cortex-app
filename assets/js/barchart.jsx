@@ -6,19 +6,18 @@ import { barchartStyles, createXScale, createYScale, styleTooltip } from './barc
 const BarChart = ({ barChartData, height, fileMappings}) => {
   const svgRef = useRef();
   const containerRef = useRef();
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
-  const [order, setOrder] = useState("filename"); 
+  const [order, setOrder] = useState("filename");
 
   // Update container width dynamically
   useEffect(() => {
 
     setTimeout(() => {
       document.querySelectorAll('.tooltip').forEach((el) => {
-        el.style.opacity = "1";
-        el.style.visibility = "visible";
+      el.style.opacity = "1";
+      el.style.visibility = "visible";
       });
-    }, 100);
+      }, 100);
 
     const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
@@ -37,56 +36,50 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
     };
   }, []);
 
-
   const getSortedData = () => {
-    if (!barChartData) return [];  // If no data, return an empty array.
-  
+    if (!barChartData) return [];
+    
     if (order === "filename") {
-      return barChartData; // Use original order, no sorting needed.
+      return [...barChartData].sort((a, b) => a.filename.localeCompare(b.filename));
     } else if (order === "ranking") {
-      return [...barChartData].sort((a, b) => b.mean - a.mean); // Sort by mean descending.
+      return [...barChartData].sort((a, b) => b.mean - a.mean);
     }
-  
-    return barChartData; // Default case: return as-is.
+    
+    return barChartData;
   };
-  
 
   const getBlobURL = (filename) => {
     const mapping = fileMappings?.find(mapping => mapping.file.name === filename);
     return mapping ? mapping.blobURL : null;
   };
 
-
-
   useEffect(() => {
+    const sortedData = getSortedData();
 
-    const barChartData = getSortedData();
-
-    if (!barChartData || barChartData.length === 0) {
-      console.warn(" No barchart data available, skipping rendering.");
+    if (!sortedData || sortedData.length === 0) {
+      console.warn("No barchart data available, skipping rendering.");
       return;
     }
-    console.log("✅ Rendering Barchart with Data:", barChartData);
+    console.log("✅ Rendering Barchart with Data:", sortedData);
 
     // Clear existing content
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
     const margin = barchartStyles.margin;
-    const width = containerWidth; // Use dynamic container width
+    const width = containerWidth;
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
-    const xScale = createXScale(barChartData.map((d) => d.filename), innerWidth);
+    const xScale = createXScale(sortedData.map((d) => d.filename), innerWidth);
 
-    const yMin = d3.min(barChartData, (d) => d.mean);
-    const yMax = d3.max(barChartData, (d) => d.mean);
+    const yMin = d3.min(sortedData, (d) => d.mean);
+    const yMax = d3.max(sortedData, (d) => d.mean);
     const yScale = d3.scaleLinear().domain([yMin, yMax]).range([innerHeight, 0]);
 
     const colorScale = d3.scaleDiverging()
-    .domain([yMin, 0, yMax])
-    .interpolator(t => d3.interpolateRdBu(1 - t));
-
+      .domain([yMin, 0, yMax])
+      .interpolator(t => d3.interpolateRdBu(1 - t));
 
     // Append group to SVG
     const g = svg
@@ -105,43 +98,43 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
 
     // Draw bars
     g.selectAll(".bar")
-    .data(barChartData)
-    .enter()
-    .append("rect")
-    .attr("class", "bar")
-    .attr("x", (d) => xScale(d.filename))
-    .attr("y", (d) => (d.mean >= 0 ? yScale(d.mean) : yScale(0)))
-    .attr("width", xScale.bandwidth())
-    .attr("height", (d) => Math.abs(yScale(d.mean) - yScale(0)))
-    .attr("fill", (d) => colorScale(d.mean))  // Dynamic color from D3 scale
-    .on("mouseover", (event, d) => {
-      d3.select(event.currentTarget).attr("fill", d3.color(colorScale(d.mean)).darker(0.5));
+      .data(sortedData)
+      .enter()
+      .append("rect")
+      .attr("class", "bar")
+      .attr("x", (d) => xScale(d.filename))
+      .attr("y", (d) => (d.mean >= 0 ? yScale(d.mean) : yScale(0)))
+      .attr("width", xScale.bandwidth())
+      .attr("height", (d) => Math.abs(yScale(d.mean) - yScale(0)))
+      .attr("fill", (d) => colorScale(d.mean))
+      .on("mouseover", (event, d) => {
+        d3.select(event.currentTarget).attr("fill", d3.color(colorScale(d.mean)).darker(0.5));
 
-      const blobURL = getBlobURL(d.filename);
+        const blobURL = getBlobURL(d.filename);
 
-      tooltip
-        .html(
-          `<div>
-            <p><strong>Filename:</strong> ${d.filename}</p>
-            <p><strong>Mean:</strong> ${d.mean.toFixed(4)}</p>
-            <p><strong>SEM:</strong> ${d.sem.toFixed(4)}</p>
-            <img src="${blobURL}" alt="Thumbnail" 
-            style="width: 80px; height: 80px; object-fit: cover; margin-bottom: 5px; border: 1px solid #ccc;">
-          </div>`
-        )
-        .style("display", "block")
-        .style("opacity", "1 !important");
-    })
-    .on("mousemove", event => {
-      const containerRect = containerRef.current.getBoundingClientRect(); 
-      tooltip
-        .style("left", `${event.clientX - containerRect.left + 10}px`)
-        .style("top", `${event.clientY - containerRect.top - 40}px`);
-    })
-    .on("mouseout", (event, d) => {
-      d3.select(event.currentTarget).attr("fill", colorScale(d.mean));
-      tooltip.style("display", "none");
-    });
+        tooltip
+          .html(
+            `<div>
+              <p><strong>Filename:</strong> ${d.filename}</p>
+              <p><strong>Mean:</strong> ${d.mean.toFixed(4)}</p>
+              <p><strong>SEM:</strong> ${d.sem.toFixed(4)}</p>
+              <img src="${blobURL}" alt="Thumbnail" 
+              style="width: 140px; height: 140px; object-fit: cover; margin-bottom: 5px; border: 1px solid #ccc;">
+            </div>`
+          )
+          .style("display", "block")
+          .style("opacity", 1);
+      })
+      .on("mousemove", event => {
+        const containerRect = containerRef.current.getBoundingClientRect(); 
+        tooltip
+          .style("left", `${event.clientX - containerRect.left + 10}px`)
+          .style("top", `${event.clientY - containerRect.top - 40}px`);
+      })
+      .on("mouseout", (event, d) => {
+        d3.select(event.currentTarget).attr("fill", colorScale(d.mean));
+        tooltip.style("display", "none");
+      });
 
     g.append("g").call(d3.axisLeft(yScale));
 
@@ -161,7 +154,7 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       .text("Mean Response");
 
     return () => {
-        d3.select(".tooltip").remove(); // Cleanup tooltip on component unmount
+      d3.select(".tooltip").remove(); // Cleanup tooltip on component unmount
     };
 
   }, [barChartData, containerWidth, height, order, fileMappings]);
@@ -180,13 +173,16 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       paddingTop: '10px', // Add extra space for the dropdown
     }}
   >
+    <div className="controls" style={{ position: 'absolute', top: -150, left: 10 }}>
+      <label htmlFor="order">Order by: </label>
+      <select id="order" value={order} onChange={e => setOrder(e.target.value)}>
+        <option value="name">Image Name</option>
+        <option value="ranking">Rank</option>
+      </select>
+    </div>
     {/* Bar Chart */}
-    <svg ref={svgRef} style={{ marginTop: '20px' }}></svg> {/* Added marginTop */}
+    <svg ref={svgRef} style={{ marginTop: '10px' }}></svg> {/* Added marginTop */}
   </div>
-
-
-
-
   );
 };
 
