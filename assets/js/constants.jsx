@@ -12,6 +12,12 @@ export const MODEL_OPTIONS = [
     { value: 'ffa', label: 'FFA' },
     { value: 'eba', label: 'EBA' },
     { value: 'ppa', label: 'PPA' },
+    { value: 'fba', label: 'FBA', disabled: true},
+    { value: 'ofa', label: 'OFA', disabled: true },
+    { value: 'opa', label: 'OPA', disabled: true },
+    { value: 'ofa', label: 'OFA', disabled: true },
+    { value: 'rsc', label: 'RSC', disabled: true },
+    { value: 'vwfa', label: 'VWFA', disabled: true },
   ];
   
   export const VOXEL_OPTIONS = [

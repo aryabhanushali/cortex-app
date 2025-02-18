@@ -10,6 +10,7 @@ import { useMemo } from "react";
 
 import RegionSelector from './regionselector.jsx';
 import PaperSelector from './paperselector.jsx'; 
+import ModelCard from './modelcard.jsx';
 
 const { Step } = Steps;
 
@@ -234,6 +235,11 @@ const Stepper: React.FC = () => {
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
           <RegionSelector region={region} setRegion={setRegion} />
+          <ModelCard 
+            modelName="Clip-ResNet50"
+            modelType="Vision Language Model"
+            description="the optimal layer for FFA: layer3.5.conv3 with highest correlation raw score: 0.79"
+          />
           <p style={{ textAlign: "left", color:"black", fontSize: "20px"}}>Univariate Analysis: Predicted Mean response across one brain region for each image</p>
           <BarChart barChartData={barchartData} height={600} fileMappings={fileMappings}/>
           <p style={{ textAlign: "left", color:"black", fontSize: "20px"}}>Multivariate Analysis: Representation Dissimilarity Matrix(RDM) quantifies how different brain responses are among images</p>
