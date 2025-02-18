@@ -4,24 +4,47 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import { Typography, Link } from '@mui/material';
+import { MODEL_OPTIONS, MODELCARD_INFO_LOOKUP } from './constants';
 
-const ModelCard = ({ modelName, modelType, description }) => {
+const ModelCard = ({region, dataset, model}) => {
+
+  console.log("ModelCard: model:", model, "region:", region, "dataset:", dataset);
+
+  const getInfo = (dataset, region, model) => {
+    console.log(MODELCARD_INFO_LOOKUP[dataset]?.[region]?.[model]);
+    return MODELCARD_INFO_LOOKUP[dataset]?.[region]?.[model] || { bestLayer: 'unknown', corrScore: 0 };
+  };
+
+  const { bestLayer, corrScore } = getInfo(dataset, region, model);
+  const getModelName = (model) => {
+    const modelOption = MODEL_OPTIONS.find(option => option.value === model);
+    return modelOption ? modelOption.label : model;
+  }
+
+  const modelName = getModelName(model);
+  const modelType = "Vision Language Model";
+
   return (
     <Box sx={{ minWidth: 250, boxShadow: 3, borderRadius: 2 }}>
       <Card variant="outlined" sx={{ borderRadius: 2 }}>
         <CardContent>
           <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-            Model Info Card
+            Model Card
           </Typography>
           <Typography variant="h5" component="div">
-            {modelName}
+            <Link href="https://github.com/openai/clip/blob/main/model-card.md" target="_blank" rel="noopener noreferrer" underline="hover">
+              {modelName}
+            </Link>
           </Typography>
           <Typography sx={{ mb: 1.5 }} color="text.secondary">
             {modelType}
           </Typography>
           <Typography variant="body2">
-            {description}
+            The optimal model layer for the selected ROI ({region.toUpperCase()}):{' '}
+            <strong style={{ color: ''}}>{bestLayer}</strong>, 
+            with highest correlation raw score: <strong style={{ color: '' }}>{corrScore}</strong> 
+            , evaluated on the selected fMRI dataset: <strong style={{ color: '' }}>{dataset}</strong>
           </Typography>
         </CardContent>
         {/* <CardActions>

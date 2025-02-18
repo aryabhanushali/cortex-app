@@ -7,6 +7,7 @@ import Settings from './settings.jsx';
 import Heatmap from './heatmap.jsx';
 import { Client, handle_file} from "@gradio/client";
 import { useMemo } from "react";
+import Grid from '@mui/material';
 
 import RegionSelector from './regionselector.jsx';
 import PaperSelector from './paperselector.jsx'; 
@@ -142,6 +143,11 @@ const Stepper: React.FC = () => {
 
   useEffect(() => {
     console.log("🔄 predictionResult updated:", predictionResult);
+      if (predictionResult && current === 1) {
+        setTimeout(() => {
+          next(); // Automatically go to the next step
+        }, 100); // 100ms delay
+      }
   }, [predictionResult]);
 
   // ✅ Ensure only the actual file is sent to Gradio
@@ -205,10 +211,8 @@ const Stepper: React.FC = () => {
     {
       title: 'Training Settings',
       content: (
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-        {/* Left Section */}
-        <div style={{ flex: 1, marginRight: '20px' }}>
-          <RegionSelector region={region} setRegion={setRegion} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px'}}>
+          <RegionSelector region={region} setRegion={setRegion} dataset={dataset}/>
           <Settings
             model={model}
             setModel={setModel}
@@ -220,13 +224,7 @@ const Stepper: React.FC = () => {
             setVoxelNumber={setVoxelNumber}
             participantName={participantName}
             setParticipantName={setParticipantName}
-          />
-        </div>
-        
-        {/* Right Section */}
-        <div style={{ flex: 1 }}>
-          {/* <img src="/assets/image/region.png" alt="My Image" style={{ maxWidth: '100%', height: 'auto' }}/> */}
-        </div>
+          />     
       </div>
       ),
     },
@@ -234,11 +232,11 @@ const Stepper: React.FC = () => {
       title: 'Prediction Results',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
-          <RegionSelector region={region} setRegion={setRegion} />
-          <ModelCard 
-            modelName="Clip-ResNet50"
-            modelType="Vision Language Model"
-            description="the optimal layer for FFA: layer3.5.conv3 with highest correlation raw score: 0.79"
+          <RegionSelector region={region} setRegion={setRegion} dataset={dataset} />
+          <ModelCard
+            region={region}
+            dataset={dataset}
+            model={model} 
           />
           <p style={{ textAlign: "left", color:"black", fontSize: "20px"}}>Univariate Analysis: Predicted Mean response across one brain region for each image</p>
           <BarChart barChartData={barchartData} height={600} fileMappings={fileMappings}/>

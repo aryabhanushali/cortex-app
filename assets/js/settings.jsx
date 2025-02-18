@@ -37,9 +37,10 @@ const Settings = ({
         marginLeft: 0,
         backgroundColor: 'white',
         borderRadius: '8px',
-        width: { xs: '90%', sm: '50%', md: '90%' },
+        // width: { xs: '90%', sm: '50%', md: '30%', lg: '30%', xl: '30%' },
+        width: '100%',
         marginRight: '0 auto',
-        flexDirection: { xs: 'column', md: 'row !important' }
+        flexDirection: { xs: 'column !important', md: 'row !important', lg: 'row !important', xl: 'row !important' }
       }}
     >
       <Typography variant="body2" sx={{ textAlign: 'left', color: 'black', mt: 1, px: 2 }}>
