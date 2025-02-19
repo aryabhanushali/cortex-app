@@ -10,8 +10,9 @@ import { useMemo } from "react";
 import Grid from '@mui/material';
 
 import RegionSelector from './regionselector.jsx';
-import PaperSelector from './paperselector.jsx'; 
+import PaperSelector from './paperselector.jsx';
 import ModelCard from './modelcard.jsx';
+import LinearIndeterminate from './linearprogessor.jsx';
 
 const { Step } = Steps;
 
@@ -64,11 +65,11 @@ const useHeatmapData = (predictionResult: any) => {
     const originalFilenames = Object.keys(data.mean || data.sem || {});
 
     // Create heatmap data with filenames
-    const heatmapData = rdm.flatMap((row, i) => 
-      row.map((value, j) => ({ 
-        x: originalFilenames[i], 
-        y: originalFilenames[j], 
-        value 
+    const heatmapData = rdm.flatMap((row, i) =>
+      row.map((value, j) => ({
+        x: originalFilenames[i],
+        y: originalFilenames[j],
+        value
       }))
     );
 
@@ -85,7 +86,6 @@ const useHeatmapData = (predictionResult: any) => {
     return { heatmapData, originalFilenames, sortedFilenames };
   }, [predictionResult]);
 };
-
 
 const Stepper: React.FC = () => {
   const { token } = theme.useToken();
@@ -111,6 +111,7 @@ const Stepper: React.FC = () => {
   const [predictionResult, setPredictionResult] = useState<any>(null);
 
   const [loading, setLoading] = useState(false);
+  const [predictionLoading, setPredictionLoading] = useState(false); // new state
 
   const next = () => setCurrent((prev) => prev + 1);
   const prev = () => setCurrent((prev) => prev - 1);
@@ -136,18 +137,18 @@ const Stepper: React.FC = () => {
 
   // Trigger prediction when settings change or files are uploaded
   useEffect(() => {
-      setPredictionResult(null); // Clear previous results
-      setPredictstep(1); // Reset button
-      handlePrediction();
+    setPredictionResult(null); // Clear previous results
+    setPredictstep(1); // Reset button
+    handlePrediction();
   }, [model, dataset, region, voxelOption, voxelNumber, paper, participantName]);
 
   useEffect(() => {
     console.log("🔄 predictionResult updated:", predictionResult);
-      if (predictionResult && current === 1) {
-        setTimeout(() => {
-          next(); // Automatically go to the next step
-        }, 100); // 100ms delay
-      }
+    if (predictionResult && current === 1) {
+      setTimeout(() => {
+        next(); // Automatically go to the next step
+      }, 100); // 100ms delay
+    }
   }, [predictionResult]);
 
   // ✅ Ensure only the actual file is sent to Gradio
@@ -157,10 +158,9 @@ const Stepper: React.FC = () => {
       return;
     }
 
-    setLoading(true);
-
+    setPredictionLoading(true); // set true when prediction start
     try {
-      console.log("📁 Sending files to Gradio:", files.map(f => handle_file(f.file)) );
+      console.log("📁 Sending files to Gradio:", files.map(f => handle_file(f.file)));
 
       const client = await Client.connect("http://127.0.0.1:7860/");
 
@@ -183,10 +183,11 @@ const Stepper: React.FC = () => {
       console.error("Error in prediction:", error);
     }
 
+    setPredictionLoading(false); // set false when prediction finish
     setLoading(false);
     setPredictstep(2);
   };
-  
+
   const barchartData = useBarchartData(predictionResult);
 
   const { heatmapData, originalFilenames, sortedFilenames } = useHeatmapData(predictionResult);
@@ -201,6 +202,35 @@ const Stepper: React.FC = () => {
     borderRadius: 0,
     border: 'none',
     marginTop: 16,
+  };
+
+  const downloadData = () => {
+    if (predictionResult) {
+      // Extract only the 'voxels' part of the prediction result
+      const voxelsData = predictionResult[0]?.voxels; // Access the first element and then the voxels property
+
+      if (voxelsData) {
+        const jsonString = JSON.stringify(voxelsData, null, 2);
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+
+        // Construct the filename using the state variables and a timestamp
+        const timestamp = new Date().toISOString().replace(/[:\-T.]/g, ""); // Create a timestamp string
+        const filename = `murtylab_${model}_${dataset}_${region}_${timestamp}.json`;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        message.success("Voxels data downloading complete!");
+      } else {
+        message.error("No voxels data available to download.");
+      }
+    } else {
+      message.error("No prediction result available to download.");
+    }
   };
 
   const steps = [
@@ -224,8 +254,9 @@ const Stepper: React.FC = () => {
             setVoxelNumber={setVoxelNumber}
             participantName={participantName}
             setParticipantName={setParticipantName}
-          />     
-      </div>
+          />
+          {predictionLoading && <LinearIndeterminate />}
+        </div>
       ),
     },
     {
@@ -236,14 +267,13 @@ const Stepper: React.FC = () => {
           <ModelCard
             region={region}
             dataset={dataset}
-            model={model} 
+            model={model}
           />
-          <p style={{ textAlign: "left", color:"black", fontSize: "20px"}}>Univariate Analysis: Predicted Mean response across one brain region for each image</p>
+          {predictionLoading && <LinearIndeterminate />} {/* add progress bar when predictionLoading is true */}
+          <h3 style={{ textAlign: "left", color:"black", fontSize: "18px", marginBottom: "50px", marginTop: "40px"}}>Univariate Analysis: Predicted Mean response across one brain region for each image</h3>
           <BarChart barChartData={barchartData} height={600} fileMappings={fileMappings}/>
-          <p style={{ textAlign: "left", color:"black", fontSize: "20px"}}>Multivariate Analysis: Representation Dissimilarity Matrix(RDM) quantifies how different brain responses are among images</p>
+          <h3 style={{ textAlign: "left", color:"black", fontSize: "18px", marginBottom: "50px", marginTop: "40px"}}>Multivariate Analysis: Representation Dissimilarity Matrix(RDM) quantifies how different brain responses are among images</h3>
           <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={800} height={800} fileMappings={fileMappings}/>
-          {/* print out prediction result for testing */}
-          {/* {predictionResult && <pre>{JSON.stringify(predictionResult, null, 2)}</pre>} */}
         </div>
       ),
       icon: <SmileOutlined />,
@@ -263,12 +293,12 @@ const Stepper: React.FC = () => {
       <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end", gap: "8px" }}>
 
         {current === 0 && (
-          <Button 
-            type="primary" 
+          <Button
+            type="primary"
             onClick={() => {
               message.success("Image Upload complete!");
-              
-              next();  
+
+              next();
             }}
             disabled={loading || files.length === 0}
           >
@@ -277,21 +307,22 @@ const Stepper: React.FC = () => {
         )}
 
         {current === 1 && (
-          <Button 
-            type="primary" 
+          <Button
+            type="primary"
             onClick={() => {
               predictstep === 1 ? handlePrediction() : next();
             }}
             disabled={loading || files.length === 0}
           >
-            {loading ? "Processing..." : "Check Prediction Results"} 
+            {loading ? "Processing..." : "Check Prediction Results"}
           </Button>
         )}
 
         {current === steps.length - 1 && (
-          <Button 
-            type="primary" 
-            onClick={() => message.success("Downloading complete!")}
+          <Button
+            type="primary"
+            onClick={downloadData}
+            disabled={!predictionResult} // Disable if no prediction result
           >
             Download Data
           </Button>

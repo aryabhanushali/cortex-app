@@ -122,6 +122,7 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
         percent={progressPercent}
         status={progressPercent === 100 ? "success" : "active"}
         style={{ marginTop: 0 }} // Inline style to ensure no gap
+        strokeColor="#1890ff"
       />
     </div>
   );

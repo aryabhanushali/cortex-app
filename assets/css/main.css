@@ -67,12 +67,16 @@ a:hover {
 
 h1,
 h2,
-h3,
 h4,
 h5,
 h6 {
   color: var(--heading-color);
   font-family: var(--heading-font);
+}
+
+h3 {
+  color: var(--heading-color);
+  font-family: var(--default-font);
 }
 
 /* PHP Email Form Messages
@@ -831,7 +835,7 @@ section,
 
 .hero h1 {
   margin: 0;
-  font-size: 64px;
+  font-size: 75px; /* 64px */
   font-weight: 700;
   line-height: 70px;
 }
@@ -2773,4 +2777,6 @@ section,
   color: color-mix(in srgb, var(--default-color), transparent 60%);
   font-size: 14px;
 }
+
+
 
