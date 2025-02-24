@@ -15,7 +15,6 @@ export const REGION_OPTIONS = [
   { value: 'fba', label: 'FBA'},
   { value: 'ofa', label: 'OFA'},
   { value: 'opa', label: 'OPA'},
-  { value: 'fba', label: 'FBA'},
   { value: 'rsc', label: 'RSC'},
   { value: 'vwfa', label: 'VWFA'},
 ];
