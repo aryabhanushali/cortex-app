@@ -13,42 +13,33 @@ interface UploaderProps {
 
 const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpdate }) => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [localFileMappings, setLocalFileMappings] = useState<{ blobURL: string; file: File }[]>([]); // Changed name to avoid confusion
+  const [localFileMappings, setLocalFileMappings] = useState<{ blobURL: string; file: File }[]>([]);
   const [completedCount, setCompletedCount] = useState(0);
 
-  // Calculate overall progress based on how many files have status === 'done'
+  // Calculate overall progress
   const totalFiles = fileList.length;
-  const progressPercent = totalFiles > 0
-    ? Math.round((completedCount / totalFiles) * 100)
-    : 0;
+  const progressPercent = totalFiles > 0 ? Math.round((completedCount / totalFiles) * 100) : 0;
 
-  // useEffect to trigger prop updates after local state changes
+  // Trigger parent callbacks when file mappings update
   useEffect(() => {
-    // Delay the callback slightly to allow React to finish its current render cycle
     const timerId = setTimeout(() => {
       onFilesUploaded(localFileMappings);
       onFileMappingsUpdate(localFileMappings);
     }, 0);
 
-    return () => clearTimeout(timerId); // Cleanup on unmount or re-render
+    return () => clearTimeout(timerId);
+  }, [localFileMappings, onFilesUploaded, onFileMappingsUpdate]);
 
-  }, [localFileMappings, onFilesUploaded, onFileMappingsUpdate]); // Dependency array:  re-run when localFileMappings changes
-
-  // Helper to simulate uploading a file and update statuses
+  // Simulated upload process
   const simulateUpload = (uploadFile: UploadFile) => {
-    // Set status to uploading initially
     uploadFile.status = "uploading";
 
-    // Simulate an asynchronous upload
     setTimeout(() => {
-      // Mark file as done
       uploadFile.status = "done";
-      setFileList((prev) => [...prev]); // Trigger a re-render
-
-      // Once done, increment completedCount
+      setFileList((prev) => [...prev]); // Trigger re-render
       setCompletedCount((prev) => prev + 1);
       message.success(`${uploadFile.name} uploaded successfully!`);
-    }, 1000); // adjust to desired “upload” speed
+    }, 1000);
   };
 
   const props: UploadProps = {
@@ -58,48 +49,37 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
     beforeUpload: (file) => {
       const blobURL = URL.createObjectURL(file);
 
-      // Create a new UploadFile object
+      // Use the File object directly to ensure filename preservation
       const newFile: UploadFile = {
         uid: file.uid || String(Date.now()),
-        name: file.name,
-        status: "uploading", // start as uploading
+        name: file.name, // Preserve original filename
+        status: "uploading",
         originFileObj: file,
       };
 
-      // Add to fileList
-      setFileList((prevList) => {
-        const updatedList = [...prevList, newFile];
-        return updatedList;
-      });
+      setFileList((prevList) => [...prevList, newFile]);
 
-      // Add to localFileMappings  <-- UPDATE LOCAL STATE HERE
-      setLocalFileMappings((prevMappings) => {
-        const updatedMappings = [...prevMappings, { blobURL, file }];
-        return updatedMappings;
-      });
+      // Store File object along with its URL
+      setLocalFileMappings((prevMappings) => [
+        ...prevMappings,
+        { blobURL, file },
+      ]);
 
-      // Kick off our simulated upload
       simulateUpload(newFile);
-
-      // Return false to prevent default upload
-      return false;
+      return false; // Prevent default upload
     },
     onRemove: (file) => {
       setFileList((prevList) => {
-        // If this file was already done, reduce completedCount
         const removingFile = prevList.find((f) => f.uid === file.uid);
         if (removingFile?.status === "done") {
           setCompletedCount((prev) => (prev > 0 ? prev - 1 : 0));
         }
-
         return prevList.filter((f) => f.uid !== file.uid);
       });
 
-      // Update localFileMappings  <-- UPDATE LOCAL STATE HERE
-      setLocalFileMappings((prevMappings) => {
-        const updatedMappings = prevMappings.filter((f) => f.file.name !== file.name);
-        return updatedMappings;
-      });
+      setLocalFileMappings((prevMappings) =>
+        prevMappings.filter((f) => f.file.name !== file.name)
+      );
     },
     onDrop(e) {
       console.log("Dropped files", e.dataTransfer.files);
@@ -121,12 +101,11 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
         className="progress-bar"
         percent={progressPercent}
         status={progressPercent === 100 ? "success" : "active"}
-        style={{ marginTop: 0 }} // Inline style to ensure no gap
+        style={{ marginTop: 0 }}
         strokeColor="#1890ff"
       />
     </div>
   );
-
 };
 
 export default Uploader;

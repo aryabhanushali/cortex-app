@@ -71,10 +71,27 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
-    const xScale = createXScale(sortedData.map((d) => d.filename), innerWidth);
+    const MAX_BAR_WIDTH = 100; // Maximum width for each bar
 
-    const yMin = d3.min(sortedData, (d) => d.mean);
-    const yMax = d3.max(sortedData, (d) => d.mean);
+    // Calculate total width and center bars if few data points
+    const totalWidth = Math.min(innerWidth, sortedData.length * (MAX_BAR_WIDTH + 20));
+    const xScale = d3.scaleBand()
+      .domain(sortedData.map(d => d.filename))
+      .range([(innerWidth - totalWidth) / 2, (innerWidth + totalWidth) / 2])
+      .padding(0.1)
+      .paddingOuter(0.2);
+
+    const adjustedBandwidth = Math.min(xScale.bandwidth(), MAX_BAR_WIDTH);
+
+    let yMin = d3.min(sortedData, (d) => d.mean);
+    let yMax = d3.max(sortedData, (d) => d.mean);
+
+    // Expand domain if yMin === yMax
+    if (yMin === yMax) {
+      yMin -= 1; // Add some padding below
+      yMax += 1; // Add some padding above
+    }
+
     const yScale = d3.scaleLinear().domain([yMin, yMax]).range([innerHeight, 0]);
 
     const colorScale = d3.scaleDiverging()
@@ -102,11 +119,11 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       .enter()
       .append("rect")
       .attr("class", "bar")
-      .attr("x", (d) => xScale(d.filename))
-      .attr("y", (d) => (d.mean >= 0 ? yScale(d.mean) : yScale(0)))
-      .attr("width", xScale.bandwidth())
-      .attr("height", (d) => Math.abs(yScale(d.mean) - yScale(0)))
-      .attr("fill", (d) => colorScale(d.mean))
+      .attr("x", d => xScale(d.filename) + (xScale.bandwidth() - adjustedBandwidth) / 2)
+      .attr("y", d => d.mean >= 0 ? yScale(d.mean) : yScale(0))
+      .attr("width", adjustedBandwidth)
+      .attr("height", d => Math.abs(yScale(d.mean) - yScale(0)))
+      .attr("fill", d => colorScale(d.mean))
       .on("mouseover", (event, d) => {
         d3.select(event.currentTarget).attr("fill", d3.color(colorScale(d.mean)).darker(0.5));
 
@@ -158,6 +175,7 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
     };
 
   }, [barChartData, containerWidth, height, order, fileMappings]);
+  
 
   return (
     <div
