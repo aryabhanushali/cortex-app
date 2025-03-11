@@ -37,7 +37,7 @@
 
 </head>
 
-<body class="scoreboard-page">
+<body class="cross-region-performance-page">
 
   <header id="header" class="header d-flex align-items-center sticky-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
@@ -49,7 +49,7 @@
       </a>
 
       <div class="header-title mx-auto">
-        <h1>Scoreboard</h1>
+        <h1>Cross-Regions Performance</h1>
       </div>
 
       <nav id="navmenu" class="navmenu">
@@ -168,12 +168,23 @@
     <main class="main container mt-4">
 
       <!-- Buttons for region selection -->
-      <div class="text-center mb-3">
+
+      <button onclick="window.location.href='scoreboard-page.html'">Back to Overview</button>
+      <button onclick="goToROIPerformance()">Performance on Roi</button>
+
+      <!-- <div class="text-center mb-3">
         <button class="btn btn-primary mx-2" onclick="updateChart('overall')">Cross-Regions</button>
         <button class="btn btn-primary mx-2" onclick="updateChart('PPA')">PPA</button>
         <button class="btn btn-primary mx-2" onclick="updateChart('FFA')">FFA</button>
         <button class="btn btn-primary mx-2" onclick="updateChart('EBA')">EBA</button>
-      </div>
+      </div> -->
+      <div class="button-container">
+        <div class="label-container"><b>Dataset:</b></div>
+        <button id="btn-NSD" onclick="updateDataset('NSD')">NSD</button>
+        <button id="btn-Dataset1"  onclick="updateDataset('Dataset1')">Dataset1</button>
+        <button id="btn-Dataset2"  onclick="updateDataset('Dataset2')">Dataset2</button>
+        <button id="btn-Dataset3"  onclick="updateDataset('Dataset3')">Dataset3</button>
+     </div>
   
       <!-- Chart container -->
       <div class="chart-container">
@@ -183,17 +194,17 @@
       <div id="snapshot">
         <div class="thumbnail-container">
         
-            <div class="thumbnail" onclick="window.location.href='cross-region-performance-page.html'">
+            <div class="thumbnail" onclick="window.location.href='scoreboard-page.html'">
                 <div class="iframe-container">
-                    <iframe id="previewFrame" src="cross-region-performance-page.html"></iframe>
+                    <iframe id="previewFrame" src="scoreboard-page.html"></iframe>
                 </div>
-                <p>Model Performance Cross Regions</p>
+                <p>Scoreboard Overview</p>
             </div>
 
           
             <div class="thumbnail" onclick="window.location.href='roi-performance-page.html'">
                 <div class="iframe-container">
-                    <iframe id="previewFrame" src="roi-performance-page.html"></iframe>
+                    <iframe id="previewFrame" src="roi-performance-page"></iframe>
                 </div>
                 <p>Model Performance on ROI</p>
             </div>
@@ -220,55 +231,59 @@
         
 
         window.addEventListener("load", function() {
-          console.log("✅ window.onload triggered!");
+            const urlParams = new URLSearchParams(window.location.search);
+            selectedDataset = urlParams.get("dataset") || "NSD"; 
 
           function resizeChart() {
                 width = window.innerWidth * 0.9;
                 height = window.innerHeight * 0.8;
                 
-                d3.select("#overall").select("svg").remove();  
-                drawChartOverall("#overall", window.overallData, "Cross-Regions"); 
+                d3.selectAll(".button-container button").classed("selected-button", false);
+                d3.select(`#btn-${selectedDataset}`).classed("selected-button", true);
+
+                updateChart();
                 
             }
 
           window.addEventListener("resize", resizeChart);
 
-          loadData((overallData, ppaData, ffaData, ebaData) => { 
-              console.log("✅ Data Loaded inside onload:", overallData, ppaData, ffaData, ebaData);
-              
-              if (!overallData || overallData.length === 0) {
-                  console.error("❌ overallData is empty!");
-                  return;
-              }
+          loadData((overallData) => {  
+                // drawChart("#overall", overallData, 'Cross-Regions Performances on Dataset: ' + selectedDataset);
+                window.overallData = overallData;
 
-              window.overallData = overallData;
-              window.ppaData = ppaData;
-              window.ffaData = ffaData;
-              window.ebaData = ebaData;
+                d3.selectAll(".button-container button").classed("selected-button", false);
+                d3.select(`#btn-${selectedDataset}`).classed("selected-button", true);
 
-              drawChartOverall("#overall", overallData, "Cross-Regions");
-              d3.select(`button[onclick="updateChart('overall')"]`).classed("selected-button", true);
-          });
+                updateChart();
+            });
       });
 
-        let selectedRegion = "overall"; 
-        function updateChart(region) {
+      function updateDataset(dataset) {
+            selectedDataset = dataset;
 
-            selectedRegion = region;
-            d3.select("#overall").select("svg").remove();  
-            d3.selectAll("button").classed("selected-button", false);
-            d3.select(`button[onclick="updateChart('${region}')"]`).classed("selected-button", true);
+            d3.selectAll(".button-container button").classed("selected-button", false);
+            d3.select(`#btn-${dataset}`).classed("selected-button", true);
+            
 
+            updateChart();
+        }
 
-            if (region === 'overall') {
-                drawChartOverall("#overall", overallData, "Cross-Regions");
-            } else if (region === 'PPA') {
-                drawChartOverall("#overall", ppaData, "PPA");
-            } else if (region === 'FFA') {
-                drawChartOverall("#overall", ffaData, "FFA");
-            } else if (region === 'EBA') {
-                drawChartOverall("#overall", ebaData, "EBA");
+        function updateChart() {
+            d3.select("#overall").select("svg").remove();  // ✅ 清空旧图表
+
+            let filteredData = window.overallData.filter(d => d.dataset === selectedDataset);
+
+            if (!filteredData.length) {
+                console.log(`❌ No data available for ${selectedDataset}`);
+                return;
             }
+
+            console.log(`✅ Drawing chart for ${selectedDataset}`);
+            drawChart("#overall", filteredData, `Cross-Regions Performances on ${selectedDataset}`);
+        }
+
+        function goToROIPerformance() {
+            window.location.href = 'roi-performance-page.html?dataset=${selectedDataset}';
         }
     </script>
       

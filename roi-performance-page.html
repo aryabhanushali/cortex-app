@@ -37,7 +37,7 @@
 
 </head>
 
-<body class="scoreboard-page">
+<body class="roi-performance-page">
 
   <header id="header" class="header d-flex align-items-center sticky-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
@@ -49,15 +49,13 @@
       </a>
 
       <div class="header-title mx-auto">
-        <h1>Scoreboard</h1>
+        <h1>Roi Performance</h1>
       </div>
 
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="index.html">Home<br></a></li>
           <li><a href="lab-page.html">The Lab</a></li>
-          <!-- <li><a href="#services">Services</a></li> -->
-          <!-- <li><a href="#portfolio">Portfolio</a></li> -->
           <li><a href="scoreboard-page.html" class="active">The Scoreboard</a></li>
           <!-- <li><a href="blog.html">Blog</a></li> -->
           <!-- <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
@@ -168,17 +166,67 @@
     <main class="main container mt-4">
 
       <!-- Buttons for region selection -->
-      <div class="text-center mb-3">
+      <!-- <div class="text-center mb-3">
         <button class="btn btn-primary mx-2" onclick="updateChart('overall')">Cross-Regions</button>
         <button class="btn btn-primary mx-2" onclick="updateChart('PPA')">PPA</button>
         <button class="btn btn-primary mx-2" onclick="updateChart('FFA')">FFA</button>
         <button class="btn btn-primary mx-2" onclick="updateChart('EBA')">EBA</button>
+      </div> -->
+      <button onclick="window.location.href='scoreboard-page.html'">Back to Overview</button>
+      <button onclick="goToCrossRegion()">Performance Cross Regions</button>
+
+      <div class="button-container">
+        <div class="label-container"><b>Dataset:</b></div>
+        <button id="btn-NSD"  onclick="updateDataset('NSD')">NSD</button>
+        <button id="btn-Dataset1" onclick="updateDataset('Dataset1')">Dataset1</button>
+        <button id="btn-Dataset2" onclick="updateDataset('Dataset2')">Dataset2</button>
+        <button id="btn-Dataset3" onclick="updateDataset('Dataset3')">Dataset3</button>
+      </div>
+
+      <div class="button-container">
+        <div class="label-container"><b>ROI:</b></div>
+        <button id="btn-PPA"  onclick="updateROI('PPA')">PPA</button>
+        <button id="btn-FFA" onclick="updateROI('FFA')">FFA</button>
+        <button id="btn-EBA" onclick="updateROI('EBA')">EBA</button>
       </div>
   
-      <!-- Chart container -->
-      <div class="chart-container">
-        <div id="overall" class="chart"></div>
-      </div>
+      <div class="roi-container">
+        <!--left chart -->
+        <div class="chart-container">
+            <div id="roi"></div>
+        </div>
+    
+        <!-- right：fMRI 和 rollable Model Performance -->
+        <div class="fmri-model-container">
+            <!-- fixed fMRI -->
+            <div class="fmri-section">
+                <h3>Real fMRI data from subjects</h3>
+                <div class="fmri-content">
+                    <div class="subject"><div class="heatmap" id="fmri-s1"></div><p>S1</p></div>
+                    <div class="subject"><div class="heatmap" id="fmri-s2"></div><p>S2</p></div>
+                    <div class="subject"><div class="heatmap" id="fmri-s3"></div><p>S3</p></div>
+                    <div class="subject"><div class="heatmap" id="fmri-s4"></div><p>S4</p></div>
+                </div>
+            </div>
+    
+            <!-- rolling Model Performance -->
+            <div class="model-section">
+                <h3>Model Performance</h3>
+                <p><b>Subject: 
+                    
+                    <button onclick="updateSubject('S1')">S1</button>
+                    <button onclick="updateSubject('S2')">S2</button>
+                    <button onclick="updateSubject('S3')">S3</button>
+                    <button onclick="updateSubject('S4')">S4</button>
+                </b></p>
+                <div class="model-content">
+                    <div class="model-heatmaps" id="model-heatmaps">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
       <div id="snapshot">
         <div class="thumbnail-container">
@@ -211,65 +259,118 @@
 
       <script>
 
-        let width = window.innerWidth * 0.9;  
-        let height = window.innerHeight * 0.8; 
-        const margin = { top: 30 , right: 150, bottom: 50, left: 300 };
+        const width = 750, height = 575;
+        const margin = { top: 50, right: 0, bottom: 50, left: 180 };
 
-       
-        
-        
+        let selectedDataset = "NSD";
+        let selectedROI = "PPA";
 
         window.addEventListener("load", function() {
-          console.log("✅ window.onload triggered!");
+          const urlParams = new URLSearchParams(window.location.search);
+          selectedDataset = urlParams.get("dataset") || "NSD"; 
+          selectedROI = urlParams.get("roi") || "PPA"; 
 
-          function resizeChart() {
-                width = window.innerWidth * 0.9;
-                height = window.innerHeight * 0.8;
-                
-                d3.select("#overall").select("svg").remove();  
-                drawChartOverall("#overall", window.overallData, "Cross-Regions"); 
-                
-            }
-
-          window.addEventListener("resize", resizeChart);
-
+          
           loadData((overallData, ppaData, ffaData, ebaData) => { 
               console.log("✅ Data Loaded inside onload:", overallData, ppaData, ffaData, ebaData);
               
-              if (!overallData || overallData.length === 0) {
-                  console.error("❌ overallData is empty!");
-                  return;
-              }
 
               window.overallData = overallData;
               window.ppaData = ppaData;
               window.ffaData = ffaData;
               window.ebaData = ebaData;
 
-              drawChartOverall("#overall", overallData, "Cross-Regions");
-              d3.select(`button[onclick="updateChart('overall')"]`).classed("selected-button", true);
+              d3.selectAll(".button-container button").classed("selected-button", false);
+              d3.select(`#btn-${selectedDataset}`).classed("selected-button", true);
+              d3.select(`#btn-${selectedROI}`).classed("selected-button", true);
+              updateChart();
+              updateHeatmaps();  
           });
       });
 
-        let selectedRegion = "overall"; 
-        function updateChart(region) {
+      function updateDataset(dataset) {
+        selectedDataset = dataset;
+       
 
-            selectedRegion = region;
-            d3.select("#overall").select("svg").remove();  
-            d3.selectAll("button").classed("selected-button", false);
-            d3.select(`button[onclick="updateChart('${region}')"]`).classed("selected-button", true);
+        d3.selectAll(".button-container button").classed("selected-button", false);
+        d3.select(`#btn-${dataset}`).classed("selected-button", true);
+        d3.select(`#btn-${selectedROI}`).classed("selected-button", true);
+
+       
 
 
-            if (region === 'overall') {
-                drawChartOverall("#overall", overallData, "Cross-Regions");
-            } else if (region === 'PPA') {
-                drawChartOverall("#overall", ppaData, "PPA");
-            } else if (region === 'FFA') {
-                drawChartOverall("#overall", ffaData, "FFA");
-            } else if (region === 'EBA') {
-                drawChartOverall("#overall", ebaData, "EBA");
-            }
+        updateChart();
+      
+      }
+
+      function updateROI(roi) {
+        selectedROI = roi;
+
+        d3.selectAll(".button-container button").classed("selected-button", false);
+        d3.select(`#btn-${selectedDataset}`).classed("selected-button", true);
+        d3.select(`#btn-${roi}`).classed("selected-button", true);
+
+        
+        updateChart();
+       
+      }
+
+      function updateChart() {
+        d3.select("#roi").select("svg").remove();
+
+        let data;
+        if (selectedROI === "PPA") data = window.ppaData;
+        else if (selectedROI === "FFA") data = window.ffaData;
+        else if (selectedROI === "EBA") data = window.ebaData;
+
+        let filteredData = data.filter(d => d.dataset === selectedDataset);
+
+        drawChart("#roi", filteredData, `${selectedROI} Performance on ${selectedDataset}`);
+        updateHeatmaps();
+      }
+
+      function goToCrossRegion() {
+            window.location.href = `cross-region-performance-page.html?dataset=${selectedDataset}`;
         }
+
+
+
+    let selectedSubject = "S1";
+
+    function updateSubject(subject) {
+        selectedSubject = subject;
+        document.getElementById("selected-subject").innerText = subject;
+        updateHeatmaps();  // 更新热力图
+    }
+    function updateHeatmaps() {
+        const heatmapContainer = document.getElementById("model-heatmaps");
+        heatmapContainer.innerHTML = "";  // 清空旧的 heatmap
+
+        let data;
+        if (selectedROI === "PPA") data = window.ppaData;
+        else if (selectedROI === "FFA") data = window.ffaData;
+        else if (selectedROI === "EBA") data = window.ebaData;
+
+        let filteredModels = data.filter(d => d.dataset === selectedDataset);
+        
+        filteredModels.forEach((d, index) => {
+            let heatmapDiv = document.createElement("div");
+            heatmapDiv.className = "heatmap";
+            heatmapDiv.id = `heatmap-${index + 1}`;
+
+            let title = document.createElement("p");
+            title.innerText = d.model; // Model 名字作为标题
+
+            let wrapper = document.createElement("div");
+            wrapper.appendChild(title);
+            wrapper.appendChild(heatmapDiv);
+
+            heatmapContainer.appendChild(wrapper);
+        });
+    }
+
+
+
     </script>
       
 

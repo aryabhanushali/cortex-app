@@ -28,7 +28,7 @@
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="assets/css/style_scoreboard/scoreboard.css">
+  
 
   <!-- script for the scoreboard main part -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -46,11 +46,8 @@
         <!-- Uncomment the line below if you also wish to use an image logo -->
         <img src="assets/img/logo.svg" alt="">
         <h1 class="sitename">Cortex</h1>
+        
       </a>
-
-      <div class="header-title mx-auto">
-        <h1>Scoreboard</h1>
-      </div>
 
       <nav id="navmenu" class="navmenu">
         <ul>
@@ -158,131 +155,7 @@
     <!-- </section> -->
     <!-- /Starter Section Section -->
 
-
-    <!-- <button onclick="updateChart('overall')">Cross-Regions</button>
-    <button onclick="updateChart('PPA')">PPA</button>
-    <button onclick="updateChart('FFA')">FFA</button>
-    <button onclick="updateChart('EBA')">EBA</button> -->
-
-    
-    <main class="main container mt-4">
-
-      <!-- Buttons for region selection -->
-      <div class="text-center mb-3">
-        <button class="btn btn-primary mx-2" onclick="updateChart('overall')">Cross-Regions</button>
-        <button class="btn btn-primary mx-2" onclick="updateChart('PPA')">PPA</button>
-        <button class="btn btn-primary mx-2" onclick="updateChart('FFA')">FFA</button>
-        <button class="btn btn-primary mx-2" onclick="updateChart('EBA')">EBA</button>
-      </div>
-  
-      <!-- Chart container -->
-      <div class="chart-container">
-        <div id="overall" class="chart"></div>
-      </div>
-
-      <div id="snapshot">
-        <div class="thumbnail-container">
-        
-            <div class="thumbnail" onclick="window.location.href='cross-region-performance-page.html'">
-                <div class="iframe-container">
-                    <iframe id="previewFrame" src="cross-region-performance-page.html"></iframe>
-                </div>
-                <p>Model Performance Cross Regions</p>
-            </div>
-
-          
-            <div class="thumbnail" onclick="window.location.href='roi-performance-page.html'">
-                <div class="iframe-container">
-                    <iframe id="previewFrame" src="roi-performance-page.html"></iframe>
-                </div>
-                <p>Model Performance on ROI</p>
-            </div>
-            <div class="thumbnail">
-                <img src="thumbnail_placeholder.png" alt="Placeholder">
-                <p>More Models</p>
-            </div>
-            <div class="thumbnail">
-                <img src="thumbnail_placeholder.png" alt="Placeholder">
-                <p>More Models</p>
-            </div>
-        </div>
-    </div>
-
-
-      <script>
-
-        let width = window.innerWidth * 0.9;  
-        let height = window.innerHeight * 0.8; 
-        const margin = { top: 30 , right: 150, bottom: 50, left: 300 };
-
-       
-        
-        
-
-        window.addEventListener("load", function() {
-          console.log("✅ window.onload triggered!");
-
-          function resizeChart() {
-                width = window.innerWidth * 0.9;
-                height = window.innerHeight * 0.8;
-                
-                d3.select("#overall").select("svg").remove();  
-                drawChartOverall("#overall", window.overallData, "Cross-Regions"); 
-                
-            }
-
-          window.addEventListener("resize", resizeChart);
-
-          loadData((overallData, ppaData, ffaData, ebaData) => { 
-              console.log("✅ Data Loaded inside onload:", overallData, ppaData, ffaData, ebaData);
-              
-              if (!overallData || overallData.length === 0) {
-                  console.error("❌ overallData is empty!");
-                  return;
-              }
-
-              window.overallData = overallData;
-              window.ppaData = ppaData;
-              window.ffaData = ffaData;
-              window.ebaData = ebaData;
-
-              drawChartOverall("#overall", overallData, "Cross-Regions");
-              d3.select(`button[onclick="updateChart('overall')"]`).classed("selected-button", true);
-          });
-      });
-
-        let selectedRegion = "overall"; 
-        function updateChart(region) {
-
-            selectedRegion = region;
-            d3.select("#overall").select("svg").remove();  
-            d3.selectAll("button").classed("selected-button", false);
-            d3.select(`button[onclick="updateChart('${region}')"]`).classed("selected-button", true);
-
-
-            if (region === 'overall') {
-                drawChartOverall("#overall", overallData, "Cross-Regions");
-            } else if (region === 'PPA') {
-                drawChartOverall("#overall", ppaData, "PPA");
-            } else if (region === 'FFA') {
-                drawChartOverall("#overall", ffaData, "FFA");
-            } else if (region === 'EBA') {
-                drawChartOverall("#overall", ebaData, "EBA");
-            }
-        }
-    </script>
-      
-
-
-
   </main>
-
-
-
-
-    
-   
-</body>
 
   <footer id="footer" class="footer">
 

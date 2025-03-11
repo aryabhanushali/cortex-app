@@ -2779,4 +2779,71 @@ section,
 }
 
 
+/*--------------------------------------------------------------
+# Scoreboard —— Scoreoard page
+--------------------------------------------------------------*/
 
+
+.scoreboard-page .header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  top: 30px;
+}
+
+.scoreboard-page .header-title h1 {
+  font-size: 35px;  
+  font-weight: 700; 
+  color: var(--heading-color); 
+  margin-top: 0;
+  text-align: center;
+}
+
+.scoreboard-page .overallchart {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+
+/*--------------------------------------------------------------
+# Scoreboard —— cross region page
+--------------------------------------------------------------*/
+
+
+.cross-region-performance-page .header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  top: 30px;
+}
+
+.cross-region-performance-page .header-title h1 {
+  font-size: 35px;  
+  font-weight: 700; 
+  color: var(--heading-color); 
+  margin-top: 0;
+  text-align: center;
+}
+
+/*--------------------------------------------------------------
+# Scoreboard —— roi performance page
+--------------------------------------------------------------*/
+
+.roi-performance-page .header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  top: 30px;
+}
+
+.roi-performance-page .header-title h1 {
+  font-size: 35px;  
+  font-weight: 700; 
+  color: var(--heading-color); 
+  margin-top: 0;
+  text-align: center;
+}
