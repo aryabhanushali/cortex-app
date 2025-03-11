@@ -168,15 +168,23 @@
     <main class="main container mt-4">
 
       <!-- Buttons for region selection -->
+
+
+      <button>Train on Murty185</button>
+      <button>Train on NSD</button>
+
       <div class="text-center mb-3">
-        <button class="btn btn-primary mx-2" onclick="updateChart('overall')">Cross-Regions</button>
-        <button class="btn btn-primary mx-2" onclick="updateChart('PPA')">PPA</button>
-        <button class="btn btn-primary mx-2" onclick="updateChart('FFA')">FFA</button>
-        <button class="btn btn-primary mx-2" onclick="updateChart('EBA')">EBA</button>
+        <button onclick="updateChart('overall')">Cross-Regions</button>
+        <button onclick="updateChart('PPA')">PPA</button>
+        <button  onclick="updateChart('FFA')">FFA</button>
+        <button  onclick="updateChart('EBA')">EBA</button>
       </div>
   
       <!-- Chart container -->
-      <div class="chart-container">
+      <div class="overallchart">
+        <div id="loading-overlay">
+          <p>Loading...</p>
+        </div>
         <div id="overall" class="chart"></div>
       </div>
 
@@ -232,7 +240,7 @@
             }
 
           window.addEventListener("resize", resizeChart);
-
+          document.getElementById("loading-overlay").style.display = "flex";
           loadData((overallData, ppaData, ffaData, ebaData) => { 
               console.log("✅ Data Loaded inside onload:", overallData, ppaData, ffaData, ebaData);
               
@@ -248,7 +256,10 @@
 
               drawChartOverall("#overall", overallData, "Cross-Regions");
               d3.select(`button[onclick="updateChart('overall')"]`).classed("selected-button", true);
+              document.getElementById("loading-overlay").style.display = "none";
+              
           });
+          
       });
 
         let selectedRegion = "overall"; 
