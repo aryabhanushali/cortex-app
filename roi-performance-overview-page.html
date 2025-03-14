@@ -37,7 +37,7 @@
 
 </head>
 
-<body class="cross-region-performance-page">
+<body class="roi-performance-page">
 
   <header id="header" class="header d-flex align-items-center sticky-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
@@ -49,15 +49,13 @@
       </a>
 
       <div class="header-title mx-auto">
-        <h1>Cross-Regions Performance</h1>
+        <h1>Roi Performance</h1>
       </div>
 
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="index.html">Home<br></a></li>
           <li><a href="lab-page.html">The Lab</a></li>
-          <!-- <li><a href="#services">Services</a></li> -->
-          <!-- <li><a href="#portfolio">Portfolio</a></li> -->
           <li><a href="scoreboard-page.html" class="active">The Scoreboard</a></li>
           <!-- <li><a href="blog.html">Blog</a></li> -->
           <!-- <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
@@ -168,43 +166,55 @@
     <main class="main container mt-4">
 
       <!-- Buttons for region selection -->
-
-      <button onclick="window.location.href='scoreboard-page.html'">Back to Overview</button>
-      <button onclick="goToROIPerformance()">Performance on Roi</button>
-
       <!-- <div class="text-center mb-3">
         <button class="btn btn-primary mx-2" onclick="updateChart('overall')">Cross-Regions</button>
         <button class="btn btn-primary mx-2" onclick="updateChart('PPA')">PPA</button>
         <button class="btn btn-primary mx-2" onclick="updateChart('FFA')">FFA</button>
         <button class="btn btn-primary mx-2" onclick="updateChart('EBA')">EBA</button>
       </div> -->
+      <button onclick="window.location.href='scoreboard-page.html'">Back to Overview</button>
+      <button onclick="goToCrossRegion()">Performance Cross Regions</button>
+
       <div class="button-container">
         <div class="label-container"><b>Dataset:</b></div>
-        <button id="btn-NSD" onclick="updateDataset('NSD')">NSD</button>
-        <button id="btn-Dataset1"  onclick="updateDataset('Dataset1')">Dataset1</button>
-        <button id="btn-Dataset2"  onclick="updateDataset('Dataset2')">Dataset2</button>
-        <button id="btn-Dataset3"  onclick="updateDataset('Dataset3')">Dataset3</button>
-     </div>
-  
-      <!-- Chart container -->
-      <div class="chart-container">
-        <div id="overall" class="chart"></div>
+        <button id="btn-NSD"  onclick="updateDataset('NSD')">NSD</button>
+        <button id="btn-Dataset1" onclick="updateDataset('Dataset1')">Dataset1</button>
+        <button id="btn-Dataset2" onclick="updateDataset('Dataset2')">Dataset2</button>
+        <button id="btn-Dataset3" onclick="updateDataset('Dataset3')">Dataset3</button>
       </div>
+
+      <div class="button-container">
+        <div class="label-container"><b>ROI:</b></div>
+        <button id="btn-PPA"  onclick="updateROI('PPA')">PPA</button>
+        <button id="btn-FFA" onclick="updateROI('FFA')">FFA</button>
+        <button id="btn-EBA" onclick="updateROI('EBA')">EBA</button>
+      </div>
+  
+      
+        <!--left chart -->
+        <div class="chart-container">
+            <div id="roi"></div>
+        </div>
+    
+       
+        
+    
+    
 
       <div id="snapshot">
         <div class="thumbnail-container">
         
-            <div class="thumbnail" onclick="window.location.href='scoreboard-page.html'">
+            <div class="thumbnail" onclick="window.location.href='cross-region-performance-page.html'">
                 <div class="iframe-container">
-                    <iframe id="previewFrame" src="scoreboard-page.html"></iframe>
+                    <iframe id="previewFrame" src="cross-region-performance-page.html"></iframe>
                 </div>
-                <p>Scoreboard Overview</p>
+                <p>Model Performance Cross Regions</p>
             </div>
 
           
-            <div class="thumbnail" onclick="window.location.href='roi-performance-overview-page.html'">
+            <div class="thumbnail" onclick="window.location.href='roi-performance-page.html'">
                 <div class="iframe-container">
-                    <iframe id="previewFrame" src="roi-performance-overview-page"></iframe>
+                    <iframe id="previewFrame" src="roi-performance-page.html"></iframe>
                 </div>
                 <p>Model Performance on ROI</p>
             </div>
@@ -222,59 +232,72 @@
 
       <script>
 
-        const width = 750, height = 600;
-        const margin = { top: 50, right: 30, bottom: 50, left: 180 };
+        let width = window.innerWidth * 0.9;  
+        let height = window.innerHeight * 0.7; 
+        const margin = { top: 80 , right: 150, bottom: 50, left: 300 };
 
         let selectedDataset = "NSD";
-        
-        
+        let selectedROI;
 
         window.addEventListener("load", function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            selectedDataset = urlParams.get("dataset") || "NSD"; 
+          const urlParams = new URLSearchParams(window.location.search);
+          selectedDataset = urlParams.get("dataset") || "NSD"; 
+          selectedROI = urlParams.get("roi") || ""; 
 
           
+          loadData((overallData, ppaData, ffaData, ebaData, allData) => { 
+              console.log("✅ Data Loaded inside onload:", overallData, ppaData, ffaData, ebaData, allData);
+              console.log(allData)
+              
 
-          
+              window.overallData = overallData;
+              window.ppaData = ppaData;
+              window.ffaData = ffaData;
+              window.ebaData = ebaData;
+              window.allData = allData;
 
-          loadData((overallData) => {  
-                // drawChart("#overall", overallData, 'Cross-Regions Performances on Dataset: ' + selectedDataset);
-                window.overallData = overallData;
-
-                d3.selectAll(".button-container button").classed("selected-button", false);
-                d3.select(`#btn-${selectedDataset}`).classed("selected-button", true);
-
-                updateChart();
-            });
+              d3.selectAll(".button-container button").classed("selected-button", false);
+              d3.select(`#btn-${selectedDataset}`).classed("selected-button", true);
+              updateDataset(selectedDataset);
+              
+          });
       });
 
-        function updateDataset(dataset) {
-            selectedDataset = dataset;
+      function updateDataset(dataset) {
+        selectedDataset = dataset;
+       
 
-            d3.selectAll(".button-container button").classed("selected-button", false);
-            d3.select(`#btn-${dataset}`).classed("selected-button", true);
-            
+        d3.selectAll(".button-container button").classed("selected-button", false);
+        d3.select(`#btn-${dataset}`).classed("selected-button", true);
 
-            updateChart();
+        updateChart();
+      
+      }
+
+      
+
+      function updateChart() {
+        d3.select("#roi").select("svg").remove();
+        let data;
+       
+
+        let filteredData = window.allData.filter(d => d.dataset == selectedDataset);
+        
+        console.log(filteredData)
+        drawChartRoi("#roi", filteredData, `Roi performance on dataset: ${selectedDataset}`); 
+        
+      }
+
+      function goToCrossRegion() {
+            window.location.href = `cross-region-performance-page.html?dataset=${selectedDataset}`;
         }
 
-        function updateChart() {
-            d3.select("#overall").select("svg").remove();  // ✅ 清空旧图表
 
-            let filteredData = window.overallData.filter(d => d.dataset === selectedDataset);
 
-            if (!filteredData.length) {
-                console.log(`❌ No data available for ${selectedDataset}`);
-                return;
-            }
+    
 
-            console.log(`✅ Drawing chart for ${selectedDataset}`);
-            drawChart("#overall", filteredData, `Cross-Regions Performances on ${selectedDataset}`);
-        }
 
-        function goToROIPerformance() {
-            window.location.href = `roi-performance-overview-page.html?dataset=${selectedDataset}`;
-        }
+
     </script>
       
 
