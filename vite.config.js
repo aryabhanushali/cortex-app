@@ -6,10 +6,10 @@ import { ngrok } from 'vite-plugin-ngrok'
 export default defineConfig({
   root: '.', // Set the project root as the current folder
   plugins: [react(),
-    ngrok({
-      authtoken: '2nIjs8LjcTSjRMWmQr8vFcrhxkP_6evRhqLBj5HgRjdSfNoyV',
-      domain: 'sunny-weasel-grossly.ngrok-free.app',
-    }),
+    // ngrok({
+    //   authtoken: '2nIjs8LjcTSjRMWmQr8vFcrhxkP_6evRhqLBj5HgRjdSfNoyV',
+    //   domain: 'sunny-weasel-grossly.ngrok-free.app',
+    // }),
   ],
   build: {
     outDir: 'dist', // Output directory for the production build
