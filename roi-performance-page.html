@@ -190,41 +190,12 @@
         <button id="btn-EBA" onclick="updateROI('EBA')">EBA</button>
       </div>
   
-      <div class="roi-container">
-        <!--left chart -->
-        <div class="chart-container">
+        <div 
+        class="chart-container">
             <div id="roi"></div>
         </div>
     
-        <!-- right：fMRI 和 rollable Model Performance -->
-        <div class="fmri-model-container">
-            <!-- fixed fMRI -->
-            <div class="fmri-section">
-                <h3>Real fMRI data from subjects</h3>
-                <div class="fmri-content">
-                    <div class="subject"><div class="heatmap" id="fmri-s1"></div><p>S1</p></div>
-                    <div class="subject"><div class="heatmap" id="fmri-s2"></div><p>S2</p></div>
-                    <div class="subject"><div class="heatmap" id="fmri-s3"></div><p>S3</p></div>
-                    <div class="subject"><div class="heatmap" id="fmri-s4"></div><p>S4</p></div>
-                </div>
-            </div>
-    
-            <!-- rolling Model Performance -->
-            <div class="model-section">
-                <h3>Model Performance</h3>
-                <p><b>Subject: 
-                    
-                    <button onclick="updateSubject('S1')">S1</button>
-                    <button onclick="updateSubject('S2')">S2</button>
-                    <button onclick="updateSubject('S3')">S3</button>
-                    <button onclick="updateSubject('S4')">S4</button>
-                </b></p>
-                <div class="model-content">
-                    <div class="model-heatmaps" id="model-heatmaps">
-                    </div>
-                </div>
-            </div>
-        </div>
+       
     </div>
     
 

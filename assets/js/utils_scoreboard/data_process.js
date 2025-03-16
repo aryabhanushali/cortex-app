@@ -68,10 +68,10 @@ function loadData(callback) {
         const ffaData = averageByModelROI(data.filter(d => d.roi === "FFA"));
         const ebaData = averageByModelROI(data.filter(d => d.roi === "EBA"));
         const allData = averageByModelROI(data.filter(d => d.roi !== "Overall"));
-        
+        const unfilter = averageByModelROI(data);
 
        
-        callback(overallData, ppaData, ffaData, ebaData, allData);
+        callback(overallData, ppaData, ffaData, ebaData, allData, unfilter);
 
     }).catch(error => console.error("❌ Data loading failed:", error));
 }
