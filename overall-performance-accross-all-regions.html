@@ -92,12 +92,9 @@
 
       <div class="button-container">
         <div class="label-container"><b>ROI:</b></div>
-        <button onclick="updateChart('overall')">Cross-Regions</button>
+        <button id="btn-Overall" onclick="updateChart('Overall')">Cross-Regions</button>
       </div>
-      <div class="text-center mb-3">
-       
-      </div>
-  
+     
       <!-- Chart container -->
       <div class="overallchart">
         <div id="loading-overlay">
@@ -140,11 +137,10 @@
         let width = window.innerWidth * 0.9;  
         let height = window.innerHeight * 0.7; 
         const margin = { top: 30 , right: 150, bottom: 100, left: 300 };
-        let training = "Murty185"
+        let selectedTraining = "Murty185";
+        let selectedDataset = "";
+        let selectedROI = "Overall"
        
-        
-        
-
         window.addEventListener("load", function() {
           console.log("✅ window.onload triggered!");
 
@@ -173,34 +169,37 @@
               window.ebaData = ebaData;
 
               drawChartOverall("#overall", overallData, "Cross-Regions");
-              d3.select(`button[onclick="updateChart('overall')"]`).classed("selected-button", true);
-              d3.select(`#btn-training-murty185`).classed("selected-button", true);
+              d3.select(`#btn-training-${selectedTraining}`).classed("selected-button", true);
+              d3.select(`#btn-${selectedROI}`).classed("selected-button", true);
               document.getElementById("loading-overlay").style.display = "none";
-              updateTraining(training)
+              updateTraining(selectedTraining);
               
           });
           
       });
 
-        
-        
-
-        function updateTraining(selectedTraining) {
-            training = selectedTraining
+        function updateTraining(training) {
+            seletedTraining = training;
             const evalNSD = document.getElementById("btn-NSD");
             const evalMurty = document.getElementById("btn-Murty185");
             d3.selectAll("button").classed("selected-button", false);
             d3.select(`#btn-training-${training}`).classed("selected-button", true);
-            d3.select(`button[onclick="updateChart('overall')"]`).classed("selected-button", true);
+            d3.select(`#btn-${selectedROI}`).classed("selected-button", true);
 
             
-            if (selectedTraining === "Murty185") {
+            if (training === "Murty185") {
                 evalMurty.style.display = "none"; 
                 evalNSD.style.display = "inline-block"; 
-            } else if (selectedTraining === "NSD") {
+            } else if (training === "NSD") {
                 evalNSD.style.display = "none"; 
                 evalMurty.style.display = "inline-block"; 
             }
+        }
+
+        function updateDataset(dataset) {
+          selectedDataset = dataset;
+          window.location.href = `cross-region-performance-page.html?training=${seletedTraining}&dataset=${selectedDataset}&roi=${selectedROI}}`;
+
         }
     </script>
       

@@ -148,7 +148,7 @@
     
           <div class="button-container">
             <div class="label-container"><b>ROI:</b></div>
-            <button onclick="updateChart('overall')">Cross-Regions</button>
+            <button id ="btn-Overall" onclick="updateChart('overall')">Cross-Regions</button>
           </div>
      </div>
   
@@ -191,13 +191,26 @@
         const width = 750, height = 600;
         const margin = { top: 50, right: 30, bottom: 50, left: 180 };
 
-        let selectedDataset = "NSD";
         
         
+        
+      
 
+        let selectedDataset = "NSD";
+        let selectedROI = "Overall"
+        let seletedTraining = "Murty185"
+
+        // 在 DOM 加载之前，确保按钮高亮，防止闪烁
+        document.addEventListener("DOMContentLoaded", function() {
+            d3.select(`#btn-training-${storedTraining}`).classed("selected-button", true);
+            d3.select(`#btn-${storedDataset}`).classed("selected-button", true);
+            d3.select(`#btn-${storedROI}`).classed("selected-button", true);
+});
         window.addEventListener("load", function() {
             const urlParams = new URLSearchParams(window.location.search);
             selectedDataset = urlParams.get("dataset") || "NSD"; 
+            selectedRoi = urlParams.get("roi") || "Overall"; 
+            selectedTraining = urlParams.get("training") || "Murty185";
 
           
 
@@ -207,10 +220,14 @@
                 // drawChart("#overall", overallData, 'Cross-Regions Performances on Dataset: ' + selectedDataset);
                 window.overallData = overallData;
 
-                d3.selectAll(".button-container button").classed("selected-button", false);
+                
                 d3.select(`#btn-${selectedDataset}`).classed("selected-button", true);
+                d3.select(`#btn-training-${selectedTraining}`).classed("selected-button", true);
+                d3.select(`#btn-${selectedROI}`).classed("selected-button", true);
 
                 updateChart();
+                updateDataset(selectedDataset);
+                updateTraining(selectedTraining);
             });
       });
 
@@ -219,9 +236,29 @@
 
             d3.selectAll(".button-container button").classed("selected-button", false);
             d3.select(`#btn-${dataset}`).classed("selected-button", true);
+            d3.select(`#btn-training-${selectedTraining}`).classed("selected-button", true);
+            d3.select(`#btn-${selectedROI}`).classed("selected-button", true);
             
 
             updateChart();
+        }
+        function updateTraining(training) {
+            selectedTraining = training;
+            const evalNSD = document.getElementById("btn-NSD");
+            const evalMurty = document.getElementById("btn-Murty185");
+            d3.selectAll("button").classed("selected-button", false);
+            d3.select(`#btn-training-${training}`).classed("selected-button", true);
+            d3.select(`#btn-${selectedDataset}`).classed("selected-button", true);
+            d3.select(`#btn-${selectedROI}`).classed("selected-button", true);
+
+            
+            if (training === "Murty185") {
+                evalMurty.style.display = "none"; 
+                evalNSD.style.display = "inline-block"; 
+            } else if (training === "NSD") {
+                evalNSD.style.display = "none"; 
+                evalMurty.style.display = "inline-block"; 
+            }
         }
 
         function updateChart() {

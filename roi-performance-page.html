@@ -235,11 +235,14 @@
 
         let selectedDataset = "NSD";
         let selectedROI = "PPA";
+        let selectedTraining = "Murty185"
 
         window.addEventListener("load", function() {
           const urlParams = new URLSearchParams(window.location.search);
+
           selectedDataset = urlParams.get("dataset") || "NSD"; 
           selectedROI = urlParams.get("roi") || "PPA"; 
+          selectedDataset = urlParams.get("training") || "Murty185";
 
           
           loadData((overallData, ppaData, ffaData, ebaData) => { 
