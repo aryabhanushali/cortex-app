@@ -55,58 +55,8 @@
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="index.html">Home<br></a></li>
-          <li><a href="lab-page.html">The Lab</a></li>
-          <!-- <li><a href="#services">Services</a></li> -->
-          <!-- <li><a href="#portfolio">Portfolio</a></li> -->
+          <li><a href="lab-page.html">The Lab</a></li>xs
           <li><a href="scoreboard-page.html" class="active">The Scoreboard</a></li>
-          <!-- <li><a href="blog.html">Blog</a></li> -->
-          <!-- <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="#">Dropdown 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <li><a href="#">Deep Dropdown 1</a></li>
-                  <li><a href="#">Deep Dropdown 2</a></li>
-                  <li><a href="#">Deep Dropdown 3</a></li>
-                  <li><a href="#">Deep Dropdown 4</a></li>
-                  <li><a href="#">Deep Dropdown 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Dropdown 2</a></li>
-              <li><a href="#">Dropdown 3</a></li>
-              <li><a href="#">Dropdown 4</a></li>
-            </ul>
-          </li> -->
-          <!-- <li class="listing-dropdown"><a href="#"><span>Listing Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li>
-                <a href="#">Column 1 link 1</a>
-                <a href="#">Column 1 link 2</a>
-                <a href="#">Column 1 link 3</a>
-              </li>
-              <li>
-                <a href="#">Column 2 link 1</a>
-                <a href="#">Column 2 link 2</a>
-                <a href="#">Column 3 link 3</a>
-              </li>
-              <li>
-                <a href="#">Column 3 link 1</a>
-                <a href="#">Column 3 link 2</a>
-                <a href="#">Column 3 link 3</a>
-              </li>
-              <li>
-                <a href="#">Column 4 link 1</a>
-                <a href="#">Column 4 link 2</a>
-                <a href="#">Column 4 link 3</a>
-              </li>
-              <li>
-                <a href="#">Column 5 link 1</a>
-                <a href="#">Column 5 link 2</a>
-                <a href="#">Column 5 link 3</a>
-              </li>
-            </ul>
-          </li> -->
-          <!-- <li><a href="#contact">Contact</a></li> -->
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -121,15 +71,8 @@
 
       <!-- Buttons for region selection -->
 
-      <button onclick="window.location.href='scoreboard-page.html'">Back to Overview</button>
+      <button onclick="window.location.href='scoreboard-page.html'">Back to Start</button>
       <button onclick="goToROIPerformance()">Performance on Roi</button>
-
-      <!-- <div class="text-center mb-3">
-        <button class="btn btn-primary mx-2" onclick="updateChart('overall')">Cross-Regions</button>
-        <button class="btn btn-primary mx-2" onclick="updateChart('PPA')">PPA</button>
-        <button class="btn btn-primary mx-2" onclick="updateChart('FFA')">FFA</button>
-        <button class="btn btn-primary mx-2" onclick="updateChart('EBA')">EBA</button>
-      </div> -->
 
         <div class="button-container">
             <div class="label-container"><b>Training Dataset:</b></div>
@@ -196,20 +139,15 @@
         
       
 
-        let selectedDataset = "NSD";
-        let selectedROI = "Overall"
-        let seletedTraining = "Murty185"
+        let selectedDataset;
+        let selectedROI;
+        let seletedTraining;
 
-        // 在 DOM 加载之前，确保按钮高亮，防止闪烁
-        document.addEventListener("DOMContentLoaded", function() {
-            d3.select(`#btn-training-${storedTraining}`).classed("selected-button", true);
-            d3.select(`#btn-${storedDataset}`).classed("selected-button", true);
-            d3.select(`#btn-${storedROI}`).classed("selected-button", true);
-});
+
         window.addEventListener("load", function() {
             const urlParams = new URLSearchParams(window.location.search);
             selectedDataset = urlParams.get("dataset") || "NSD"; 
-            selectedRoi = urlParams.get("roi") || "Overall"; 
+            selectedROI = urlParams.get("roi") || "Overall"; 
             selectedTraining = urlParams.get("training") || "Murty185";
 
           
@@ -233,8 +171,12 @@
 
         function updateDataset(dataset) {
             selectedDataset = dataset;
+            
 
             d3.selectAll(".button-container button").classed("selected-button", false);
+
+
+
             d3.select(`#btn-${dataset}`).classed("selected-button", true);
             d3.select(`#btn-training-${selectedTraining}`).classed("selected-button", true);
             d3.select(`#btn-${selectedROI}`).classed("selected-button", true);
