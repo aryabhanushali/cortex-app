@@ -49,7 +49,7 @@
       </a>
 
       <div class="header-title mx-auto">
-        <h1>Roi Performance on All Datasets</h1>
+        <h1>Performance on Specific Datasets</h1>
       </div>
 
       <nav id="navmenu" class="navmenu">
@@ -74,13 +74,14 @@
 
       <div class="button-container">
         <div class="label-container"><b>Training Dataset:</b></div>
-        <button id="btn-traning-murty"  onclick="updateDataset('NSD')">Murty185</button>
-        <button id="btn-traning-nsd" onclick="updateDataset('Dataset1')">NSD</button>
+        <button id="btn-training-Murty185" onclick = "updateTraining('Murty185')">Murty185</button>
+        <button id="btn-training-NSD" onclick = "updateTraining('NSD')">NSD</button>
       </div>
 
       <div class="button-container">
         <div class="label-container"><b>Evaluation Dataset:</b></div>
         <button id="btn-NSD"  onclick="updateDataset('NSD')">NSD</button>
+        <button id="btn-Murty185"  onclick="updateDataset('Murty185')">Murty185</button>
         <button id="btn-Dataset1" onclick="updateDataset('Dataset1')">Dataset1</button>
         <button id="btn-Dataset2" onclick="updateDataset('Dataset2')">Dataset2</button>
         <button id="btn-Dataset3" onclick="updateDataset('Dataset3')">Dataset3</button>
@@ -88,9 +89,11 @@
 
       <div class="button-container">
         <div class="label-container"><b>ROI:</b></div>
+        <button id="btn-Overall" onclick="updateChart('Overall')">Cross-Regions</button>
         <button id="btn-PPA"  onclick="updateROI('PPA')">PPA</button>
         <button id="btn-FFA" onclick="updateROI('FFA')">FFA</button>
         <button id="btn-EBA" onclick="updateROI('EBA')">EBA</button>
+        
       </div>
   
       
@@ -136,14 +139,16 @@
 
         let selectedDataset = "NSD";
         let selectedROI;
+        let selectedTraining = "Murty185";
 
         window.addEventListener("load", function() {
           const urlParams = new URLSearchParams(window.location.search);
           selectedDataset = urlParams.get("dataset") || "NSD"; 
           selectedROI = urlParams.get("roi") || ""; 
+          selectedTraining = urlParams.get("training") || "Murty185"
 
           
-          loadData((overallData, ppaData, ffaData, ebaData, allData) => { 
+          loadData((overallData, ppaData, ffaData, ebaData, allData, unfilter) => { 
               console.log("✅ Data Loaded inside onload:", overallData, ppaData, ffaData, ebaData, allData);
               console.log(allData)
               
@@ -153,10 +158,14 @@
               window.ffaData = ffaData;
               window.ebaData = ebaData;
               window.allData = allData;
+              window.unfilter = unfilter;
 
               d3.selectAll(".button-container button").classed("selected-button", false);
               d3.select(`#btn-${selectedDataset}`).classed("selected-button", true);
+              d3.select(`#btn-training-${selectedTraining}`).classed("selected-button", true);
+              
               updateDataset(selectedDataset);
+              updateTraining(selectedTraining);
               
           });
       });
@@ -167,19 +176,37 @@
 
         d3.selectAll(".button-container button").classed("selected-button", false);
         d3.select(`#btn-${dataset}`).classed("selected-button", true);
+        d3.select(`#btn-training-${selectedTraining}`).classed("selected-button", true);
 
         updateChart();
       
       }
 
-      
+      function updateTraining(training) {
+            selectedTraining = training;
+            const evalNSD = document.getElementById("btn-NSD");
+            const evalMurty = document.getElementById("btn-Murty185");
+            d3.selectAll("button").classed("selected-button", false);
+            d3.select(`#btn-training-${training}`).classed("selected-button", true);
+            d3.select(`#btn-${selectedDataset}`).classed("selected-button", true);
+            d3.select(`#btn-${selectedROI}`).classed("selected-button", true);
+
+            
+            if (training === "Murty185") {
+                evalMurty.style.display = "none"; 
+                evalNSD.style.display = "inline-block"; 
+            } else if (training === "NSD") {
+                evalNSD.style.display = "none"; 
+                evalMurty.style.display = "inline-block"; 
+            }
+      }
 
       function updateChart() {
         d3.select("#roi").select("svg").remove();
         let data;
        
 
-        let filteredData = window.allData.filter(d => d.dataset == selectedDataset);
+        let filteredData = window.unfilter.filter(d => d.dataset == selectedDataset);
         
         console.log(filteredData)
         drawChartRoi("#roi", filteredData, `Roi performance on dataset: ${selectedDataset}`); 
