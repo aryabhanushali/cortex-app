@@ -1,5 +1,5 @@
 function loadData(callback) {
-    d3.json("assets/data/data_scoreboard_test/plot_frame.json").then(data => {
+    d3.json("assets/data/data_scoreboard_test/trained_on_Murty185.json").then(data => {
         console.log("Data Loaded:", data);
         if (!data || data.length === 0) {
             console.error("❌ JSON data is empty");
