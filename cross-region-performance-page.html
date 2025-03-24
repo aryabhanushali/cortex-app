@@ -82,12 +82,12 @@
     
           <div class="button-container">
             <div class="label-container"><b>Evaluation Dataset:</b></div>
-            <button id="btn-NSD"  onclick="updateDataset('NSD')">NSD</button>
-            <button id="btn-Murty185"  onclick="updateDataset('Murty185')">Murty185</button>
-            <button id="btn-BOLD5000" onclick="updateDataset('BOLD5000')">BOLD5000</button>
-            <button id="btn-BonnerEpstein" onclick="updateDataset('BonnerEpstein')">BonnerEpstein</button>
-            <button id="btn-KingBaker" onclick="updateDataset('KingBaker')">KingBaker</button>
-            <button id="btn-algonauts" onclick="updateDataset('algonauts')">algonauts</button>
+            <button id="btn-NSD"  onclick="updateDataset('NSD', true)">NSD</button>
+            <button id="btn-Murty185"  onclick="updateDataset('Murty185', true)">Murty185</button>
+            <button id="btn-BOLD5000" onclick="updateDataset('BOLD5000', true)">BOLD5000</button>
+            <button id="btn-BonnerEpstein" onclick="updateDataset('BonnerEpstein', true)">BonnerEpstein</button>
+            <button id="btn-KingBaker" onclick="updateDataset('KingBaker', true)">KingBaker</button>
+            <button id="btn-algonauts" onclick="updateDataset('algonauts', true)">algonauts</button>
           </div>
     
           <div class="button-container">
@@ -131,6 +131,34 @@
 
 
       <script>
+        // before loading from last page
+      (function preselectButtons() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedTraining = urlParams.get("training") || "Murty185";
+        const selectedDataset = urlParams.get("dataset") || localStorage.getItem("selectedDataset") || "NSD";
+        const selectedROI = urlParams.get("roi") || localStorage.getItem("selectedROI") || "Overall";
+
+
+       
+          document.addEventListener("DOMContentLoaded", () => {
+            const trainBtn = document.getElementById(`btn-training-${selectedTraining}`);
+            const datasetBtn = document.getElementById(`btn-${selectedDataset}`);
+            const roiBtn = document.getElementById(`btn-${selectedROI}`);
+            if (trainBtn) trainBtn.classList.add("selected-button");
+            if (datasetBtn) datasetBtn.classList.add("selected-button");
+            if (roiBtn) roiBtn.classList.add("selected-button");
+          });
+        })();
+
+        (function () {
+          const training = localStorage.getItem('selectedTraining') || 'Murty185';
+
+          const style = document.createElement('style');
+          style.innerHTML = `
+            ${training === 'Murty185' ? '#btn-Murty185' : '#btn-NSD'} { display: none !important; }
+          `;
+          document.head.appendChild(style);
+        })();
 
         const width = 750, height = 600;
         const margin = { top: 50, right: 30, bottom: 50, left: 180 };
@@ -142,15 +170,16 @@
 
         let selectedDataset;
         let selectedROI;
-        let seletedTraining;
+        let selectedTraining;
 
 
         window.addEventListener("load", function() {
             const urlParams = new URLSearchParams(window.location.search);
-            selectedDataset = urlParams.get("dataset") || "NSD"; 
-            selectedROI = urlParams.get("roi") || "Overall"; 
-            selectedTraining = urlParams.get("training") || "Murty185";
+            selectedTraining = localStorage.getItem("selectedTraining") || urlParams.get("training") || "Murty185";
+            selectedDataset = localStorage.getItem("selectedDataset") || urlParams.get("dataset") || "NSD";
+            selectedROI = localStorage.getItem("selectedROI") || urlParams.get("roi") || "Overall";
 
+            
           
 
           
@@ -167,10 +196,23 @@
                 updateChart();
                 updateDataset(selectedDataset);
                 updateTraining(selectedTraining);
+
             });
       });
 
-        function updateDataset(dataset) {
+        function updateDataset(dataset, isUserClick = false) {
+          
+            console.log(dataset);
+            console.log(selectedDataset);
+            console.log(isUserClick);
+            console.log(isUserClick && selectedDataset === dataset);
+            if (isUserClick && selectedDataset === dataset) {
+              window.location.href = 'overall-performance-accross-all-regions.html';
+              return;
+          }
+         
+
+
             selectedDataset = dataset;
             
 

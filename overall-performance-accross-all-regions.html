@@ -180,7 +180,10 @@
       });
 
         function updateTraining(training) {
-            seletedTraining = training;
+            selectedTraining = training;
+            localStorage.setItem("selectedTraining", selectedTraining);
+            localStorage.setItem("selectedDataset", selectedDataset);
+            localStorage.setItem("selectedROI", selectedROI);
             const evalNSD = document.getElementById("btn-NSD");
             const evalMurty = document.getElementById("btn-Murty185");
             d3.selectAll("button").classed("selected-button", false);
@@ -199,7 +202,10 @@
 
         function updateDataset(dataset) {
           selectedDataset = dataset;
-          window.location.href = `cross-region-performance-page.html?training=${seletedTraining}&dataset=${selectedDataset}&roi=${selectedROI}`;
+          localStorage.setItem("selectedTraining", selectedTraining);
+          localStorage.setItem("selectedDataset", selectedDataset);
+          localStorage.setItem("selectedROI", selectedROI);
+          window.location.href = `cross-region-performance-page.html?training=${selectedTraining}&dataset=${selectedDataset}&roi=${selectedROI}`;
 
         }
     </script>
