@@ -1,79 +1,73 @@
 function loadData(callback) {
+    let murtyLoaded = false;
+    let nsdLoaded = false;
+
+    let murty = {};
+    let nsd = {};
+
+    function averageByModelROI(data) {
+        let grouped = d3.rollup(
+            data,
+            v => d3.mean(v, d => d.pearsonr),
+            d => d.model,
+            d => d.dataset,
+            d => d.roi
+        );
+
+        let flattened = Array.from(grouped, ([model, datasetMap]) =>
+            Array.from(datasetMap, ([dataset, roiMap]) =>
+                Array.from(roiMap, ([roi, pearsonr]) => ({
+                    model,
+                    dataset,
+                    roi,
+                    pearsonr
+                }))
+            )
+        ).flat(2);
+
+        return flattened;
+    }
+
+    // 加载 Murty185
     d3.json("assets/data/data_scoreboard_test/trained_on_Murty185.json").then(data => {
-        console.log("Data Loaded:", data);
         if (!data || data.length === 0) {
-            console.error("❌ JSON data is empty");
+            console.error("❌ Murty185 data is empty");
             return;
         }
+        murty.overallData = data.filter(d => d.roi === "Overall");
+        murty.ppaData = averageByModelROI(data.filter(d => d.roi === "PPA"));
+        murty.ffaData = averageByModelROI(data.filter(d => d.roi === "FFA"));
+        murty.ebaData = averageByModelROI(data.filter(d => d.roi === "EBA"));
+        murty.allData = averageByModelROI(data.filter(d => d.roi !== "Overall"));
+        murty.unfilter = averageByModelROI(data);
+        murtyLoaded = true;
+        maybeCallback();
+    });
 
-        
-        function averageByModelROI(data) {
-            let grouped = d3.rollup(
-                data, 
-                v => d3.mean(v, d => d.pearsonr),  // 计算 pearsonr 均值
-                d => d.model,  
-                d => d.dataset, 
-                d => d.roi
-            );
-        
-            console.log("Grouped Data:", grouped); // 调试分组后的数据
-        
-            let flattened = Array.from(grouped, ([model, datasetMap]) => 
-                Array.from(datasetMap, ([dataset, roiMap]) => 
-                    Array.from(roiMap, ([roi, pearsonr]) => ({
-                        model,
-                        dataset,
-                        roi,  // 确保 roi 信息被保留
-                        pearsonr
-                    }))
-                )
-            ).flat(2);
-        
-            console.log("Flattened Data:", flattened); // 调试最终展开的数据
-        
-            return flattened;
+    // 加载 NSD
+    d3.json("assets/data/data_scoreboard_test/trained_on_NSD.json").then(data => {
+        if (!data || data.length === 0) {
+            console.error("❌ NSD data is empty");
+            return;
         }
+        nsd.overallData = data.filter(d => d.roi === "Overall");
+        nsd.ppaData = averageByModelROI(data.filter(d => d.roi === "PPA"));
+        nsd.ffaData = averageByModelROI(data.filter(d => d.roi === "FFA"));
+        nsd.ebaData = averageByModelROI(data.filter(d => d.roi === "EBA"));
+        nsd.allData = averageByModelROI(data.filter(d => d.roi !== "Overall"));
+        nsd.unfilter = averageByModelROI(data);
+        nsdLoaded = true;
+        maybeCallback();
+    });
 
-        function averageByDataset(data) {
-            let grouped = d3.rollup(
-                data, 
-                v => d3.mean(v, d => d.pearsonr),  // 计算 pearsonr 均值
-                d => d.model,  
-                d => d.dataset, 
-                d => d.roi
-            );
-        
-            console.log("Grouped Data:", grouped); // 调试分组后的数据
-        
-            let flattened = Array.from(grouped, ([model, datasetMap]) => 
-                Array.from(datasetMap, ([dataset, roiMap]) => 
-                    Array.from(roiMap, ([roi, pearsonr]) => ({
-                        model,
-                        dataset,
-                        roi,  // 确保 roi 信息被保留
-                        pearsonr
-                    }))
-                )
-            ).flat(2);
-        
-            console.log("Flattened Data:", flattened); // 调试最终展开的数据
-        
-            return flattened;
+    function maybeCallback() {
+        if (murtyLoaded && nsdLoaded) {
+            callback({
+                Murty185: murty,
+                NSD: nsd
+            });
         }
-        
-
-        const overallData = data.filter(d => d.roi === "Overall");
-        // const filteredData = data.filter(d => d.roi !== "Overall");
-        const ppaData = averageByModelROI(data.filter(d => d.roi === "PPA"));
-        const ffaData = averageByModelROI(data.filter(d => d.roi === "FFA"));
-        const ebaData = averageByModelROI(data.filter(d => d.roi === "EBA"));
-        const allData = averageByModelROI(data.filter(d => d.roi !== "Overall"));
-        const unfilter = averageByModelROI(data);
-
-       
-        callback(overallData, ppaData, ffaData, ebaData, allData, unfilter);
-
-    }).catch(error => console.error("❌ Data loading failed:", error));
+    }
 }
 
 window.loadData = loadData;

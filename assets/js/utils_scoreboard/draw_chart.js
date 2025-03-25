@@ -95,10 +95,12 @@ function drawChartOverall(selector, dataset, title) {
                     .padding(0.05);
 
   
-   const colorScale = d3.scaleLinear()
-                        .domain([-0.3, 1.0])
-                        .range(["#deebf1", "#3182bd"]);  // 浅蓝到深蓝
-
+   // const colorScale = d3.scaleLinear()
+   //                      .domain([-0.3, 1.0])
+   //                      .range(["#deebf1", "#3182bd"]);  // 浅蓝到深蓝
+   const colorScale = d3.scaleSequential()
+                        .domain([-0.3, 0.8])
+                        .interpolator(d3.interpolateBlues);
 
    const xAxis = svg.append("g")
       .attr("transform", `translate(0, ${height - margin.bottom})`)
@@ -174,7 +176,8 @@ function drawChartRoi(selector, dataset, title) {
 
    const models = Array.from(new Set(dataset.map(d => d.model)));
    //const datasets = ["NSD", "dataset1", "dataset2", "dataset3"];
-   const rois = Array.from(new Set(dataset.map(d => d.roi)));
+    const rois = ["Overall", "PPA", "FFA", "EBA"];
+   // const rois = Array.from(new Set(dataset.map(d => d.roi)));
 
 
 
@@ -190,10 +193,14 @@ function drawChartRoi(selector, dataset, title) {
                     .padding(0.05);
 
   
-   const colorScale = d3.scaleLinear()
-                        .domain([-0.3, 1.0])
-                        .range(["#deebf1", "#3182bd"]);  // 浅蓝到深蓝
+   // const colorScale = d3.scaleLinear()
+   //                      .domain([-0.1, 0.8])
+   //                      // .range(["#ffffff", "#3182bd"]);  // 浅蓝到深蓝
+                        //.interpolate(d3.interpolateBlues);
 
+   const colorScale = d3.scaleSequential()
+                        .domain([-0.3, 0.8])
+                        .interpolator(d3.interpolateBlues);
 
    const xAxis = svg.append("g")
       .attr("transform", `translate(0, ${height - margin.bottom})`)

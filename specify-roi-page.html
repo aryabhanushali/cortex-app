@@ -85,13 +85,15 @@
         <div class="label-container"><b>Evaluation Dataset:</b></div>
         <button id="btn-NSD"  onclick="updateDataset('NSD')">NSD</button>
         <button id="btn-Murty185"  onclick="updateDataset('Murty185')">Murty185</button>
-        <button id="btn-Dataset1" onclick="updateDataset('Dataset1')">Dataset1</button>
-        <button id="btn-Dataset2" onclick="updateDataset('Dataset2')">Dataset2</button>
-        <button id="btn-Dataset3" onclick="updateDataset('Dataset3')">Dataset3</button>
+        <button id="btn-BOLD5000" onclick="updateDataset('BOLD5000')">BOLD5000</button>
+        <button id="btn-BonnerEpstein" onclick="updateDataset('BonnerEpstein')">BonnerEpstein</button>
+        <button id="btn-KingBaker" onclick="updateDataset('KingBaker')">KingBaker</button>
+        <button id="btn-algonauts" onclick="updateDataset('algonauts')">algonauts</button>
       </div>
 
       <div class="button-container">
         <div class="label-container"><b>ROI:</b></div>
+        <button id ="btn-Overall" onclick="updateOverall()">Cross-Regions</button>
         <button id="btn-PPA"  onclick="updateROI('PPA')">PPA</button>
         <button id="btn-FFA" onclick="updateROI('FFA')">FFA</button>
         <button id="btn-EBA" onclick="updateROI('EBA')">EBA</button>
@@ -141,7 +143,7 @@
         const margin = { top: 30 , right: 150, bottom: 100, left: 300 };
         let selectedTraining = "Murty185";
         let selectedDataset = "";
-        let selectedROI = "Overall"
+        let selectedROI = "PPA"
        
         window.addEventListener("load", function() {
           console.log("✅ window.onload triggered!");
@@ -151,29 +153,31 @@
                 height = window.innerHeight * 0.8;
                 
                 d3.select("#overall").select("svg").remove();  
-                drawChartOverall("#overall", window.overallData, "Cross-Regions"); 
+                drawChartOverall("#overall", window.overallData, selectedROI); 
                 
             }
 
           window.addEventListener("resize", resizeChart);
           document.getElementById("loading-overlay").style.display = "flex";
-          loadData((overallData, ppaData, ffaData, ebaData) => { 
-              console.log("✅ Data Loaded inside onload:", overallData, ppaData, ffaData, ebaData);
-              
-              if (!overallData || overallData.length === 0) {
-                  console.error("❌ overallData is empty!");
-                  return;
-              }
+          loadData((data) => { 
+              window.allTrainingData = data;
+              const trainingData = data[selectedTraining];
+              console.log("✅ Data Loaded inside onload:", trainingData.overallData, trainingData.ppaData, trainingData.ffaData, trainingData.ebaData);
+                
+            if (!trainingData.overallData || trainingData.overallData.length === 0) {
+                console.error("❌ overallData is empty!");
+                return;
+            }
+            window.overallData = trainingData.overallData;
+            window.dataPPA = trainingData.ppaData;
+            window.dataFFA = trainingData.ffaData;
+            window.dataEBA = trainingData.ebaData;
 
-              window.overallData = overallData;
-              window.ppaData = ppaData;
-              window.ffaData = ffaData;
-              window.ebaData = ebaData;
-
-              drawChartOverall("#overall", overallData, "Cross-Regions");
+              drawChartOverall("#overall", dataPPA, selectedROI);
               d3.select(`#btn-training-${selectedTraining}`).classed("selected-button", true);
               d3.select(`#btn-${selectedROI}`).classed("selected-button", true);
               document.getElementById("loading-overlay").style.display = "none";
+              updateROI(selectedROI);
               updateTraining(selectedTraining);
               
           });
@@ -181,7 +185,7 @@
       });
 
         function updateTraining(training) {
-            seletedTraining = training;
+            selectedTraining = training;
             const evalNSD = document.getElementById("btn-NSD");
             const evalMurty = document.getElementById("btn-Murty185");
             d3.selectAll("button").classed("selected-button", false);
@@ -196,13 +200,74 @@
                 evalNSD.style.display = "none"; 
                 evalMurty.style.display = "inline-block"; 
             }
+            const trainingData = window.allTrainingData[selectedTraining];
+            window.overallData = trainingData.overallData;
+            window.dataPPA = trainingData.ppaData;
+            window.dataFFA = trainingData.ffaData;
+            window.dataEBA = trainingData.ebaData;
+            updatechart();
         }
 
-        function updateDataset(dataset) {
-          selectedDataset = dataset;
-          window.location.href = `cross-region-performance-page.html?training=${seletedTraining}&dataset=${selectedDataset}&roi=${selectedROI}`;
+        function updateROI(roi) {
+            selectedROI = roi;
+            d3.selectAll("button").classed("selected-button", false);
+            d3.select(`#btn-training-${selectedTraining}`).classed("selected-button", true);
+            d3.select(`#btn-${selectedDataset}`).classed("selected-button", true);
+            d3.select(`#btn-${roi}`).classed("selected-button", true);
+            d3.select("#overall").select("svg").remove();  
+
+            const roiDataMap = {
+                PPA: window.dataPPA,
+                FFA: window.dataFFA,
+                EBA: window.dataEBA,
+            };
+
+            const data = roiDataMap[roi];
+            if (!data || data.length === 0) {
+                console.error(`❌ No data for ROI: ${roi}`);
+                return;
+            }
+            
+
+           updatechart()
 
         }
+        function updatechart() {
+            d3.select("#overall").select("svg").remove();  
+
+            const roiDataMap = {
+                PPA: window.dataPPA,
+                FFA: window.dataFFA,
+                EBA: window.dataEBA,
+            };
+
+            const data = roiDataMap[selectedROI];
+            if (!data || data.length === 0) {
+                console.error(`❌ No data for ROI: ${selectedROI}`);
+                return;
+            }
+            
+
+            drawChartOverall("#overall", data, `Model Performance on ${selectedROI}`);
+            
+        }
+
+        function updateDataset(dataset){
+            selectedDataset = dataset;
+            window.location.href = `roi-performance-page.html?training=${selectedTraining}&dataset=${selectedDataset}&roi=${selectedROI}`;
+
+
+        }
+        function updateOverall(){
+          window.location.href = `overall-performance-accross-all-regions.html?training=${selectedTraining}&dataset=""&roi=${selectedROI}`;
+
+        }
+
+        // function updateDataset(dataset) {
+        //   selectedDataset = dataset;
+        // //   window.location.href = `cross-region-performance-page.html?training=${seletedTraining}&dataset=${selectedDataset}&roi=${selectedROI}`;
+
+        // }
     </script>
       
 

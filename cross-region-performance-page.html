@@ -72,7 +72,7 @@
       <!-- Buttons for region selection -->
 
       <button onclick="window.location.href='scoreboard-page.html'">Back to Start</button>
-      <button onclick="goToROIPerformance()">Performance on Roi</button>
+
 
         <div class="button-container">
             <div class="label-container"><b>Training Dataset:</b></div>
@@ -93,6 +93,9 @@
           <div class="button-container">
             <div class="label-container"><b>ROI:</b></div>
             <button id ="btn-Overall" onclick="updateChart('overall')">Cross-Regions</button>
+            <button id="btn-PPA"  onclick="updateROI('PPA')">PPA</button>
+            <button id="btn-FFA" onclick="updateROI('FFA')">FFA</button>
+            <button id="btn-EBA" onclick="updateROI('EBA')">EBA</button>
           </div>
      </div>
   
@@ -137,8 +140,6 @@
         const selectedTraining = urlParams.get("training") || "Murty185";
         const selectedDataset = urlParams.get("dataset") || localStorage.getItem("selectedDataset") || "NSD";
         const selectedROI = urlParams.get("roi") || localStorage.getItem("selectedROI") || "Overall";
-
-
        
           document.addEventListener("DOMContentLoaded", () => {
             const trainBtn = document.getElementById(`btn-training-${selectedTraining}`);
@@ -147,26 +148,14 @@
             if (trainBtn) trainBtn.classList.add("selected-button");
             if (datasetBtn) datasetBtn.classList.add("selected-button");
             if (roiBtn) roiBtn.classList.add("selected-button");
+            updateTraining(selectedTraining);
           });
         })();
 
-        (function () {
-          const training = localStorage.getItem('selectedTraining') || 'Murty185';
-
-          const style = document.createElement('style');
-          style.innerHTML = `
-            ${training === 'Murty185' ? '#btn-Murty185' : '#btn-NSD'} { display: none !important; }
-          `;
-          document.head.appendChild(style);
-        })();
+        
 
         const width = 750, height = 600;
         const margin = { top: 50, right: 30, bottom: 50, left: 180 };
-
-        
-        
-        
-      
 
         let selectedDataset;
         let selectedROI;
@@ -178,15 +167,23 @@
             selectedTraining = localStorage.getItem("selectedTraining") || urlParams.get("training") || "Murty185";
             selectedDataset = localStorage.getItem("selectedDataset") || urlParams.get("dataset") || "NSD";
             selectedROI = localStorage.getItem("selectedROI") || urlParams.get("roi") || "Overall";
+            // updateTraining(selectedTraining);
 
-            
-          
-
-          
-
-          loadData((overallData) => {  
+          loadData((data) => {  
                 // drawChart("#overall", overallData, 'Cross-Regions Performances on Dataset: ' + selectedDataset);
-                window.overallData = overallData;
+                window.allTrainingData = data;
+                const trainingData = data[selectedTraining];
+                console.log("✅ Data Loaded inside onload:", trainingData.overallData, trainingData.ppaData, trainingData.ffaData, trainingData.ebaData);
+                
+                if (!trainingData.overallData || trainingData.overallData.length === 0) {
+                    console.error("❌ overallData is empty!");
+                    return;
+                }
+
+                window.overallData = trainingData.overallData;
+                window.ppaData = trainingData.ppaData;
+                window.ffaData = trainingData.ffaData;
+                window.ebaData = trainingData.ebaData;
 
                 
                 d3.select(`#btn-${selectedDataset}`).classed("selected-button", true);
@@ -207,19 +204,13 @@
             console.log(isUserClick);
             console.log(isUserClick && selectedDataset === dataset);
             if (isUserClick && selectedDataset === dataset) {
-              window.location.href = 'overall-performance-accross-all-regions.html';
+              window.location.href = `overall-performance-accross-all-regions.html?training=${selectedTraining}&dataset=${selectedDataset}&roi="`;
               return;
           }
-         
-
-
+        
             selectedDataset = dataset;
-            
-
+          
             d3.selectAll(".button-container button").classed("selected-button", false);
-
-
-
             d3.select(`#btn-${dataset}`).classed("selected-button", true);
             d3.select(`#btn-training-${selectedTraining}`).classed("selected-button", true);
             d3.select(`#btn-${selectedROI}`).classed("selected-button", true);
@@ -244,10 +235,14 @@
                 evalNSD.style.display = "none"; 
                 evalMurty.style.display = "inline-block"; 
             }
+
+            const trainingData = window.allTrainingData[selectedTraining];
+            window.overallData = trainingData.overallData;
+            updateChart();
         }
 
         function updateChart() {
-            d3.select("#overall").select("svg").remove();  // ✅ 清空旧图表
+            d3.select("#overall").select("svg").remove();  
 
             let filteredData = window.overallData.filter(d => d.dataset === selectedDataset);
 
@@ -260,9 +255,14 @@
             drawChart("#overall", filteredData, `Cross-Regions Performances on ${selectedDataset}`);
         }
 
-        function goToROIPerformance() {
-            window.location.href = `roi-performance-overview-page.html?dataset=${selectedDataset}`;
+        function updateROI(roi){
+            selectedROI = roi;
+            window.location.href = `roi-performance-page.html?training=${selectedTraining}&dataset=${selectedDataset}&roi=${selectedROI}`;
+
+
         }
+
+       
     </script>
       
 

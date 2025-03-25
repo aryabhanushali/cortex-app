@@ -94,6 +94,9 @@
       <div class="button-container">
         <div class="label-container"><b>ROI:</b></div>
         <button id="btn-Overall" onclick="updateChart('Overall')">Cross-Regions</button>
+        <button id="btn-PPA"  onclick="updateROI('PPA')">PPA</button>
+        <button id="btn-FFA" onclick="updateROI('FFA')">FFA</button>
+        <button id="btn-EBA" onclick="updateROI('EBA')">EBA</button>
       </div>
      
       <!-- Chart container -->
@@ -156,20 +159,22 @@
 
           window.addEventListener("resize", resizeChart);
           document.getElementById("loading-overlay").style.display = "flex";
-          loadData((overallData, ppaData, ffaData, ebaData) => { 
-              console.log("✅ Data Loaded inside onload:", overallData, ppaData, ffaData, ebaData);
+          loadData((data) => { 
+              window.allTrainingData = data;
+              const trainingData = data[selectedTraining];
+              console.log("✅ Data Loaded inside onload:", trainingData.overallData, trainingData.ppaData, trainingData.ffaData, trainingData.ebaData);
               
-              if (!overallData || overallData.length === 0) {
+              if (!trainingData.overallData || trainingData.overallData.length === 0) {
                   console.error("❌ overallData is empty!");
                   return;
               }
 
-              window.overallData = overallData;
-              window.ppaData = ppaData;
-              window.ffaData = ffaData;
-              window.ebaData = ebaData;
+              window.overallData = trainingData.overallData;
+              window.ppaData = trainingData.ppaData;
+              window.ffaData = trainingData.ffaData;
+              window.ebaData = trainingData.ebaData;
 
-              drawChartOverall("#overall", overallData, "Cross-Regions");
+              drawChartOverall("#overall", trainingData.overallData, "Cross-Regions");
               d3.select(`#btn-training-${selectedTraining}`).classed("selected-button", true);
               d3.select(`#btn-${selectedROI}`).classed("selected-button", true);
               document.getElementById("loading-overlay").style.display = "none";
@@ -198,6 +203,12 @@
                 evalNSD.style.display = "none"; 
                 evalMurty.style.display = "inline-block"; 
             }
+
+            const trainingData = window.allTrainingData[selectedTraining];
+            window.overallData = trainingData.overallData;
+            d3.select("#overall").select("svg").remove(); // ✅ 清除旧图
+            drawChartOverall("#overall", trainingData.overallData, "Cross-Regions");
+           
         }
 
         function updateDataset(dataset) {
@@ -206,6 +217,13 @@
           localStorage.setItem("selectedDataset", selectedDataset);
           localStorage.setItem("selectedROI", selectedROI);
           window.location.href = `cross-region-performance-page.html?training=${selectedTraining}&dataset=${selectedDataset}&roi=${selectedROI}`;
+
+        }
+
+        function updateROI(roi){
+          window.location.href = `specify-roi-page.html?training=${selectedTraining}&dataset=""&roi=${selectedROI}`;
+
+
 
         }
     </script>
