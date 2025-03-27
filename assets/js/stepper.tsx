@@ -5,7 +5,6 @@ import Uploader from './uploader.tsx';
 import BarChart from './barchart.jsx';
 import Settings from './settings.jsx';
 import Heatmap from './heatmap.jsx';
-import { Client, handle_file} from "@gradio/client";
 import { useMemo } from "react";
 import axios from 'axios';
 
@@ -170,7 +169,7 @@ const Stepper: React.FC = () => {
       // predict via http method
       const result = await axios.post(`${SERVER_BASE_URL}/api/predict`, {
         data: [
-          uploadResult.map(f => ({ path: `${SERVER_BASE_URL}/files/${f}`, org_name: f.split('/').pop() })),
+          uploadResult.map((f: string) => ({ path: `${f}`, org_name: f.split('/').pop() })),
           region || "ffa",
           dataset || "murty185",
           model || "clip_rn50",
