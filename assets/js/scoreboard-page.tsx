@@ -10,7 +10,8 @@ import { useMemo } from "react";
 import Grid from '@mui/material';
 
 import ROISelect from './roiselect.jsx';
-import PaperSelector from './paperselector.jsx';
+// import PaperSelector from './paperselector.jsx';
+import TrainingSelect from './trainingselect.jsx';
 import ModelCard from './modelcard.jsx';
 import LinearIndeterminate from './linearprogessor.jsx';
 
@@ -93,6 +94,8 @@ const ScoreboardPage: React.FC = () => {
   const [predictstep, setPredictstep] = useState(1);
 
   const DEFAULT_OVERALL = "overall"
+  const DEFAULT_TRAINING = "murty185"
+  
   const DEFAULT_ROI = "ffa";
   const DEFAULT_MODEL = "clip_rn50";
   const DEFAULT_DATASET = "murty185";
@@ -101,6 +104,7 @@ const ScoreboardPage: React.FC = () => {
   const [model, setModel] = useState(DEFAULT_MODEL);
   const [dataset, setDataset] = useState(DEFAULT_DATASET);
   const [overall, setOverall] = useState(DEFAULT_OVERALL);
+  const [training, setTraining] = useState(DEFAULT_TRAINING);
   const [roi, setROI] = useState(DEFAULT_ROI);
   const [voxelOption, setVoxelOption] = useState(DEFAULT_VOXEL);
   const [voxelNumber, setVoxelNumber] = useState("");
@@ -240,6 +244,7 @@ const ScoreboardPage: React.FC = () => {
       title: 'Overall performance across all regions',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px'}}>
+          <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <ROISelect region={overall} setRegion={setOverall} dataset={dataset}/>
           <Settings
             model={model}
@@ -262,6 +267,7 @@ const ScoreboardPage: React.FC = () => {
       title: 'A specific ROI',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px'}}>
+          <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <ROISelect region={roi} setRegion={setROI} dataset={dataset}/>
           <Settings
             model={model}
@@ -284,6 +290,7 @@ const ScoreboardPage: React.FC = () => {
       title: 'A specific Dataset',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
+          <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <ROISelect region={roi} setRegion={setROI} dataset={dataset} />
           <ModelCard
             region={roi}
@@ -348,7 +355,7 @@ const ScoreboardPage: React.FC = () => {
 
       <div style={contentStyle}>{steps[current].content}</div>
 
-      <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+      <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end", gap: "8px",marginBottom:0 }}>
 
         {current === 0 && (
           <Button

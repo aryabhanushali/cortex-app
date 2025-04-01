@@ -3,9 +3,9 @@ export const MODEL_OPTIONS = [
     { value: 'dinov2', label: 'dinov2' },
   ];
   
-export const DATASET_OPTIONS = [
-  { value: 'murty185', label: 'murty185' },
-  { value: 'nsd_1000', label: 'nsd_1000' },
+export const TRAINING_OPTIONS = [
+  { value: 'murty185', label: 'Murty185' },
+  { value: 'nsd_1000', label: 'NSD' },
 ];
   
 export const REGION_OPTIONS = [
