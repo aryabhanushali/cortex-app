@@ -92,14 +92,16 @@ const ScoreboardPage: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const [predictstep, setPredictstep] = useState(1);
 
-  const DEFAULT_REGION = "ffa";
+  const DEFAULT_OVERALL = "overall"
+  const DEFAULT_ROI = "ffa";
   const DEFAULT_MODEL = "clip_rn50";
   const DEFAULT_DATASET = "murty185";
   const DEFAULT_VOXEL = "all-participants";
 
   const [model, setModel] = useState(DEFAULT_MODEL);
   const [dataset, setDataset] = useState(DEFAULT_DATASET);
-  const [region, setRegion] = useState(DEFAULT_REGION);
+  const [overall, setOverall] = useState(DEFAULT_OVERALL);
+  const [roi, setROI] = useState(DEFAULT_ROI);
   const [voxelOption, setVoxelOption] = useState(DEFAULT_VOXEL);
   const [voxelNumber, setVoxelNumber] = useState("");
   const [paper, setPaper] = useState("");
@@ -140,7 +142,7 @@ const ScoreboardPage: React.FC = () => {
     setPredictionResult(null); // Clear previous results
     setPredictstep(1); // Reset button
     handlePrediction();
-  }, [model, dataset, region, voxelOption, voxelNumber, paper, participantName]);
+  }, [model, dataset, roi, voxelOption, voxelNumber, paper, participantName]);
 
   useEffect(() => {
     console.log("🔄 predictionResult updated:", predictionResult);
@@ -166,7 +168,7 @@ const ScoreboardPage: React.FC = () => {
 
       const result = await client.predict("/predict", {
         images: files.map(f => handle_file(f.file)),
-        roi: region || "ffa",
+        roi: roi || "ffa",
         dataset: dataset || "murty185",
         backbone_name: model || "clip_rn50",
         rdm: true,
@@ -218,7 +220,7 @@ const ScoreboardPage: React.FC = () => {
 
         // Construct the filename using the state variables and a timestamp
         const timestamp = new Date().toISOString().replace(/[:\-T.]/g, ""); // Create a timestamp string
-        const filename = `murtylab_${model}_${dataset}_${region}_${timestamp}.json`;
+        const filename = `murtylab_${model}_${dataset}_${roi}_${timestamp}.json`;
         a.download = filename;
         document.body.appendChild(a);
         a.click();
@@ -236,14 +238,31 @@ const ScoreboardPage: React.FC = () => {
   const steps = [
     {
       title: 'Overall performance across all regions',
-      content: <Uploader onFilesUploaded={handleFilesUploaded} onFileMappingsUpdate={handleFileMappingsUpdate} />,
+      content: (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px'}}>
+          <ROISelect region={overall} setRegion={setOverall} dataset={dataset}/>
+          <Settings
+            model={model}
+            setModel={setModel}
+            dataset={dataset}
+            setDataset={setDataset}
+            voxelOption={voxelOption}
+            setVoxelOption={setVoxelOption}
+            voxelNumber={voxelNumber}
+            setVoxelNumber={setVoxelNumber}
+            participantName={participantName}
+            setParticipantName={setParticipantName}
+          />
+          {predictionLoading && <LinearIndeterminate />}
+        </div>
+      ),
       icon: <SmileOutlined />,
     },
     {
       title: 'A specific ROI',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px'}}>
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset}/>
+          <ROISelect region={roi} setRegion={setROI} dataset={dataset}/>
           <Settings
             model={model}
             setModel={setModel}
@@ -265,9 +284,9 @@ const ScoreboardPage: React.FC = () => {
       title: 'A specific Dataset',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} />
+          <ROISelect region={roi} setRegion={setROI} dataset={dataset} />
           <ModelCard
-            region={region}
+            region={roi}
             dataset={dataset}
             model={model}
           />
@@ -314,7 +333,7 @@ const ScoreboardPage: React.FC = () => {
             </Button>
         ))}
         </div> */}
-    <Steps current={-1} style={{ marginBottom: 40 }}>
+    <Steps>
         {steps.map((item, index) => (
             <Steps.Step
             key={item.title}
