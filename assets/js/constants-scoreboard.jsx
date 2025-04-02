@@ -4,8 +4,8 @@ export const MODEL_OPTIONS = [
   ];
   
 export const TRAINING_OPTIONS = [
-  { value: 'murty185', label: 'Murty185' },
-  { value: 'nsd_1000', label: 'NSD' },
+  { value: 'Murty185', label: 'Murty185' },
+  { value: 'NSD', label: 'NSD' },
 ];
   
 export const REGION_OPTIONS = [
@@ -19,7 +19,22 @@ export const REGION_OPTIONS = [
   { value: 'rsc', label: 'RSC'},
   { value: 'vwfa', label: 'VWFA'},
 ];
-  
+
+export const DATASET_OPTIONS = [
+    { value: 'Murty185', label: 'Murty185' },
+    { value: 'NSD', label: 'NSD' },
+    { value: 'algonauts', label: 'Algonauts' },
+    { value: 'BOLD5000', label: 'BOLD5000' },
+    { value: 'BonnerEpstein', label: 'BonnerEpstein' },
+    { value: 'KingBaker', label: 'KingBaker' }
+  ];
+
+
+    
+export const MURTY185_DATASET = ['NSD','algonauts', 'BOLD5000', 'BonnerEpstein','KingBaker'];
+export const NSD_DATASET = ['Murty185','algonauts', 'BOLD5000', 'BonnerEpstein','KingBaker'];
+
+
 export const VOXEL_OPTIONS = [
   { value: 'all-participants', label: 'All Participants' },
   { value: 'specify-a-participant', label: 'Specify a Participant' },
