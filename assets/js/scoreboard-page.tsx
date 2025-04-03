@@ -39,11 +39,23 @@ const ScoreboardPage: React.FC = () => {
   const [training, setTraining] = useState(DEFAULT_TRAINING);
   const [roi, setROI] = useState(DEFAULT_ROI);
 
+  const roiDataMap = {
+    PPA: (data as any)[training]?.ppaData,
+    FFA: (data as any)[training]?.ffaData,
+    EBA: (data as any)[training]?.ebaData,
+    FBA: (data as any)[training]?.fbaData,
+    OFA: (data as any)[training]?.ofaData,
+    OPA: (data as any)[training]?.opaData,
+    RSC: (data as any)[training]?.rscData,
+    VWFA: (data as any)[training]?.vwfaData,
+  };
+
+  const roiData = (roiDataMap as any)[roi] || [];
+
   const overallData =(data as any)[training]?.overallData || [];
  
   console.log('🎯 OverallData:', (data as any)[training]?.overallData);
-//   console.log('📊 Unique datasets in overallData:', [...new Set(((data as any)[training]?.overallData || []).map(d => d.dataset))]);
-  
+    
 
   const contentStyle: React.CSSProperties = {
     lineHeight: '260px',
@@ -68,10 +80,6 @@ const ScoreboardPage: React.FC = () => {
           {!loading && (
             <HeatChartOverall dataset={overallData} title="Cross-Regions Performance on all Datasets" />
           )}
-
-          {/* <div className="overallchart">
-            <div id="cross-regions-performance-all-datasets"></div>
-          </div> */}
         </div>
       ),
       icon: <SmileOutlined />,
@@ -83,6 +91,9 @@ const ScoreboardPage: React.FC = () => {
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training}/>
           <ROISelect region={roi} setRegion={setROI} dataset={dataset}/>
+          {!loading && (
+            <HeatChartOverall dataset={roiData} title={`${roi} Performance on all Datasets`} />
+          )}
           
         </div>
       ),

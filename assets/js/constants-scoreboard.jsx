@@ -10,14 +10,14 @@ export const TRAINING_OPTIONS = [
   
 export const REGION_OPTIONS = [
   { value: 'overall', label: 'Cross-Regions' },
-  { value: 'ffa', label: 'FFA' },
-  { value: 'eba', label: 'EBA' },
-  { value: 'ppa', label: 'PPA' },
-  { value: 'fba', label: 'FBA'},
-  { value: 'ofa', label: 'OFA'},
-  { value: 'opa', label: 'OPA'},
-  { value: 'rsc', label: 'RSC'},
-  { value: 'vwfa', label: 'VWFA'},
+  { value: 'FFA', label: 'FFA' },
+  { value: 'EBA', label: 'EBA' },
+  { value: 'PPA', label: 'PPA' },
+  { value: 'FBA', label: 'FBA'},
+  { value: 'OFA', label: 'OFA'},
+  { value: 'OPA', label: 'OPA'},
+  { value: 'RSC', label: 'RSC'},
+  { value: 'VWFA', label: 'VWFA'},
 ];
 
 export const DATASET_OPTIONS = [
