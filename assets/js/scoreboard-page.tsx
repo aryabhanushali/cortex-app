@@ -7,6 +7,7 @@ import TrainingSelect from './trainingselect.jsx';
 import DatasetSelect from './datasetselect.jsx';
 import HeatChartOverall from './overallheatchart.jsx';
 import useLoadData from './loaddata.jsx';
+import RoiHeatChart from './roiheartchart.jsx';
 
 
 
@@ -21,23 +22,26 @@ const ScoreboardPage: React.FC = () => {
   const { data, loading } = useLoadData();
   
  
+  const [manualStepChange, setManualStepChange] = useState(false);
 
-  const DEFAULT_OVERALL = "overall"
   const DEFAULT_TRAINING = "Murty185"
 
-  const DEFAULT_DATASET_EMPTY= ""
+  const DEFAULT_DATASET_EMPTY= ""   
   
-  const DEFAULT_ROI = "ffa";
+  const DEFAULT_REGION = "overall";
   
   const DEFAULT_DATASET = "NSD";
+  const DEFAULT_REGION_EMPTY = "";
   
 
 
   const [datasetEmpty, setDatasetEmpty] = useState(DEFAULT_DATASET_EMPTY);
   const [dataset, setDataset] = useState(DEFAULT_DATASET);
-  const [overall, setOverall] = useState(DEFAULT_OVERALL);
   const [training, setTraining] = useState(DEFAULT_TRAINING);
-  const [roi, setROI] = useState(DEFAULT_ROI);
+  const [regionEmpty, setRegionEmpty] = useState(DEFAULT_REGION_EMPTY);
+  const [region, setRegion] = useState(DEFAULT_REGION);
+
+  
 
   const roiDataMap = {
     PPA: (data as any)[training]?.ppaData,
@@ -50,9 +54,21 @@ const ScoreboardPage: React.FC = () => {
     VWFA: (data as any)[training]?.vwfaData,
   };
 
-  const roiData = (roiDataMap as any)[roi] || [];
+  const roiData = (roiDataMap as any)[region] || [];
 
   const overallData =(data as any)[training]?.overallData || [];
+
+  type DataItem = {
+    model: string;
+    dataset: string;
+    roi: string;
+    pearsonr: number;
+  };
+  
+  const unfilteredData: DataItem[] = (data as any)[training]?.unfilter || [];
+  const filteredData = unfilteredData.filter(d => d.dataset === dataset);
+  
+
  
   console.log('🎯 OverallData:', (data as any)[training]?.overallData);
     
@@ -67,6 +83,24 @@ const ScoreboardPage: React.FC = () => {
     marginTop: 16,
   };
 
+  useEffect(() => {
+    if (!manualStepChange) {
+      if (current === 0 && region !== "overall") {
+        setCurrent(1);
+      } else if (current === 1 && region === "overall" && datasetEmpty === "") {
+        setCurrent(0);
+      }
+    }
+  }, [region, datasetEmpty, current]);
+  
+  useEffect(() => {
+    if (manualStepChange) {
+      setManualStepChange(false); 
+    }
+  }, [manualStepChange]);
+  
+  
+
   
 
   const steps = [
@@ -76,7 +110,7 @@ const ScoreboardPage: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column'}}>
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training}/>
-          <ROISelect region={overall} setRegion={setOverall} dataset={dataset}/>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset}/>
           {!loading && (
             <HeatChartOverall dataset={overallData} title="Cross-Regions Performance on all Datasets" />
           )}
@@ -90,9 +124,9 @@ const ScoreboardPage: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column'}}>
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training}/>
-          <ROISelect region={roi} setRegion={setROI} dataset={dataset}/>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset}/>
           {!loading && (
-            <HeatChartOverall dataset={roiData} title={`${roi} Performance on all Datasets`} />
+            <HeatChartOverall dataset={roiData} title={`${region} Performance on all Datasets`} />
           )}
           
         </div>
@@ -105,7 +139,10 @@ const ScoreboardPage: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column'}}>
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={dataset} setDataset={setDataset} training={training}/>
-          <ROISelect region={roi} setRegion={setROI} dataset={dataset} />
+          <ROISelect region={regionEmpty} setRegion={setRegionEmpty} dataset={dataset} />
+          {!loading && (
+            <RoiHeatChart dataset={filteredData} title="Cross-Regions Performance on all Datasets" />
+          )}
         </div>
       ),
       icon: <SmileOutlined />,
@@ -121,7 +158,18 @@ const ScoreboardPage: React.FC = () => {
             title={item.title}
             icon={item.icon}
             status={current === index ? 'process' : 'wait'}
-            onClick={() => setCurrent(index)}
+            onClick={() => {
+                setManualStepChange(true); // 用户点击触发
+                setCurrent(index);
+                if (index === 0) {
+                    setRegion("overall");
+                } else if (index === 1 && region === "overall") {
+                    setRegion("PPA");
+                }
+                
+                
+            }
+        }
             style={{ cursor: 'pointer' }}
             />
         ))}
