@@ -23,7 +23,7 @@ export const REGION_OPTIONS = [
 export const DATASET_OPTIONS = [
     { value: 'Murty185', label: 'Murty185' },
     { value: 'NSD', label: 'NSD' },
-    { value: 'algonauts', label: 'Algonauts' },
+    { value: 'algonauts', label: 'algonauts' },
     { value: 'BOLD5000', label: 'BOLD5000' },
     { value: 'BonnerEpstein', label: 'BonnerEpstein' },
     { value: 'KingBaker', label: 'KingBaker' }

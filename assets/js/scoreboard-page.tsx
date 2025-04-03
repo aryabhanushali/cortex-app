@@ -5,6 +5,8 @@ import { SmileOutlined } from '@ant-design/icons';
 import ROISelect from './roiselect.jsx';
 import TrainingSelect from './trainingselect.jsx';
 import DatasetSelect from './datasetselect.jsx';
+import HeatChartOverall from './overallheatchart.jsx';
+import useLoadData from './loaddata.jsx';
 
 
 
@@ -16,23 +18,31 @@ import DatasetSelect from './datasetselect.jsx';
 const ScoreboardPage: React.FC = () => {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
-
+  const { data, loading } = useLoadData();
+  
+ 
 
   const DEFAULT_OVERALL = "overall"
   const DEFAULT_TRAINING = "Murty185"
+
+  const DEFAULT_DATASET_EMPTY= ""
   
   const DEFAULT_ROI = "ffa";
   
   const DEFAULT_DATASET = "NSD";
+  
 
 
-
+  const [datasetEmpty, setDatasetEmpty] = useState(DEFAULT_DATASET_EMPTY);
   const [dataset, setDataset] = useState(DEFAULT_DATASET);
   const [overall, setOverall] = useState(DEFAULT_OVERALL);
   const [training, setTraining] = useState(DEFAULT_TRAINING);
   const [roi, setROI] = useState(DEFAULT_ROI);
- 
 
+  const overallData =(data as any)[training]?.overallData || [];
+ 
+  console.log('🎯 OverallData:', (data as any)[training]?.overallData);
+//   console.log('📊 Unique datasets in overallData:', [...new Set(((data as any)[training]?.overallData || []).map(d => d.dataset))]);
   
 
   const contentStyle: React.CSSProperties = {
@@ -53,15 +63,15 @@ const ScoreboardPage: React.FC = () => {
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
-          <DatasetSelect dataset={dataset} setDataset={setDataset} training={training}/>
+          <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training}/>
           <ROISelect region={overall} setRegion={setOverall} dataset={dataset}/>
+          {!loading && (
+            <HeatChartOverall dataset={overallData} title="Cross-Regions Performance on all Datasets" />
+          )}
 
-          <div className="overallchart">
-            <div id="loading-overlay">
-            <p>Loading...</p>
-            </div>
-            <div id="overall" className="chart"></div>
-        </div>
+          {/* <div className="overallchart">
+            <div id="cross-regions-performance-all-datasets"></div>
+          </div> */}
         </div>
       ),
       icon: <SmileOutlined />,
@@ -71,7 +81,7 @@ const ScoreboardPage: React.FC = () => {
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
-          <DatasetSelect dataset={dataset} setDataset={setDataset} training={training}/>
+          <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training}/>
           <ROISelect region={roi} setRegion={setROI} dataset={dataset}/>
           
         </div>

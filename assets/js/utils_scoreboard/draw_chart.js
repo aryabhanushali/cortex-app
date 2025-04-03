@@ -111,13 +111,7 @@ function drawChartOverall(selector, dataset, title) {
       .attr("class", "axis-label clickable") 
       .style("cursor", "pointer")  // 🆕 鼠标指针变成手型
       .style("font-size", `${baseFontSize * 1.5}px`)
-      .on("click", function(event, datasetName) {
-         if (selectedRegion === "overall") {
-            window.location.href = `cross-region-performance-page.html?dataset=${datasetName}`;
-         } else {
-            window.location.href = `roi-performance-page.html?dataset=${datasetName}&roi=${selectedRegion}`;
-         }
-      });
+      
 
    
    const yAxis = svg.append("g")
