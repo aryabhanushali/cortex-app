@@ -40,9 +40,9 @@ const HeatChartOverall = ({ dataset, title}) => {
       .attr('height', totalHeight);
 
       
-      const xScale = d3.scaleOrdinal()
-        .domain(datasets)
-        .range(datasets.map((_, i) => margin.left + i * (columnWidth + columnGap)));
+    const xScale = d3.scaleOrdinal()
+       .domain(datasets)
+       .range(datasets.map((_, i) => margin.left + i * (columnWidth + columnGap)));
 
     const xAxisHeight = 30;
     const yScale = d3.scaleOrdinal()

@@ -31,8 +31,8 @@ export const DATASET_OPTIONS = [
 
 
     
-export const MURTY185_DATASET = ['NSD','algonauts', 'BOLD5000', 'BonnerEpstein','KingBaker'];
-export const NSD_DATASET = ['Murty185','algonauts', 'BOLD5000', 'BonnerEpstein','KingBaker'];
+// export const MURTY185_DATASET = ['NSD','algonauts', 'BOLD5000', 'BonnerEpstein','KingBaker'];
+// export const NSD_DATASET = ['Murty185','algonauts', 'BOLD5000', 'BonnerEpstein','KingBaker'];
 
 
 export const VOXEL_OPTIONS = [
