@@ -26,7 +26,7 @@ const DatasetSelect = ({ dataset, setDataset, training }) => {
           marginBottom: 1,
         }}
       >
-        Select a Region of Interest
+        Evaluation Dataset:
       </FormLabel>
       <ButtonGroup 
         aria-labelledby="region-buttons-group-label"

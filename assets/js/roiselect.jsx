@@ -22,7 +22,7 @@ const ROISelect = ({ region, setRegion, dataset }) => {
           marginBottom: 1,
         }}
       >
-        Select a ROI you are caring about:
+        Region of Interest:
       </FormLabel>
       <ButtonGroup 
         aria-labelledby="region-buttons-group-label"

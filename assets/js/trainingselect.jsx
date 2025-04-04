@@ -23,7 +23,7 @@ const TrainingSelect = ({ training, setTraining, dataset }) => {
           marginBottom:0,
         }}
       >
-        Select a training dataset:
+        Training Dataset:
       </FormLabel>
       <ButtonGroup 
         aria-labelledby="region-buttons-group-label"

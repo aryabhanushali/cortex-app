@@ -5,16 +5,17 @@ import Uploader from './uploader.tsx';
 import BarChart from './barchart.jsx';
 import Settings from './settings.jsx';
 import Heatmap from './heatmap.jsx';
-import { Client, handle_file} from "@gradio/client";
 import { useMemo } from "react";
-import Grid from '@mui/material';
+import axios from 'axios';
 
 import RegionSelector from './regionselector.jsx';
 import PaperSelector from './paperselector.jsx';
 import ModelCard from './modelcard.jsx';
 import LinearIndeterminate from './linearprogessor.jsx';
+import { uploadImages } from './services/imageUploader.js';
 
 const { Step } = Steps;
+const SERVER_BASE_URL = "http://127.0.0.1:7860";
 
 const useBarchartData = (predictionResult: any) => {
   console.log("📊 Prediction Result for Bar Chart:", predictionResult);
@@ -160,21 +161,23 @@ const Stepper: React.FC = () => {
 
     setPredictionLoading(true); // set true when prediction start
     try {
-      console.log("📁 Sending files to Gradio:", files.map(f => handle_file(f.file)));
-
-      const client = await Client.connect("http://127.0.0.1:7860/");
-
-      const result = await client.predict("/predict", {
-        images: files.map(f => handle_file(f.file)),
-        roi: region || "ffa",
-        dataset: dataset || "murty185",
-        backbone_name: model || "clip_rn50",
-        rdm: true,
-        mean: true,
-        sem: true,
+      // Upload images to the server
+      const uploadResult = await uploadImages(files.map(f => f.file));
+      
+      // predict via http method
+      const result = await axios.post(`${SERVER_BASE_URL}/api/predict`, {
+        data: [
+          uploadResult.map((f: string) => ({ path: `${f}`, org_name: f.split('/').pop() })),
+          region || "ffa",
+          dataset || "murty185",
+          model || "clip_rn50",
+          true, // rdm
+          true, // mean
+          true, // sem
+        ],
       });
 
-      setPredictionResult(result.data);
+      setPredictionResult(result.data.data);
       console.log("Full predictionResult:", JSON.stringify(result.data, null, 2));
 
       message.success("Prediction complete!");
