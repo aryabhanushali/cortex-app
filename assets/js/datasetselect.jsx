@@ -8,7 +8,7 @@ import { DATASET_OPTIONS } from './constants-scoreboard';
 
 
 
-const DatasetSelect = ({ dataset, setDataset, training }) => {
+const DatasetSelect = ({ dataset, setDataset, training, allowToggle}) => {
   // const isEnabled = (option) => {
   //   return training === 'Murty185'
   //     ? MURTY185_DATASET.includes(option.value)
@@ -34,9 +34,14 @@ const DatasetSelect = ({ dataset, setDataset, training }) => {
         {DATASET_OPTIONS.map((option) => (
           <Button
             key={option.value}
-            onClick={() => setDataset(option.value)}
+            onClick={() => {
+              if (allowToggle) {
+                setDataset(prev => prev === option.value ? "" : option.value);
+              } else {
+                setDataset(option.value); 
+              }
+            }}
             variant={dataset === option.value ? "contained" : "outlined"}
-            // disabled={!isEnabled(option)}
             sx={{
               "&.Mui-disabled": {
                 backgroundColor: "#f3f3f3",

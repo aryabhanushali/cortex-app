@@ -8,6 +8,7 @@ import DatasetSelect from './datasetselect.jsx';
 import HeatChartOverall from './overallheatchart.jsx';
 import useLoadData from './loaddata.jsx';
 import RoiHeatChart from './roiheartchart.jsx';
+import BarChartSpecific from './barchartspecific.jsx';
 
 
 
@@ -66,11 +67,19 @@ const ScoreboardPage: React.FC = () => {
   };
   
   const unfilteredData: DataItem[] = (data as any)[training]?.unfilter || [];
-  const filteredData = unfilteredData.filter(d => d.dataset === dataset);
+  const filteredData = unfilteredData.filter(d => {
+    if (current === 0 || current === 1) {
+      return d.dataset === datasetEmpty;
+    } else {
+      return d.dataset === dataset;
+    }
+  });
   
 
  
   console.log('🎯 OverallData:', (data as any)[training]?.overallData);
+  console.log('🎯 filteredData:', filteredData);
+
     
 
   const contentStyle: React.CSSProperties = {
@@ -109,11 +118,17 @@ const ScoreboardPage: React.FC = () => {
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
-          <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training}/>
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset}/>
-          {!loading && overallData.length > 0 && (
+          <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false}/>
+          {!loading && overallData.length > 0 && datasetEmpty === "" && (
             <HeatChartOverall dataset={overallData} title="Cross-Regions Performance on all Datasets" />
           )}
+
+          {!loading && filteredData.length > 0 && (
+            <BarChartSpecific dataset={filteredData} title="Cross-Regions Performance on all Datasets" />
+          )}
+
+
         </div>
       ),
       icon: <SmileOutlined />,
@@ -123,8 +138,8 @@ const ScoreboardPage: React.FC = () => {
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
-          <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training}/>
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset}/>
+          <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false}/>
           {!loading && roiData.length > 0 && (
             <HeatChartOverall dataset={roiData} title={`${region} Performance on all Datasets`} />
           )}
@@ -138,8 +153,8 @@ const ScoreboardPage: React.FC = () => {
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
-          <DatasetSelect dataset={dataset} setDataset={setDataset} training={training}/>
-          <ROISelect region={regionEmpty} setRegion={setRegionEmpty} dataset={dataset} />
+          <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} allowToggle={false}/>
+          <ROISelect region={regionEmpty} setRegion={setRegionEmpty} dataset={dataset} allowToggle={true} />
           {!loading &&  filteredData.length > 0 &&(
             <RoiHeatChart dataset={filteredData} title={`Models Performance on Evaluation Datasets: ${dataset}`}/>
           )}
@@ -159,7 +174,7 @@ const ScoreboardPage: React.FC = () => {
             icon={item.icon}
             status={current === index ? 'process' : 'wait'}
             onClick={() => {
-                setManualStepChange(true); // 用户点击触发
+                setManualStepChange(true); 
                 setCurrent(index);
                 if (index === 0) {
                     setRegion("overall");
@@ -185,44 +200,6 @@ const ScoreboardPage: React.FC = () => {
 
       <div style={contentStyle}>{steps[current].content}</div>
 
-      {/* <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end", gap: "8px",marginBottom:24 }}>
-
-        {current === 0 && (
-          <Button
-            type="primary"
-            onClick={() => {
-              message.success("Image Upload complete!");
-
-              next();
-            }}
-            disabled={loading || files.length === 0}
-          >
-            {loading ? "Uploading..." : "Proceed to Settings"}
-          </Button>
-        )}
-
-        {current === 1 && (
-          <Button
-            type="primary"
-            onClick={() => {
-              predictstep === 1 ? handlePrediction() : next();
-            }}
-            disabled={loading || files.length === 0}
-          >
-            {loading ? "Processing..." : "Check Prediction Results"}
-          </Button>
-        )}
-
-        {current === steps.length - 1 && (
-          <Button
-            type="primary"
-            onClick={downloadData}
-            disabled={!predictionResult} // Disable if no prediction result
-          >
-            Download Data
-          </Button>
-        )}
-      </div> */}
     </>
   );
 };

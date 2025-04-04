@@ -5,12 +5,10 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import { REGION_OPTIONS } from './constants-scoreboard';
-import { MURTY185_INCLUDED_REGIONS } from './constants-scoreboard';
 
-const ROISelect = ({ region, setRegion, dataset }) => {
-  const isEnabled = (option) => {
-    return dataset !== 'murty185' || MURTY185_INCLUDED_REGIONS.includes(option.value);
-  };
+
+const ROISelect = ({ region, setRegion, dataset,allowToggle }) => {
+  
 
   return (
     <FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
@@ -31,9 +29,15 @@ const ROISelect = ({ region, setRegion, dataset }) => {
         {REGION_OPTIONS.map((option) => (
           <Button
             key={option.value}
-            onClick={() => isEnabled(option) && setRegion(option.value)}
+            onClick={() => {
+              if (allowToggle) {
+                setRegion(prev => prev === option.value ? "" : option.value);
+              } else {
+                setRegion(option.value); 
+              }
+            }}
             variant={region === option.value ? "contained" : "outlined"}
-            disabled={!isEnabled(option)}
+            
             sx={{
               "&.Mui-disabled": {
                 backgroundColor: "#f3f3f3",
