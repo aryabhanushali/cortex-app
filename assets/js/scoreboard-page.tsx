@@ -30,7 +30,7 @@ const ScoreboardPage: React.FC = () => {
   
   const DEFAULT_REGION = "overall";
   
-  const DEFAULT_DATASET = "NSD";
+  const DEFAULT_DATASET = "Murty185";
   const DEFAULT_REGION_EMPTY = "";
   
 
@@ -111,7 +111,7 @@ const ScoreboardPage: React.FC = () => {
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training}/>
           <ROISelect region={region} setRegion={setRegion} dataset={dataset}/>
-          {!loading && (
+          {!loading && overallData.length > 0 && (
             <HeatChartOverall dataset={overallData} title="Cross-Regions Performance on all Datasets" />
           )}
         </div>
@@ -125,7 +125,7 @@ const ScoreboardPage: React.FC = () => {
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training}/>
           <ROISelect region={region} setRegion={setRegion} dataset={dataset}/>
-          {!loading && (
+          {!loading && roiData.length > 0 && (
             <HeatChartOverall dataset={roiData} title={`${region} Performance on all Datasets`} />
           )}
           
@@ -140,8 +140,8 @@ const ScoreboardPage: React.FC = () => {
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={dataset} setDataset={setDataset} training={training}/>
           <ROISelect region={regionEmpty} setRegion={setRegionEmpty} dataset={dataset} />
-          {!loading && (
-            <RoiHeatChart dataset={filteredData} title="Cross-Regions Performance on all Datasets" />
+          {!loading &&  filteredData.length > 0 &&(
+            <RoiHeatChart dataset={filteredData} title={`Models Performance on Evaluation Datasets: ${dataset}`}/>
           )}
         </div>
       ),
@@ -163,8 +163,16 @@ const ScoreboardPage: React.FC = () => {
                 setCurrent(index);
                 if (index === 0) {
                     setRegion("overall");
-                } else if (index === 1 && region === "overall") {
+                    setDatasetEmpty("");
+                    setTraining("Murty185");
+                } else if (index === 1) {
                     setRegion("PPA");
+                    setDatasetEmpty("");
+                    setTraining("Murty185");
+                } else if(index == 2) {
+                    setRegionEmpty("");
+                    setDataset("Murty185");
+                    setTraining("Murty185");
                 }
                 
                 
