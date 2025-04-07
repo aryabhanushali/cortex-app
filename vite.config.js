@@ -1,26 +1,32 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { ngrok } from 'vite-plugin-ngrok'
-
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
-  root: '.', // Set the project root as the current folder
-  plugins: [react(),
-    // ngrok({
-    //   authtoken: '2nIjs8LjcTSjRMWmQr8vFcrhxkP_6evRhqLBj5HgRjdSfNoyV',
-    //   domain: 'sunny-weasel-grossly.ngrok-free.app',
-    // }),
+  root: '.',
+  plugins: [
+    react(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'assets',
+          dest: '.'
+        }
+      ]
+    })
   ],
   build: {
-    outDir: 'dist', // Output directory for the production build
+    outDir: 'dist',
     rollupOptions: {
       input: {
-        main: 'index.html', // Define the main entry HTML
+        main: 'index.html',
+        admin: 'lab-page.html',
+        scoreboard: 'scoreboard-page.html',
       },
     },
   },
   server: {
-    open: '/index.html', 
+    open: '/index.html',
     allowedHosts: ['sunny-weasel-grossly.ngrok-free.app', 'localhost'],
     host: true,
     strictPort: true,
@@ -29,7 +35,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@js': '/js', 
+      '@js': '/js',
       '@assets': '/assets',
     },
   },
