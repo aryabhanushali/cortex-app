@@ -1,7 +1,7 @@
 import axios from 'axios';
-const SERVER_BASE_URL = "http://127.0.0.1:7860";
+import { SERVER_URL } from './config';
 
-
+const SERVER_BASE_URL = SERVER_URL;
 export const uploadImages = async (images) => {
     const randomId = Math.random().toString(36).substring(2, 12);
 

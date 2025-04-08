@@ -13,9 +13,10 @@ import PaperSelector from './paperselector.jsx';
 import ModelCard from './modelcard.jsx';
 import LinearIndeterminate from './linearprogessor.jsx';
 import { uploadImages } from './services/imageUploader.js';
+import { SERVER_URL } from './services/config';
 
 const { Step } = Steps;
-const SERVER_BASE_URL = "http://127.0.0.1:7860";
+const SERVER_BASE_URL = SERVER_URL;
 
 const useBarchartData = (predictionResult: any) => {
   console.log("📊 Prediction Result for Bar Chart:", predictionResult);
