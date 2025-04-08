@@ -1,0 +1,2 @@
+# Ensure index.html is served by default
+DirectoryIndex index.html
