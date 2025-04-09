@@ -94,7 +94,7 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
           <InboxOutlined />
         </p>
         <p className="ant-upload-text">Click or drag file to this area to upload</p>
-        <p className="ant-upload-hint">Support for a single or bulk upload.</p>
+        <p className="ant-upload-hint">Upload one or more .jpg/png files</p>
       </Dragger>
 
       <Progress
