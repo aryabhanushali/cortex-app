@@ -245,7 +245,7 @@ const Stepper: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0px', marginBottom: '-100px' }}>
           <Uploader onFilesUploaded={handleFilesUploaded} onFileMappingsUpdate={handleFileMappingsUpdate} />
           <div style={{ textAlign: 'right', color: 'black', marginTop: '-100px', fontWeight: 500 }}>
-            📸 {files.length} image{files.length === 1 ? '' : 's'} uploaded
+            📸 {files.length} image{files.length <= 1 ? '' : 's'} uploaded
           </div>
         </div>
       ),
@@ -291,7 +291,15 @@ const Stepper: React.FC = () => {
             </h3>
           <BarChart barChartData={barchartData} height={600} fileMappings={fileMappings}/>
             <h3 style={{ textAlign: "left", color:"black", fontSize: "18px", marginBottom: "50px", marginTop: "40px"}}><b>Multivariate Analysis:</b> Respresentational dissimilarity matrix (RDM) from predicted voxel responses</h3>
-          <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={800} height={800} fileMappings={fileMappings}/>
+          {/* <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={800} height={800} fileMappings={fileMappings}/> */}
+          {barchartData.length <= 1 ? (
+            <div style={{ textAlign: 'center', fontSize: '16px', color: '#888', fontStyle: 'italic' }}>
+              RDM unavailable for one image. Please upload more than 2 images to see the visualization.
+            </div>
+          ) : (
+            <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={800} height={800} fileMappings={fileMappings}
+            />
+          )}
         </div>
       ),
       icon: <SmileOutlined />,

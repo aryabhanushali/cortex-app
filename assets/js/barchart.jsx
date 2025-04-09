@@ -86,8 +86,8 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       xScale(d.filename) + (xScale.bandwidth() - adjustedBandwidth) / 2 + adjustedBandwidth / 2;
     
 
-    let yMin = d3.min(sortedData, (d) => d.mean);
-    let yMax = d3.max(sortedData, (d) => d.mean);
+    let yMin = d3.min(sortedData, d => d.mean - d.sem);
+    let yMax = d3.max(sortedData, d => d.mean + d.sem);
 
     // Expand domain if yMin === yMax
     if (yMin === yMax) {
@@ -117,12 +117,15 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
     styleTooltip(tooltip);
 
     //Draw bars
+
+    const shiftX = x => x + 20;
+
     g.selectAll(".bar")
       .data(sortedData)
       .enter()
       .append("rect")
       .attr("class", "bar")
-      .attr("x", d => xScale(d.filename) + (xScale.bandwidth() - adjustedBandwidth) / 2)
+      .attr("x", d => shiftX(xScale(d.filename) + (xScale.bandwidth() - adjustedBandwidth) / 2))
       .attr("y", d => d.mean >= 0 ? yScale(d.mean) : yScale(0))
       .attr("width", adjustedBandwidth)
       .attr("height", d => Math.abs(yScale(d.mean) - yScale(0)))
@@ -177,43 +180,44 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       .style("font-size", "20px")
       .text("Mean Response");
 
-    // Draw error bars
-    // Vertical error line
+   // Draw error bar (vertical line)
     g.selectAll(".error-bar")
       .data(sortedData)
       .enter()
       .append("line")
       .attr("class", "error-bar")
-      .attr("x1", d => barCenterX(d))
-      .attr("x2", d => barCenterX(d))
+      .attr("x1", d => shiftX(barCenterX(d)))
+      .attr("x2", d => shiftX(barCenterX(d)))
       .attr("y1", d => yScale(d.mean - d.sem))
       .attr("y2", d => yScale(d.mean + d.sem))
-      .attr("stroke", "white")
-      .attr("stroke-width", 1.5)
-      .attr("opacity", 0.9);
+      .attr("stroke", "grey")
+      .attr("stroke-width", adjustedBandwidth / 10);
 
-    // Top round cap
-    g.selectAll(".error-dot-top")
+    // Top cap
+    g.selectAll(".cap-top")
       .data(sortedData)
       .enter()
-      .append("circle")
-      .attr("class", "error-dot-top")
-      .attr("cx", d => barCenterX(d))
-      .attr("cy", d => yScale(d.mean + d.sem))
-      .attr("r", 3)
-      .attr("fill", "white");
+      .append("line")
+      .attr("x1", d => shiftX(barCenterX(d) - adjustedBandwidth/4))
+      .attr("x2", d => shiftX(barCenterX(d) + adjustedBandwidth/4))
+      .attr("y1", d => yScale(d.mean + d.sem))
+      .attr("y2", d => yScale(d.mean + d.sem))
+      .attr("stroke", "grey")
+      .attr("stroke-width", adjustedBandwidth / 10);
 
-    // Bottom round cap
-    g.selectAll(".error-dot-bottom")
+    // Bottom cap
+    g.selectAll(".cap-bottom")
       .data(sortedData)
       .enter()
-      .append("circle")
-      .attr("class", "error-dot-bottom")
-      .attr("cx", d => barCenterX(d))
-      .attr("cy", d => yScale(d.mean - d.sem))
-      .attr("r", 3)
-      .attr("fill", "white");
+      .append("line")
+      .attr("x1", d => shiftX(barCenterX(d) - adjustedBandwidth/4))
+      .attr("x2", d => shiftX(barCenterX(d) +  adjustedBandwidth/4))
+      .attr("y1", d => yScale(d.mean - d.sem))
+      .attr("y2", d => yScale(d.mean - d.sem))
+      .attr("stroke", "grey")
+      .attr("stroke-width", adjustedBandwidth / 10);
 
+ 
 
 
     
@@ -238,7 +242,7 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       alignItems: 'center', // Center align content
       paddingTop: '10px', // Add extra space for the dropdown
     }}
-  >
+    >
     <div className="controls" style={{ position: 'absolute', top: -150, left: 10 }}>
       <label htmlFor="order">Order by: </label>
       <select id="order" value={order} onChange={e => setOrder(e.target.value)}>
