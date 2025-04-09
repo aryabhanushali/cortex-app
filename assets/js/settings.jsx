@@ -55,7 +55,7 @@ const Settings = ({
           }}
           id="model-select-label"
         >
-          Select a Model
+          Select a base-model architecture
         </InputLabel>
         <Select
           labelId="model-select-label"
@@ -85,7 +85,7 @@ const Settings = ({
           }}
           id="dataset-select-label"
         >
-          Select a fMRI Dataset
+          Select the fMRI mapping dataset
         </InputLabel>
         <Select
           labelId="dataset-select-label"
