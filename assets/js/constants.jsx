@@ -21,8 +21,8 @@ export const REGION_OPTIONS = [
   
 export const VOXEL_OPTIONS = [
   { value: 'all-participants', label: 'All Participants' },
-  { value: 'specify-a-participant', label: 'Specify a Participant' },
-  { value: 'random-voxels', label: 'Specify Number of Random Voxels' },
+  // { value: 'specify-a-participant', label: 'Specify a Participant' },
+  // { value: 'random-voxels', label: 'Specify Number of Random Voxels' },
 ];
   
 export const PAPER_OPTIONS = [

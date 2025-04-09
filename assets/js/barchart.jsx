@@ -153,7 +153,11 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
         tooltip.style("display", "none");
       });
 
-    g.append("g").call(d3.axisLeft(yScale));
+    // g.append("g").call(d3.axisLeft(yScale));
+    g.append("g")
+      .attr("transform", "translate(20, 0)")  
+      .call(d3.axisLeft(yScale));
+
 
     g.append("text")
       .attr("x", innerWidth / 2)
@@ -163,11 +167,11 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       .text("Images");
     
     g.append("text")
-      .attr("x", -margin.left - 10 / 2)
+      .attr("x", -margin.left - 10)
       .attr("y", -30)
       .attr("text-anchor", "middle")
       .attr("transform", "rotate(-90)")
-      .style("font-size", "14px")
+      .style("font-size", "20px")
       .text("Mean Response");
 
     return () => {

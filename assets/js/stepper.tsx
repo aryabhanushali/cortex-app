@@ -240,7 +240,15 @@ const Stepper: React.FC = () => {
   const steps = [
     {
       title: 'Upload Stimuli',
-      content: <Uploader onFilesUploaded={handleFilesUploaded} onFileMappingsUpdate={handleFileMappingsUpdate} />,
+      // content: <Uploader onFilesUploaded={handleFilesUploaded} onFileMappingsUpdate={handleFileMappingsUpdate} />,
+      content: (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0px', marginBottom: '-100px' }}>
+          <Uploader onFilesUploaded={handleFilesUploaded} onFileMappingsUpdate={handleFileMappingsUpdate} />
+          <div style={{ textAlign: 'right', color: 'black', marginTop: '-100px', fontWeight: 500 }}>
+            📸 {files.length} image{files.length === 1 ? '' : 's'} uploaded
+          </div>
+        </div>
+      ),
     },
     {
       title: 'Training Settings',
@@ -260,6 +268,10 @@ const Stepper: React.FC = () => {
             setParticipantName={setParticipantName}
           />
           {predictionLoading && <LinearIndeterminate />}
+
+
+
+
         </div>
       ),
     },
