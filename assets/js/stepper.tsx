@@ -274,9 +274,11 @@ const Stepper: React.FC = () => {
             model={model}
           />
           {predictionLoading && <LinearIndeterminate />} {/* add progress bar when predictionLoading is true */}
-          <h3 style={{ textAlign: "left", color:"black", fontSize: "18px", marginBottom: "50px", marginTop: "40px"}}>Univariate Analysis: Predicted voxel average responses</h3>
+            <h3 style={{ textAlign: "left", color:"black", fontSize: "18px", marginBottom: "50px", marginTop: "40px"}}>
+            <b>Univariate Analysis:</b> Predicted voxel average responses
+            </h3>
           <BarChart barChartData={barchartData} height={600} fileMappings={fileMappings}/>
-          <h3 style={{ textAlign: "left", color:"black", fontSize: "18px", marginBottom: "50px", marginTop: "40px"}}>Multivariate Analysis: Respresentational dissimilarity matrix (RDM) from predicted voxel responses</h3>
+            <h3 style={{ textAlign: "left", color:"black", fontSize: "18px", marginBottom: "50px", marginTop: "40px"}}><b>Multivariate Analysis:</b> Respresentational dissimilarity matrix (RDM) from predicted voxel responses</h3>
           <Heatmap heatmapData={heatmapData} originalFilenames={originalFilenames} sortedFilenames={sortedFilenames} width={800} height={800} fileMappings={fileMappings}/>
         </div>
       ),
