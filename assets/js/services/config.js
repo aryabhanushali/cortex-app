@@ -1,1 +1,1 @@
-export const SERVER_URL = 'https://3003db0e8c7338190f.gradio.live';
+export const SERVER_URL = 'https://ed3d3a4ee828981195.gradio.live';
