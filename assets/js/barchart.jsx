@@ -82,6 +82,9 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       .paddingOuter(0.2);
 
     const adjustedBandwidth = Math.min(xScale.bandwidth(), MAX_BAR_WIDTH);
+    const barCenterX = d => 
+      xScale(d.filename) + (xScale.bandwidth() - adjustedBandwidth) / 2 + adjustedBandwidth / 2;
+    
 
     let yMin = d3.min(sortedData, (d) => d.mean);
     let yMax = d3.max(sortedData, (d) => d.mean);
@@ -113,7 +116,7 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
     }
     styleTooltip(tooltip);
 
-    // Draw bars
+    //Draw bars
     g.selectAll(".bar")
       .data(sortedData)
       .enter()
@@ -153,7 +156,7 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
         tooltip.style("display", "none");
       });
 
-    // g.append("g").call(d3.axisLeft(yScale));
+
     g.append("g")
       .attr("transform", "translate(20, 0)")  
       .call(d3.axisLeft(yScale));
@@ -173,6 +176,47 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       .attr("transform", "rotate(-90)")
       .style("font-size", "20px")
       .text("Mean Response");
+
+    // Draw error bars
+    // Vertical error line
+    g.selectAll(".error-bar")
+      .data(sortedData)
+      .enter()
+      .append("line")
+      .attr("class", "error-bar")
+      .attr("x1", d => barCenterX(d))
+      .attr("x2", d => barCenterX(d))
+      .attr("y1", d => yScale(d.mean - d.sem))
+      .attr("y2", d => yScale(d.mean + d.sem))
+      .attr("stroke", "white")
+      .attr("stroke-width", 1.5)
+      .attr("opacity", 0.9);
+
+    // Top round cap
+    g.selectAll(".error-dot-top")
+      .data(sortedData)
+      .enter()
+      .append("circle")
+      .attr("class", "error-dot-top")
+      .attr("cx", d => barCenterX(d))
+      .attr("cy", d => yScale(d.mean + d.sem))
+      .attr("r", 3)
+      .attr("fill", "white");
+
+    // Bottom round cap
+    g.selectAll(".error-dot-bottom")
+      .data(sortedData)
+      .enter()
+      .append("circle")
+      .attr("class", "error-dot-bottom")
+      .attr("cx", d => barCenterX(d))
+      .attr("cy", d => yScale(d.mean - d.sem))
+      .attr("r", 3)
+      .attr("fill", "white");
+
+
+
+    
 
     return () => {
       d3.select(".tooltip").remove(); // Cleanup tooltip on component unmount
