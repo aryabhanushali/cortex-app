@@ -125,7 +125,7 @@ const ScoreboardPage: React.FC = () => {
           )}
 
           {!loading && filteredData.length > 0 && (
-            <BarChartSpecific dataset={filteredData} title="Cross-Regions Performance on all Datasets" />
+            <BarChartSpecific dataset={filteredData} title={`Cross-Regions Performance on ${datasetEmpty}`} />
           )}
 
 
@@ -140,8 +140,11 @@ const ScoreboardPage: React.FC = () => {
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>
           <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false}/>
-          {!loading && roiData.length > 0 && (
+          {!loading && roiData.length > 0 && datasetEmpty === "" && (
             <HeatChartOverall dataset={roiData} title={`${region} Performance on all Datasets`} />
+          )}
+          {!loading && filteredData.length > 0 && (
+            <BarChartSpecific dataset={filteredData} title={`${region} Performance on ${datasetEmpty}`} />
           )}
           
         </div>
@@ -155,8 +158,11 @@ const ScoreboardPage: React.FC = () => {
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} allowToggle={false}/>
           <ROISelect region={regionEmpty} setRegion={setRegionEmpty} dataset={dataset} allowToggle={true} />
-          {!loading &&  filteredData.length > 0 &&(
+          {!loading &&  filteredData.length > 0 && regionEmpty === "" &&(
             <RoiHeatChart dataset={filteredData} title={`Models Performance on Evaluation Datasets: ${dataset}`}/>
+          )}
+          {!loading && filteredData.length > 0 && (
+            <BarChartSpecific dataset={filteredData} title={`${regionEmpty} Performance on ${dataset}`} />
           )}
         </div>
       ),
