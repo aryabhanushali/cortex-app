@@ -21,7 +21,7 @@ export default defineConfig({
       input: {
         main: 'index.html',
         admin: 'lab-page.html',
-        scoreboard: 'scoreboard-page.html',
+        scoreboard: 'scoreboard-page-new.html',
       },
     },
   },
