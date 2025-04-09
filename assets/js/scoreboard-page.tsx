@@ -29,7 +29,7 @@ const ScoreboardPage: React.FC = () => {
 
   const DEFAULT_DATASET_EMPTY= ""   
   
-  const DEFAULT_REGION = "overall";
+  const DEFAULT_REGION = "Overall";
   
   const DEFAULT_DATASET = "Murty185";
   const DEFAULT_REGION_EMPTY = "";
@@ -54,31 +54,38 @@ const ScoreboardPage: React.FC = () => {
     RSC: (data as any)[training]?.rscData,
     VWFA: (data as any)[training]?.vwfaData,
   };
-
-  const roiData = (roiDataMap as any)[region] || [];
-
-  const overallData =(data as any)[training]?.overallData || [];
-
   type DataItem = {
     model: string;
     dataset: string;
     roi: string;
     pearsonr: number;
   };
+
+  const roiData = (roiDataMap as any)[region] || [];
+  const filtereROIData: DataItem[] = roiData.filter((d: DataItem) => d.dataset === datasetEmpty);
+
+
+  const overallData=(data as any)[training]?.overallData || [];
+  const filteredOverallData: DataItem[] = overallData.filter((d: DataItem) => d.dataset === datasetEmpty);
+
+
+ 
   
   const unfilteredData: DataItem[] = (data as any)[training]?.unfilter || [];
   const filteredData = unfilteredData.filter(d => {
     if (current === 0 || current === 1) {
-      return d.dataset === datasetEmpty;
+      return d.dataset === datasetEmpty ;
     } else {
       return d.dataset === dataset;
     }
   });
+  const filteredRegionData : DataItem[] = filteredData.filter((d: DataItem) => d.roi === regionEmpty);
   
 
  
   console.log('🎯 OverallData:', (data as any)[training]?.overallData);
   console.log('🎯 filteredData:', filteredData);
+  console.log('🎯 filteredOverallData:', filteredOverallData);
 
     
 
@@ -94,9 +101,9 @@ const ScoreboardPage: React.FC = () => {
 
   useEffect(() => {
     if (!manualStepChange) {
-      if (current === 0 && region !== "overall") {
+      if (current === 0 && region !== "Overall") {
         setCurrent(1);
-      } else if (current === 1 && region === "overall" && datasetEmpty === "") {
+      } else if (current === 1 && region === "Overall" && datasetEmpty === "") {
         setCurrent(0);
       }
     }
@@ -124,8 +131,8 @@ const ScoreboardPage: React.FC = () => {
             <HeatChartOverall dataset={overallData} title="Cross-Regions Performance on all Datasets" />
           )}
 
-          {!loading && filteredData.length > 0 && (
-            <BarChartSpecific dataset={filteredData} title={`Cross-Regions Performance on ${datasetEmpty}`} />
+          {!loading && filteredOverallData.length > 0 && (
+            <BarChartSpecific dataset={filteredOverallData} title={`Cross-Regions Performance on ${datasetEmpty}`} />
           )}
 
 
@@ -143,8 +150,8 @@ const ScoreboardPage: React.FC = () => {
           {!loading && roiData.length > 0 && datasetEmpty === "" && (
             <HeatChartOverall dataset={roiData} title={`${region} Performance on all Datasets`} />
           )}
-          {!loading && filteredData.length > 0 && (
-            <BarChartSpecific dataset={filteredData} title={`${region} Performance on ${datasetEmpty}`} />
+          {!loading && filtereROIData.length > 0 && (
+            <BarChartSpecific dataset={filtereROIData} title={`${region} Performance on ${datasetEmpty}`} />
           )}
           
         </div>
@@ -161,8 +168,8 @@ const ScoreboardPage: React.FC = () => {
           {!loading &&  filteredData.length > 0 && regionEmpty === "" &&(
             <RoiHeatChart dataset={filteredData} title={`Models Performance on Evaluation Datasets: ${dataset}`}/>
           )}
-          {!loading && filteredData.length > 0 && (
-            <BarChartSpecific dataset={filteredData} title={`${regionEmpty} Performance on ${dataset}`} />
+          {!loading && filteredRegionData.length > 0 && (
+            <BarChartSpecific dataset={filteredRegionData} title={`${regionEmpty} Performance on ${dataset}`} />
           )}
         </div>
       ),
@@ -183,7 +190,7 @@ const ScoreboardPage: React.FC = () => {
                 setManualStepChange(true); 
                 setCurrent(index);
                 if (index === 0) {
-                    setRegion("overall");
+                    setRegion("Overall");
                     setDatasetEmpty("");
                     setTraining("Murty185");
                 } else if (index === 1) {

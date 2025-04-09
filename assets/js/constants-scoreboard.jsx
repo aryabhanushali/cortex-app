@@ -9,7 +9,7 @@ export const TRAINING_OPTIONS = [
 ];
   
 export const REGION_OPTIONS = [
-  { value: 'overall', label: 'Cross-Regions' },
+  { value: 'Overall', label: 'Cross-Regions' },
   { value: 'PPA', label: 'PPA' },
   { value: 'FFA', label: 'FFA' },
   { value: 'EBA', label: 'EBA' },
