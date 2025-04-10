@@ -217,27 +217,86 @@ const Stepper: React.FC = () => {
     marginTop: 16,
   };
 
+  // const downloadData = () => {
+  //   if (predictionResult) {
+  //     // Extract only the 'voxels' part of the prediction result
+  //     const voxelsData = predictionResult[0]?.voxels; // Access the first element and then the voxels property
+
+  //     if (voxelsData) {
+  //       const jsonString = JSON.stringify(voxelsData, null, 2);
+  //       const blob = new Blob([jsonString], { type: "application/json" });
+  //       const url = URL.createObjectURL(blob);
+  //       const a = document.createElement("a");
+  //       a.href = url;
+
+  //       // Construct the filename using the state variables and a timestamp
+  //       const timestamp = new Date().toISOString().replace(/[:\-T.]/g, ""); // Create a timestamp string
+  //       const filename = `murtylab_${model}_${dataset}_${region}_${timestamp}.json`;
+  //       a.download = filename;
+  //       document.body.appendChild(a);
+  //       a.click();
+  //       document.body.removeChild(a);
+  //       URL.revokeObjectURL(url);
+  //       message.success("Voxels data downloading complete!");
+  //     } else {
+  //       message.error("No voxels data available to download.");
+  //     }
+  //   } else {
+  //     message.error("No prediction result available to download.");
+  //   }
+  // };
+
+  //support csv download
   const downloadData = () => {
     if (predictionResult) {
-      // Extract only the 'voxels' part of the prediction result
-      const voxelsData = predictionResult[0]?.voxels; // Access the first element and then the voxels property
-
-      if (voxelsData) {
-        const jsonString = JSON.stringify(voxelsData, null, 2);
-        const blob = new Blob([jsonString], { type: "application/json" });
+      const voxelsData = predictionResult[0]?.voxels;
+  
+      if (voxelsData && typeof voxelsData === "object") {
+        const csvRows = [];
+  
+        // Step 1: Collect all headers dynamically
+        const headers = new Set();
+        const imageRows = [];
+  
+        for (const [imageName, subjects] of Object.entries(voxelsData)) {
+          const row = { image: imageName };
+  
+          for (const [subject, regions] of Object.entries(subjects)) {
+            for (const [regionName, voxelArray] of Object.entries(regions)) {
+              voxelArray.forEach((val, i) => {
+                const key = `${subject}_${i}`;
+                row[key] = val;
+                headers.add(key);
+              });
+            }
+          }
+  
+          imageRows.push(row);
+        }
+  
+        const orderedHeaders = ["image", ...Array.from(headers)];
+        csvRows.push(orderedHeaders.join(","));
+  
+        // Step 2: Write rows based on headers
+        imageRows.forEach(row => {
+          const values = orderedHeaders.map(h => row[h] ?? "");
+          csvRows.push(values.join(","));
+        });
+  
+        const csvString = csvRows.join("\n");
+        const blob = new Blob([csvString], { type: "text/csv" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-
-        // Construct the filename using the state variables and a timestamp
-        const timestamp = new Date().toISOString().replace(/[:\-T.]/g, ""); // Create a timestamp string
-        const filename = `murtylab_${model}_${dataset}_${region}_${timestamp}.json`;
+  
+        const timestamp = new Date().toISOString().replace(/[:\-T.]/g, "");
+        const filename = `murtylab_${model}_${dataset}_${region}_${timestamp}.csv`;
         a.download = filename;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        message.success("Voxels data downloading complete!");
+        message.success("Voxels data downloaded as CSV!");
       } else {
         message.error("No voxels data available to download.");
       }
@@ -245,7 +304,7 @@ const Stepper: React.FC = () => {
       message.error("No prediction result available to download.");
     }
   };
-
+  
   const steps = [
     {
       title: 'Upload Stimuli',
