@@ -7,8 +7,7 @@ import Button from '@mui/material/Button';
 import { Typography, Link } from '@mui/material';
 import { MODEL_OPTIONS, MODELCARD_INFO_LOOKUP } from './constants';
 
-const ModelCard = ({region, dataset, model}) => {
-
+const ModelCard = ({ region, dataset, model }) => {
   console.log("ModelCard: model:", model, "region:", region, "dataset:", dataset);
 
   const getInfo = (dataset, region, model) => {
@@ -16,14 +15,12 @@ const ModelCard = ({region, dataset, model}) => {
     return MODELCARD_INFO_LOOKUP[dataset]?.[region]?.[model] || { bestLayer: 'unknown', corrScore: 0 };
   };
 
-  const { bestLayer, corrScore } = getInfo(dataset, region, model);
-  const getModelName = (model) => {
-    const modelOption = MODEL_OPTIONS.find(option => option.value === model);
-    return modelOption ? modelOption.label : model;
-  }
+  const modelMeta = MODEL_OPTIONS.find(option => option.value === model);
+  const modelName = modelMeta?.label || model;
+  const modelType = modelMeta?.type || 'Unknown Model Type';
+  const cardUrl = modelMeta?.cardUrl || '#';
 
-  const modelName = getModelName(model);
-  const modelType = "Vision Language Model";
+  const { bestLayer, corrScore } = getInfo(dataset, region, model);
 
   return (
     <Box sx={{ minWidth: 250, boxShadow: 3, borderRadius: 2 }}>
@@ -33,7 +30,7 @@ const ModelCard = ({region, dataset, model}) => {
             Model Card
           </Typography>
           <Typography variant="h5" component="div">
-            <Link href="https://github.com/openai/clip/blob/main/model-card.md" target="_blank" rel="noopener noreferrer" underline="hover">
+            <Link href={cardUrl} target="_blank" rel="noopener noreferrer" underline="hover">
               {modelName}
             </Link>
           </Typography>
@@ -41,15 +38,12 @@ const ModelCard = ({region, dataset, model}) => {
             {modelType}
           </Typography>
           <Typography variant="body2">
-            The optimal model layer for the selected ROI ({region.toUpperCase()}):{' '}
-            <strong style={{ color: ''}}>{bestLayer}</strong>, 
-            with highest correlation raw score: <strong style={{ color: '' }}>{corrScore}</strong> 
-            , evaluated on the selected fMRI dataset: <strong style={{ color: '' }}>{dataset}</strong>
+            The optimal model layer for the selected ROI({region.toUpperCase()}):{' '}
+            <strong>{bestLayer}</strong>, 
+            with highest correlation raw score: <strong>{corrScore.toFixed(2)}</strong>, 
+            evaluated on the selected fMRI dataset: <strong>{dataset}</strong>
           </Typography>
         </CardContent>
-        {/* <CardActions>
-          <Button size="small">View Details</Button>
-        </CardActions> */}
       </Card>
     </Box>
   );
