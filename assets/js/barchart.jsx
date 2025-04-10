@@ -173,8 +173,8 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       .text("Images");
     
     g.append("text")
-      .attr("x", -margin.left - 10)
-      .attr("y", -40)
+      .attr("x", -margin.left - 50)
+      .attr("y", -30)
       .attr("text-anchor", "middle")
       .attr("transform", "rotate(-90)")
       .style("font-size", "20px")
