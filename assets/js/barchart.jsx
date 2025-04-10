@@ -178,7 +178,7 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       .attr("text-anchor", "middle")
       .attr("transform", "rotate(-90)")
       .style("font-size", "20px")
-      .text("Mean Response");
+      .text("Mean Predicted Response");
 
    // Draw error bar (vertical line)
     g.selectAll(".error-bar")
