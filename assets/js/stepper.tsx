@@ -96,7 +96,7 @@ const Stepper: React.FC = () => {
 
   const DEFAULT_REGION = "ffa";
   const DEFAULT_MODEL = "clip_rn50";
-  const DEFAULT_DATASET = "murty185";
+  const DEFAULT_DATASET = "nsd_1000";
   const DEFAULT_VOXEL = "all-participants";
 
   const [model, setModel] = useState(DEFAULT_MODEL);
