@@ -21,7 +21,15 @@ export default defineConfig({
       input: {
         main: 'index.html',
         admin: 'lab-page.html',
-        scoreboard: 'scoreboard-page-new.html',
+        scoreboard: 'scoreboard-page.html',
+        overallPerformance: 'overall-performance-accross-all-regions.html',
+        specificROI: 'specify-roi-page.html',
+        specificDataset: 'specify-dataset-page.html',
+        crossRegion: 'cross-region-performance-page.html',
+        roiPerformance: 'roi-performance-page.html',
+    
+        
+
       },
     },
   },
