@@ -138,11 +138,20 @@ const Stepper: React.FC = () => {
   // }, [files]);
 
   // Trigger prediction when settings change or files are uploaded
+  // useEffect(() => {
+  //   setPredictionResult(null); // Clear previous results
+  //   setPredictstep(1); // Reset button
+  //   handlePrediction();
+  // }, [model, dataset, region, voxelOption, voxelNumber, paper, participantName]);
+
   useEffect(() => {
-    setPredictionResult(null); // Clear previous results
-    setPredictstep(1); // Reset button
-    handlePrediction();
-  }, [model, dataset, region, voxelOption, voxelNumber, paper, participantName]);
+    // Only auto-trigger prediction if we're on Step 3 (index 2)
+    if (current === 2) {
+      setPredictionResult(null);
+      setPredictstep(1);
+      handlePrediction();
+    }
+  }, [region]); // Only watch region
 
   useEffect(() => {
     console.log("🔄 predictionResult updated:", predictionResult);
