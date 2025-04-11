@@ -313,7 +313,7 @@ const Stepper: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0px', marginBottom: '-100px' }}>
           <Uploader onFilesUploaded={handleFilesUploaded} onFileMappingsUpdate={handleFileMappingsUpdate} />
           <div style={{ textAlign: 'right', color: 'black', marginTop: '-100px', fontWeight: 500 }}>
-            📸 {files.length} image{files.length <= 1 ? '' : 's'} uploaded
+            📸 {files.length} images{files.length <= 1 ? '' : 's'} uploaded
           </div>
         </div>
       ),
