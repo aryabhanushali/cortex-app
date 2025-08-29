@@ -20,13 +20,17 @@ export const REGION_OPTIONS = [
   { value: 'VWFA', label: 'VWFA'},
 ];
 
-export const DATASET_OPTIONS = [
+export const DATASET_OPTIONS_LEFT = [
     { value: 'Murty185', label: 'Murty185' },
-    { value: 'NSD', label: 'NSD' },
+    { value: 'nsd1000', label: 'NSD' },
     { value: 'algonauts', label: 'algonauts' },
-    { value: 'BOLD5000', label: 'BOLD5000' },
-    { value: 'BonnerEpstein', label: 'BonnerEpstein' },
-    { value: 'KingBaker', label: 'KingBaker' }
+    { value: 'bold5000', label: 'BOLD5000' },
+    { value: 'bonner', label: 'BonnerEpstein' },
+    { value: 'kingbaker', label: 'KingBaker' }
+  ];
+
+export const DATASET_OPTIONS_RIGHT = [
+    { value: 'DuplicatePaper', label: 'DuplicatePaper' }
   ];
 
 

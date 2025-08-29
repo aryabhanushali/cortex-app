@@ -7,8 +7,14 @@ import TrainingSelect from './trainingselect.jsx';
 import DatasetSelect from './datasetselect.jsx';
 import HeatChartOverall from './overallheatchart.jsx';
 import useLoadData from './loaddata.jsx';
+import useLoadDataNew from './loadDataNew.jsx';
 import RoiHeatChart from './roiheartchart.jsx';
 import BarChartSpecific from './barchartspecific.jsx';
+
+//  new this time
+import ScatterMurtyVsNsd from './scatterplot.jsx';
+import HeatmapByROI from './heatMapRoi.jsx';
+import RoiBarChart from './roiDatasetBarChart.jsx';
 
 
 
@@ -22,10 +28,13 @@ const ScoreboardPage: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const { data, loading } = useLoadData();
   
+
+  
  
+
   const [manualStepChange, setManualStepChange] = useState(false);
 
-  const DEFAULT_TRAINING = "Murty185"
+  const DEFAULT_TRAINING = ""
 
   const DEFAULT_DATASET_EMPTY= ""   
   
@@ -81,11 +90,33 @@ const ScoreboardPage: React.FC = () => {
   });
   const filteredRegionData : DataItem[] = filteredData.filter((d: DataItem) => d.roi === regionEmpty);
   
+//   useEffect(() => {
+//   if (!loadingNew && newData) {
+//     console.log("🚀 NewData loaded:", newData);
+//     console.log("📂 Keys:", Object.keys(newData));
+//   }
+// }, [loadingNew, newData]);
 
+ type newData = {
+  murty_uni?: Record<string, any>;
+  nsd_uni?: Record<string, any>;
+  murty_multi?: Record<string, any>;
+  nsd_multi?: Record<string, any>;
+};
+
+  const { data: newData, loading: loadingNew } = useLoadDataNew() as {
+    data: newData;
+    loading: boolean;
+  };
+
+
+  const murtyUni = newData?.murty_uni;
+  const nsdUni   = newData?.nsd_uni;
  
   console.log('🎯 OverallData:', (data as any)[training]?.overallData);
   console.log('🎯 filteredData:', filteredData);
   console.log('🎯 filteredOverallData:', filteredOverallData);
+
 
     
 
@@ -115,7 +146,8 @@ const ScoreboardPage: React.FC = () => {
     }
   }, [manualStepChange]);
   
-  
+
+
 
   
 
@@ -127,14 +159,59 @@ const ScoreboardPage: React.FC = () => {
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>
           <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false}/>
-          {!loading && overallData.length > 0 && datasetEmpty === "" && (
+         
+        {!loadingNew && newData && training === "" && datasetEmpty === ""  && (
+          <ScatterMurtyVsNsd 
+            murtyData={newData.murty_uni} 
+            nsdData={newData.nsd_uni} 
+            roi= {region}
+            title={`Murty vs NSD on ${region}`} 
+          />
+        )}
+          
+          {/* {!loading && overallData.length > 0 && datasetEmpty === "" && (
             <HeatChartOverall dataset={overallData} title="Cross-Regions Performance on all Datasets" />
+          )} */}
+
+          {!loadingNew && datasetEmpty === "" && training === "Murty185" && (
+            <HeatmapByROI
+              data={newData.murty_uni}
+              roi ={region}
+              title="Cross-Regions Performance (Trained on Murty185)"
+            />
           )}
 
-          {!loading && filteredOverallData.length > 0 && (
+          {!loadingNew && datasetEmpty === "" && training === "NSD" && (
+            <HeatmapByROI
+              data={newData.nsd_uni}
+              roi ={region}
+              title="Cross-Regions Performance (Trained on NSD)"
+            />
+          )}
+
+          {/* {!loading && filteredOverallData.length > 0 && (
             <BarChartSpecific dataset={filteredOverallData} title={`Cross-Regions Performance on ${datasetEmpty}`} />
+          )} */}
+
+          {!loadingNew  && datasetEmpty != "" && training === "NSD" && (
+             <RoiBarChart
+              data={newData.nsd_uni}
+              roi ={region}
+              dataset={datasetEmpty}
+              title={`${region} Performance on ${datasetEmpty}  (Trained on NSD)`}
+            />
+
           )}
 
+             {!loadingNew  && datasetEmpty != "" && training === "Murty185" && (
+             <RoiBarChart
+              data={newData.murty_uni}
+              roi ={region}
+              dataset={datasetEmpty}
+              title={`${region} Performance on ${datasetEmpty}  (Trained on Murty 185)`}
+            />
+
+          )}
 
         </div>
       ),
@@ -147,12 +224,60 @@ const ScoreboardPage: React.FC = () => {
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>
           <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false}/>
-          {!loading && roiData.length > 0 && datasetEmpty === "" && (
+          {/* {!loading && roiData.length > 0 && datasetEmpty === "" && (
             <HeatChartOverall dataset={roiData} title={`${region} Performance on all Datasets`} />
+          )} */}
+
+          {!loadingNew && datasetEmpty === "" && training === "Murty185" && (
+            <HeatmapByROI
+              data={newData.murty_uni}
+              roi ={region.toLowerCase()}
+              title={`${region} Performance on all Datasets (Trained on Murty 185)`}
+            />
           )}
-          {!loading && filtereROIData.length > 0 && (
+
+          {!loadingNew && datasetEmpty === "" && training === "NSD" && (
+            <HeatmapByROI
+              data={newData.nsd_uni}
+              roi ={region.toLowerCase()}
+              title={`${region} Performance on all Datasets (Trained on NSD 1000)`}
+            />
+          )}
+
+
+          {/* {!loading && filtereROIData.length > 0 && (
             <BarChartSpecific dataset={filtereROIData} title={`${region} Performance on ${datasetEmpty}`} />
+          )} */}
+
+            {!loadingNew && newData && training === "" && datasetEmpty === ""  && (
+          <ScatterMurtyVsNsd 
+            murtyData={newData.murty_uni} 
+            nsdData={newData.nsd_uni} 
+            roi= {region.toLowerCase()}
+            title={`Murty vs NSD on ${region}`} 
+          />
+        )}
+
+         {!loadingNew  && datasetEmpty != "" && training === "NSD" && (
+             <RoiBarChart
+              data={newData.nsd_uni}
+              roi ={region.toLowerCase()}
+              dataset={datasetEmpty}
+              title={`${region} Performance on ${datasetEmpty}  (Trained on NSD)`}
+            />
+
           )}
+
+             {!loadingNew  && datasetEmpty != "" && training === "Murty185" && (
+             <RoiBarChart
+              data={newData.murty_uni}
+              roi ={region.toLowerCase()}
+              dataset={datasetEmpty}
+              title={`${region} Performance on ${datasetEmpty}  (Trained on Murty 185)`}
+            />
+
+          )}
+
           
         </div>
       ),

@@ -32,7 +32,9 @@ const TrainingSelect = ({ training, setTraining, dataset }) => {
         {TRAINING_OPTIONS.map((option) => (
           <Button
             key={option.value}
-            onClick={() => setTraining(option.value)}
+            onClick={() => {
+              setTraining(prev => prev === option.value ? "" : option.value);
+            }}
             variant={training === option.value ? "contained" : "outlined"}
             sx={{
               "&.Mui-disabled": {

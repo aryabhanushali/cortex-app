@@ -22,6 +22,7 @@ export default defineConfig({
         main: 'index.html',
         admin: 'lab-page.html',
         scoreboard: 'scoreboard-page.html',
+        scoreboardNew: 'scoreboard-page-new.html',
         overallPerformance: 'overall-performance-accross-all-regions.html',
         specificROI: 'specify-roi-page.html',
         specificDataset: 'specify-dataset-page.html',
@@ -43,8 +44,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@js': '/js',
-      '@assets': '/assets',
+     '@js': '/assets/js',
+      '@assets': '/assets'
     },
   },
 });

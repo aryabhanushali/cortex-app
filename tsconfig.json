@@ -15,7 +15,7 @@
       "allowImportingTsExtensions": true,
       "noEmit": true
     },
-    "include": ["assets"],
+    "include": ["assets", "assets/js/barchart.jsx", "assets/js/barchartspecific.jsx", "assets/js/barchartstyles.jsx", "assets/js/components.jsx", "assets/js/constants-scoreboard.jsx", "assets/js/constants.jsx", "assets/js/datasetselect.jsx", "assets/js/heatmap.jsx", "assets/js/heatmapstyles.jsx"],
     "exclude": ["node_modules", "dist"]
 }
   

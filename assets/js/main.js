@@ -258,3 +258,5 @@ var TxtType = function(el, toRotate, period) {
         css.innerHTML = ".typewrite > .wrap { border-right: 2px solid #4154f1; animation: blinking 0.8s infinite;}";
         document.body.appendChild(css);
     };
+
+  

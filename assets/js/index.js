@@ -1,0 +1,126 @@
+// ===== Minimal 3D Brain STL Viewer =====
+console.log('✅ index.js loaded');
+import * as THREE from 'https://unpkg.com/three@0.159/build/three.module.js';
+import { OrbitControls } from 'https://unpkg.com/three@0.159/examples/jsm/controls/OrbitControls.js?module';
+import { STLLoader } from 'https://unpkg.com/three@0.159/examples/jsm/loaders/STLLoader.js?module';
+
+
+
+function initBrainViewer(url = 'assets/brainModel/brain.stl') {
+  const container = document.getElementById('brain-viewport');
+  if (!container) return;
+
+  const scene = new THREE.Scene();
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  container.appendChild(renderer.domElement);
+
+  const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 2000);
+  camera.position.set(0, 0.2, 2.2);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.1;
+  controls.rotateSpeed = 0.6;
+  controls.enablePan = false;
+  controls.target.set(0, 0, 0);
+
+  scene.add(new THREE.AmbientLight(0xf3f5fb, 0.9));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.6);
+  dir.position.set(1, 1, 1);
+  scene.add(dir);
+
+  const loader = new STLLoader();
+  loader.load(
+    url,
+    (geometry) => {
+    const material = new THREE.MeshPhysicalMaterial({
+        // color: 0xf3f5fb,       // 浅蓝白
+        metalness: 0.1,       // 几乎不带金属
+        roughness: 0.1,       // 更光滑
+        clearcoat: 0.5,        // 清漆层，增加光泽
+        clearcoatRoughness: 0.1,
+        reflectivity: 0.6,     // 让它多反射环境光
+        transparent: true,   // 必须加
+        opacity: 0.9    
+  
+    });
+    // 加入 y 方向渐变 (白 -> 浅蓝)
+material.onBeforeCompile = (shader) => {
+  shader.fragmentShader = shader.fragmentShader.replace(
+    '#include <dithering_fragment>',
+    `
+      float grad = clamp((vViewPosition.y + 1.0) / 2.0, 0.0, 1.0);
+      vec3 gradColor = mix(vec3(1.0,1.0,1.0), vec3(0.75,0.82,1.0), grad);
+      gl_FragColor = vec4(gradColor, 1.0) * gl_FragColor;
+      #include <dithering_fragment>
+    `
+  );
+};
+      const mesh = new THREE.Mesh(geometry, material);
+
+        geometry.computeVertexNormals();  // 确保有法线
+        geometry.center();    
+
+      geometry.computeBoundingBox();
+      const box = geometry.boundingBox;
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      mesh.position.sub(center);
+
+      const maxDim = Math.max(size.x, size.y, size.z);
+      mesh.scale.setScalar(1.2 / maxDim);
+      mesh.rotation.x = -Math.PI /2;
+
+      scene.add(mesh);
+
+      let autoRotate = true;
+      function tick(time) {
+      requestAnimationFrame(tick);
+      if (autoRotate) mesh.rotation.z += 0.001;
+
+        // 变色逻辑：用时间算颜色
+        const t = (Math.sin(time * 0.001) + 1) / 2; // 0~1 循环
+        const r = 0.75;                // 红色高 → 偏白蓝
+        const g = 0.9;                // 绿色高 → 去掉灰感
+        const b = 0.85 + 0.3 * t; ;       // 蓝色 0.9 ~ 1.0 微变化
+        mesh.material.color.setRGB(r, g, b);
+
+        controls.update();
+        renderer.render(scene, camera);
+        }
+        tick();
+
+      controls.addEventListener('start', () => {
+        autoRotate = false; // 拖动中关闭自转
+        });
+
+        controls.addEventListener('end', () => {
+        autoRotate = true;  // 拖动结束恢复自转
+        });
+    },
+    undefined,
+    (err) => {
+      console.error('STL 加载失败：', err);
+      container.innerHTML =
+        '<div style="padding:12px;border-radius:12px;background:#f8d7da;color:#842029;font-size:14px;">⚠️ 模型加载失败，请检查路径和文件体积。</div>';
+    }
+  );
+
+  const resize = () => {
+    const w = container.clientWidth, h = container.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  };
+  const ro = new ResizeObserver(resize);
+  ro.observe(container);
+  window.addEventListener('orientationchange', resize);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  initBrainViewer('assets/brainModel/brain.stl'); // <- 这里用你实际文件路径
+});

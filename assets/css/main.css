@@ -950,6 +950,17 @@ section,
   }
 }
 
+
+.brain-viewport {
+  width: 100%;
+  height: 420px;           /* 需要更高就调这里；lg 以上我下面会自动调到 520px */
+  border-radius: 16px;
+  overflow: hidden;        /* 防止模型溢出 */
+  background: transparent; /* 与 hero 背景融合 */
+}
+@media (min-width: 992px) {
+  .brain-viewport { height: 520px; }
+}
 /*--------------------------------------------------------------
 # About Section
 --------------------------------------------------------------*/

@@ -1,6 +1,8 @@
+
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import Stepper from './stepper';
+import Stepper from './stepper.js';
 
 function App() {
   return (
