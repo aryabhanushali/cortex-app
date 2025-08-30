@@ -4,7 +4,9 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-import { REGION_OPTIONS } from './constants-scoreboard';
+
+import {ROI_OPTIONS} from './constants-scoreboard';
+import {OVERALL_OPTION} from './constants-scoreboard';
 
 
 const ROISelect = ({ region, setRegion, dataset,allowToggle }) => {
@@ -22,32 +24,51 @@ const ROISelect = ({ region, setRegion, dataset,allowToggle }) => {
       >
         Region of Interest:
       </FormLabel>
-      <ButtonGroup 
-        aria-labelledby="region-buttons-group-label"
-        fullWidth
-      >
-        {REGION_OPTIONS.map((option) => (
-          <Button
-            key={option.value}
-            onClick={() => {
-              if (allowToggle) {
-                setRegion(prev => prev === option.value ? "" : option.value);
-              } else {
-                setRegion(option.value); 
-              }
-            }}
-            variant={region === option.value ? "contained" : "outlined"}
-            
-            sx={{
-              "&.Mui-disabled": {
-                backgroundColor: "#f3f3f3",
-                color: "#c0c0c0"
-              }
-            }}
-          >
-            {option.label}
-          </Button>
-        ))}
+        <ButtonGroup fullWidth>
+        {region === "Overall"
+          ? OVERALL_OPTION.map((option) => (
+              <Button
+                key={option.value}
+                onClick={() => {
+                  if (allowToggle) {
+                    setRegion((prev) => (prev === option.value ? "" : option.value));
+                  } else {
+                    setRegion(option.value);
+                  }
+                }}
+                variant={region === option.value ? "contained" : "outlined"}
+                sx={{
+                  "&.Mui-disabled": {
+                    backgroundColor: "#f3f3f3",
+                    color: "#c0c0c0",
+                  },
+                }}
+              >
+                {option.label}
+              </Button>
+            ))
+          : 
+          ROI_OPTIONS.map((option) => (
+            <Button
+              key={option.value}
+              onClick={() => {
+                if (allowToggle) {
+                  setRegion((prev) => (prev === option.value ? "" : option.value));
+                } else {
+                  setRegion(option.value);
+                }
+              }}
+              variant={region === option.value ? "contained" : "outlined"}
+              sx={{
+                "&.Mui-disabled": {
+                  backgroundColor: "#f3f3f3",
+                  color: "#c0c0c0",
+                },
+              }}
+            >
+              {option.label}
+            </Button>
+          ))}
       </ButtonGroup>
     </FormControl>
   );

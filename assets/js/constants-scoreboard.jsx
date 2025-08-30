@@ -8,16 +8,21 @@ export const TRAINING_OPTIONS = [
   { value: 'NSD', label: 'NSD' },
 ];
   
-export const REGION_OPTIONS = [
-  { value: 'Overall', label: 'Cross-Regions' },
+export const ROI_OPTIONS = [
+  
   { value: 'PPA', label: 'PPA' },
   { value: 'FFA', label: 'FFA' },
   { value: 'EBA', label: 'EBA' },
-  { value: 'FBA', label: 'FBA'},
-  { value: 'OFA', label: 'OFA'},
-  { value: 'OPA', label: 'OPA'},
-  { value: 'RSC', label: 'RSC'},
-  { value: 'VWFA', label: 'VWFA'},
+  // { value: 'FBA', label: 'FBA'},
+  // { value: 'OFA', label: 'OFA'},
+  // { value: 'OPA', label: 'OPA'},
+  // { value: 'RSC', label: 'RSC'},
+  // { value: 'VWFA', label: 'VWFA'},
+];
+
+export const OVERALL_OPTION = [
+  { value: 'Overall', label: 'Cross-Regions' },
+
 ];
 
 export const DATASET_OPTIONS_LEFT = [

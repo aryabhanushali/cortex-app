@@ -17,20 +17,11 @@ import HeatmapByROI from './heatMapRoi.jsx';
 import RoiBarChart from './roiDatasetBarChart.jsx';
 
 
-
-
-
-
-
-
 const ScoreboardPage: React.FC = () => {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const { data, loading } = useLoadData();
   
-
-  
- 
 
   const [manualStepChange, setManualStepChange] = useState(false);
 
@@ -90,12 +81,6 @@ const ScoreboardPage: React.FC = () => {
   });
   const filteredRegionData : DataItem[] = filteredData.filter((d: DataItem) => d.roi === regionEmpty);
   
-//   useEffect(() => {
-//   if (!loadingNew && newData) {
-//     console.log("🚀 NewData loaded:", newData);
-//     console.log("📂 Keys:", Object.keys(newData));
-//   }
-// }, [loadingNew, newData]);
 
  type newData = {
   murty_uni?: Record<string, any>;
@@ -153,12 +138,13 @@ const ScoreboardPage: React.FC = () => {
 
   const steps = [
     {
-      title: 'Overall performance across all regions',
+      title: 'Overall Performance ',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false}/>
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false}/>
+          
          
         {!loadingNew && newData && training === "" && datasetEmpty === ""  && (
           <ScatterMurtyVsNsd 
@@ -300,6 +286,15 @@ const ScoreboardPage: React.FC = () => {
       ),
       icon: <SmileOutlined />,
     },
+    {
+      title:'Duplicate Table',
+      icon: <SmileOutlined />,
+    },
+    {
+      title:'Customized',
+      icon: <SmileOutlined />,
+    },
+
   ];
 
   return (
@@ -317,7 +312,7 @@ const ScoreboardPage: React.FC = () => {
                 if (index === 0) {
                     setRegion("Overall");
                     setDatasetEmpty("");
-                    setTraining("Murty185");
+                    setTraining("");
                 } else if (index === 1) {
                     setRegion("PPA");
                     setDatasetEmpty("");
