@@ -207,9 +207,10 @@ const ScoreboardPage: React.FC = () => {
       title: 'A specific ROI',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false}/>
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false}/>
+          
           {/* {!loading && roiData.length > 0 && datasetEmpty === "" && (
             <HeatChartOverall dataset={roiData} title={`${region} Performance on all Datasets`} />
           )} */}
@@ -316,7 +317,7 @@ const ScoreboardPage: React.FC = () => {
                 } else if (index === 1) {
                     setRegion("PPA");
                     setDatasetEmpty("");
-                    setTraining("Murty185");
+                    setTraining("");
                 } else if(index == 2) {
                     setRegionEmpty("");
                     setDataset("Murty185");
