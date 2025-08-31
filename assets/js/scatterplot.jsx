@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, title }) => {
+const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi}) => {
   const containerRef = useRef();
 
   useEffect(() => {
@@ -109,9 +109,8 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, title }) => {
       .attr("text-anchor", "middle")
       .style("font-size", "18px")
       .style("font-weight", "bold")
-      .text(title || `${roi.toUpperCase()} — Murty vs NSD`);
 
-  }, [murtyData, nsdData, roi, title]);
+  }, [murtyData, nsdData, roi]);
 
   return <div ref={containerRef}></div>;
 };

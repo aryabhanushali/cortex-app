@@ -2795,6 +2795,17 @@ section,
 # Scoreboard —— All pages general
 --------------------------------------------------------------*/
 
+.chart-title {
+  font-size: 20px;            
+  font-weight: 600;          
+  color: #000000;             
+  text-align: center;        
+  margin: 30px 0 12px 0;     
+  line-height: 1.4;           
+}
+
+
+
 .button-container {
   display: flex;
   align-items: flex-start;

@@ -29,7 +29,7 @@ const ScoreboardPage: React.FC = () => {
 
   const DEFAULT_DATASET_EMPTY= ""   
   
-  const DEFAULT_REGION = "";
+  const DEFAULT_REGION = "Overall";
   
   const DEFAULT_DATASET = "";
   const DEFAULT_REGION_EMPTY = "";
@@ -184,14 +184,29 @@ const ScoreboardPage: React.FC = () => {
           {region != "" && ( <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>) }
           {region !== "" && training !== "" && (<DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>)}
           
-          
+          {/* title display logic */}
+          {!loadingNew && (
+            <div className="chart-title">
+              {training === "" && datasetEmpty === "" && newData
+                ? `Cross-Regions Performence (Trained on Murty and Trained on NSD) `
+                : training === "Murty185" && datasetEmpty === ""
+                ? "Cross-Regions Performance (Trained on Murty185)"
+                : training === "NSD" && datasetEmpty === ""
+                ? "Cross-Regions Performance (Trained on NSD)"
+                : training === "NSD" && datasetEmpty !== ""
+                ? `Cross-Regions Performance on ${datasetEmpty} (Trained on NSD)`
+                : training === "Murty185" && datasetEmpty !== ""
+                ? `Cross-Regions Performance on ${datasetEmpty} (Trained on Murty185)`
+                : ""}
+            </div>
+          )}
+
 
         {!loadingNew && newData && training === "" && datasetEmpty === ""  && (
           <ScatterMurtyVsNsd 
             murtyData={newData.murty_uni} 
             nsdData={newData.nsd_uni} 
             roi= {region}
-            title={`Murty vs NSD on ${region}`} 
           />
         )}
           
@@ -252,6 +267,26 @@ const ScoreboardPage: React.FC = () => {
           <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true}/>
           {region !== "" && ( <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>)}
           {region !== "" && training!== "" && ( <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>)}
+
+
+          {/* title display logic */}
+          {!loadingNew && (
+            <div className="chart-title">
+              { region === "" && training === "" && datasetEmpty === "" && newData
+                ? `Dataset and ROIs Effects`
+                : training === "" && datasetEmpty === ""
+                ? `${region} Performance (Trained on Murty185 and Trained on NSD)`
+                : training === "Murty185" && datasetEmpty === ""
+                ? `${region} Performance (Trained on Murty185)`
+                : training === "NSD" && datasetEmpty === ""
+                ? `${region} Performance (Trained on NSD)`
+                : training === "NSD" && datasetEmpty !== ""
+                ? `${region} Performance on ${datasetEmpty} (Trained on NSD)`
+                : training === "Murty185" && datasetEmpty !== ""
+                ? `${region} Performance on ${datasetEmpty} (Trained on Murty185)`
+                : ""}
+            </div>
+          )}
          
           
           {/* {!loading && roiData.length > 0 && datasetEmpty === "" && (
@@ -284,7 +319,6 @@ const ScoreboardPage: React.FC = () => {
             murtyData={newData.murty_uni} 
             nsdData={newData.nsd_uni} 
             roi= {region.toLowerCase()}
-            title={`Murty vs NSD on ${region}`} 
           />
         )}
 
@@ -322,6 +356,27 @@ const ScoreboardPage: React.FC = () => {
           <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} allowToggle={true}/>
           {dataset !== "" && (<TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>)}
           {dataset !== "" && training !== "" && (<ROISelect region={regionEmpty} setRegion={setRegionEmpty} dataset={dataset} allowToggle={true} />)}
+
+
+          {/* title display logic */}
+          {!loadingNew && (
+            <div className="chart-title">
+              { regionEmpty === "" && training === "" && dataset === "" && newData
+                ? `Dataset and ROIs Effects`
+                : training === "" && regionEmpty === ""
+                ? `Performance on ${dataset}(Trained on Murty185 and Trained on NSD)`
+                : training === "Murty185" && datasetEmpty === ""
+                ? `Performance on ${dataset} (Trained on Murty185)`
+                : training === "NSD" && regionEmpty === ""
+                ? `Performance on ${dataset} (Trained on NSD)`
+                : training === "NSD" && dataset !== ""
+                ? `${regionEmpty} Performance on ${dataset} (Trained on NSD)`
+                : training === "Murty185" && dataset !== ""
+                ? `${regionEmpty} Performance on ${dataset} (Trained on Murty185)`
+                : ""}
+            </div>
+          )}
+         
           
           {!loading &&  filteredData.length > 0 && regionEmpty === "" &&(
             <RoiHeatChart dataset={filteredData} title={`Models Performance on Evaluation Datasets: ${dataset}`}/>
