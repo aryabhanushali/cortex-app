@@ -207,7 +207,7 @@ const ScoreboardPage: React.FC = () => {
       title: 'A specific ROI',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false}/>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true}/>
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
           <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>
           
@@ -315,7 +315,7 @@ const ScoreboardPage: React.FC = () => {
                     setDatasetEmpty("");
                     setTraining("");
                 } else if (index === 1) {
-                    setRegion("PPA");
+                    setRegion("");
                     setDatasetEmpty("");
                     setTraining("");
                 } else if(index == 2) {
