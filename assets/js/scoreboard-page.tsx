@@ -42,6 +42,43 @@ const ScoreboardPage: React.FC = () => {
   const [regionEmpty, setRegionEmpty] = useState(DEFAULT_REGION_EMPTY);
   const [region, setRegion] = useState(DEFAULT_REGION);
 
+
+  // step 0 clear value logic
+  useEffect(() => {
+    if (current === 0 && training === "") {
+      setDatasetEmpty("");
+    }
+  }, [current, training])
+
+  //step 1 clear value logic
+  useEffect(() => {
+    if (current === 1 && region === "") {
+      setTraining("");
+      setDatasetEmpty("");
+    }
+  }, [current, region]);
+  
+  useEffect(() => {
+    if (current === 1 && training === "") {
+      setDatasetEmpty("");
+    }
+  }, [current, training]);
+
+  // step 2 clear value logic
+  useEffect(() => {
+    if (current === 2 && dataset === "") {
+      setTraining("");
+      setRegionEmpty("");
+    }
+  }, [current, dataset]);
+  
+ 
+  useEffect(() => {
+    if (current === 2 && training === "") {
+      setRegionEmpty("");
+    }
+  }, [current, training]);
+
   
 
   const roiDataMap = {
@@ -141,11 +178,14 @@ const ScoreboardPage: React.FC = () => {
       title: 'Overall Performance ',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
+
+          {/* panel display logic */}
           <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false}/>
-          <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
-          <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>
+          {region != "" && ( <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>) }
+          {region !== "" && training !== "" && (<DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>)}
           
-         
+          
+
         {!loadingNew && newData && training === "" && datasetEmpty === ""  && (
           <ScatterMurtyVsNsd 
             murtyData={newData.murty_uni} 
@@ -207,9 +247,12 @@ const ScoreboardPage: React.FC = () => {
       title: 'A specific ROI',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
+
+          {/* panel display logic */}
           <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true}/>
-          <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
-          <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>
+          {region !== "" && ( <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>)}
+          {region !== "" && training!== "" && ( <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>)}
+         
           
           {/* {!loading && roiData.length > 0 && datasetEmpty === "" && (
             <HeatChartOverall dataset={roiData} title={`${region} Performance on all Datasets`} />
@@ -274,9 +317,12 @@ const ScoreboardPage: React.FC = () => {
       title: 'A specific Dataset',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
+
+          {/* panel display logic */}
           <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} allowToggle={true}/>
-          <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
-          <ROISelect region={regionEmpty} setRegion={setRegionEmpty} dataset={dataset} allowToggle={true} />
+          {dataset !== "" && (<TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>)}
+          {dataset !== "" && training !== "" && (<ROISelect region={regionEmpty} setRegion={setRegionEmpty} dataset={dataset} allowToggle={true} />)}
+          
           {!loading &&  filteredData.length > 0 && regionEmpty === "" &&(
             <RoiHeatChart dataset={filteredData} title={`Models Performance on Evaluation Datasets: ${dataset}`}/>
           )}
