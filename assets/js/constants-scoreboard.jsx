@@ -25,6 +25,16 @@ export const OVERALL_OPTION = [
 
 ];
 
+export const REGION_OPTIONS = [
+  { value: 'Overall', label: 'Cross-Regions' },
+  { value: 'PPA', label: 'PPA' },
+  { value: 'FFA', label: 'FFA' },
+  { value: 'EBA', label: 'EBA' }
+
+];
+
+
+
 export const DATASET_OPTIONS_LEFT = [
     { value: 'Murty185', label: 'Murty185' },
     { value: 'nsd1000', label: 'NSD' },

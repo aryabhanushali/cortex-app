@@ -180,7 +180,7 @@ const ScoreboardPage: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
           {/* panel display logic */}
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false}/>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false} mode={1}/>
           {region != "" && ( <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>) }
           {region !== "" && training !== "" && (<DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>)}
           
@@ -264,7 +264,7 @@ const ScoreboardPage: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
           {/* panel display logic */}
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true}/>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={2}/>
           {region !== "" && ( <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>)}
           {region !== "" && training!== "" && ( <DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true}/>)}
 
@@ -355,7 +355,7 @@ const ScoreboardPage: React.FC = () => {
           {/* panel display logic */}
           <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} allowToggle={true}/>
           {dataset !== "" && (<TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>)}
-          {dataset !== "" && training !== "" && (<ROISelect region={regionEmpty} setRegion={setRegionEmpty} dataset={dataset} allowToggle={true} />)}
+          {dataset !== "" && training !== "" && (<ROISelect region={regionEmpty} setRegion={setRegionEmpty} dataset={dataset} allowToggle={true} mode={3}/>)}
 
 
           {/* title display logic */}
