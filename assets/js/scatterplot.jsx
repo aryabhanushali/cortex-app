@@ -7,12 +7,12 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi}) => {
   useEffect(() => {
     if (!murtyData || !nsdData) return;
 
-    // 清空旧图
+    // clear the old data
     d3.select(containerRef.current).select("svg").remove();
 
-    const width = window.innerWidth * 0.7;
-    const height = 600;
-    const margin = { top: 50, right: 50, bottom: 50, left: 70 };
+    const width = 800;
+    const height = 800;
+    const margin = { top: 60, right: 60, bottom: 60, left: 60 };
 
     const svg = d3
       .select(containerRef.current)
@@ -42,14 +42,15 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi}) => {
     });
 
     // scale
-    const xScale = d3
-      .scaleLinear()
-      .domain([d3.min(points, (d) => d.x) - 0.05, d3.max(points, (d) => d.x) + 0.05])
+    const minVal = Math.min(d3.min(points, d => d.x), d3.min(points, d => d.y)) - 0.05;
+    const maxVal = Math.max(d3.max(points, d => d.x), d3.max(points, d => d.y)) + 0.05;
+
+    const xScale = d3.scaleLinear()
+      .domain([minVal, maxVal])
       .range([margin.left, width - margin.right]);
 
-    const yScale = d3
-      .scaleLinear()
-      .domain([d3.min(points, (d) => d.y) - 0.05, d3.max(points, (d) => d.y) + 0.05])
+    const yScale = d3.scaleLinear()
+      .domain([minVal, maxVal])  // 
       .range([height - margin.bottom, margin.top]);
 
     // 轴
@@ -63,10 +64,10 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi}) => {
 
     // 参考线 y=x
     svg.append("line")
-      .attr("x1", margin.left)
-      .attr("y1", yScale(d3.min(points, d => d.x)))
-      .attr("x2", xScale(d3.max(points, d => d.x)))
-      .attr("y2", yScale(d3.max(points, d => d.x)))
+      .attr("x1", xScale(minVal))
+      .attr("y1", yScale(minVal))
+      .attr("x2", xScale(maxVal))
+      .attr("y2", yScale(maxVal))
       .attr("stroke", "black")
       .attr("stroke-dasharray", "4 2")
       .attr("opacity", 0.5);
