@@ -274,8 +274,8 @@ const ScoreboardPage: React.FC = () => {
       title: 'A specific Dataset',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
+          <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} allowToggle={true}/>
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset}/>
-          <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} allowToggle={false}/>
           <ROISelect region={regionEmpty} setRegion={setRegionEmpty} dataset={dataset} allowToggle={true} />
           {!loading &&  filteredData.length > 0 && regionEmpty === "" &&(
             <RoiHeatChart dataset={filteredData} title={`Models Performance on Evaluation Datasets: ${dataset}`}/>
@@ -320,8 +320,8 @@ const ScoreboardPage: React.FC = () => {
                     setTraining("");
                 } else if(index == 2) {
                     setRegionEmpty("");
-                    setDataset("Murty185");
-                    setTraining("Murty185");
+                    setDataset("");
+                    setTraining("");
                 }
                 
                 
