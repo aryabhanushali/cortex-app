@@ -29,9 +29,9 @@ const ScoreboardPage: React.FC = () => {
 
   const DEFAULT_DATASET_EMPTY= ""   
   
-  const DEFAULT_REGION = "Overall";
+  const DEFAULT_REGION = "";
   
-  const DEFAULT_DATASET = "Murty185";
+  const DEFAULT_DATASET = "";
   const DEFAULT_REGION_EMPTY = "";
   
 
