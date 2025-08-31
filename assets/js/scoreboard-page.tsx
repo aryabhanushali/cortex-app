@@ -16,31 +16,32 @@ import ScatterMurtyVsNsd from './scatterplot.jsx';
 import HeatmapByROI from './heatMapRoi.jsx';
 import RoiBarChart from './roiDatasetBarChart.jsx';
 
+import ChartSelect from './chartselect.jsx';
+
 
 const ScoreboardPage: React.FC = () => {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const { data, loading } = useLoadData();
   
-
   const [manualStepChange, setManualStepChange] = useState(false);
 
   const DEFAULT_TRAINING = ""
-
   const DEFAULT_DATASET_EMPTY= ""   
-  
   const DEFAULT_REGION = "Overall";
-  
   const DEFAULT_DATASET = "";
   const DEFAULT_REGION_EMPTY = "";
   
-
 
   const [datasetEmpty, setDatasetEmpty] = useState(DEFAULT_DATASET_EMPTY);
   const [dataset, setDataset] = useState(DEFAULT_DATASET);
   const [training, setTraining] = useState(DEFAULT_TRAINING);
   const [regionEmpty, setRegionEmpty] = useState(DEFAULT_REGION_EMPTY);
   const [region, setRegion] = useState(DEFAULT_REGION);
+
+
+  const [chartType, setChartType] = useState("uni");   
+  const [chartScope, setChartScope] = useState("all");
 
 
   // step 0 clear value logic
@@ -57,7 +58,6 @@ const ScoreboardPage: React.FC = () => {
       setDatasetEmpty("");
     }
   }, [current, region]);
-  
   useEffect(() => {
     if (current === 1 && training === "") {
       setDatasetEmpty("");
@@ -71,8 +71,6 @@ const ScoreboardPage: React.FC = () => {
       setRegionEmpty("");
     }
   }, [current, dataset]);
-  
- 
   useEffect(() => {
     if (current === 2 && training === "") {
       setRegionEmpty("");
@@ -80,7 +78,6 @@ const ScoreboardPage: React.FC = () => {
   }, [current, training]);
 
   
-
   const roiDataMap = {
     PPA: (data as any)[training]?.ppaData,
     FFA: (data as any)[training]?.ffaData,
@@ -135,12 +132,6 @@ const ScoreboardPage: React.FC = () => {
   const murtyUni = newData?.murty_uni;
   const nsdUni   = newData?.nsd_uni;
  
-  console.log('🎯 OverallData:', (data as any)[training]?.overallData);
-  console.log('🎯 filteredData:', filteredData);
-  console.log('🎯 filteredOverallData:', filteredOverallData);
-
-
-    
 
   const contentStyle: React.CSSProperties = {
     lineHeight: '260px',
@@ -152,15 +143,6 @@ const ScoreboardPage: React.FC = () => {
     marginTop: 16,
   };
 
-  useEffect(() => {
-    if (!manualStepChange) {
-      if (current === 0 && region !== "Overall") {
-        setCurrent(1);
-      } else if (current === 1 && region === "Overall" && datasetEmpty === "") {
-        setCurrent(0);
-      }
-    }
-  }, [region, datasetEmpty, current]);
   
   useEffect(() => {
     if (manualStepChange) {
@@ -169,9 +151,6 @@ const ScoreboardPage: React.FC = () => {
   }, [manualStepChange]);
   
 
-
-
-  
 
   const steps = [
     {
@@ -200,6 +179,8 @@ const ScoreboardPage: React.FC = () => {
                 : ""}
             </div>
           )}
+
+          <ChartSelect chartType={chartType} setChartType={setChartType} chartScope={chartScope} setChartScope={setChartScope}/>
 
 
         {!loadingNew && newData && training === "" && datasetEmpty === ""  && (
@@ -287,6 +268,8 @@ const ScoreboardPage: React.FC = () => {
                 : ""}
             </div>
           )}
+
+          <ChartSelect chartType={chartType} setChartType={setChartType} chartScope={chartScope} setChartScope={setChartScope}/>
          
           
           {/* {!loading && roiData.length > 0 && datasetEmpty === "" && (
@@ -377,6 +360,7 @@ const ScoreboardPage: React.FC = () => {
             </div>
           )}
          
+          <ChartSelect chartType={chartType} setChartType={setChartType} chartScope={chartScope} setChartScope={setChartScope}/>
           
           {!loading &&  filteredData.length > 0 && regionEmpty === "" &&(
             <RoiHeatChart dataset={filteredData} title={`Models Performance on Evaluation Datasets: ${dataset}`}/>

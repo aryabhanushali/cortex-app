@@ -33,8 +33,6 @@ export const REGION_OPTIONS = [
 
 ];
 
-
-
 export const DATASET_OPTIONS_LEFT = [
     { value: 'Murty185', label: 'Murty185' },
     { value: 'nsd1000', label: 'NSD' },
@@ -47,6 +45,18 @@ export const DATASET_OPTIONS_LEFT = [
 export const DATASET_OPTIONS_RIGHT = [
     { value: 'DuplicatePaper', label: 'DuplicatePaper' }
   ];
+
+
+export const CHART_TYPE_OPTIONS = [
+  { value: 'uni', label: 'Univariate' },
+  { value: 'multi', label: 'Multivariate' },
+];
+
+export const CHART_SCOPE_OPTIONS = [
+  { value: 'all', label: 'All Models' },
+  { value: 'top', label: 'Top 10 Models' },
+];
+
 
 
     
