@@ -37,102 +37,111 @@ const HeatmapByROI = ({ data, roi}) => {
 
     const colorScale = d3.scaleSequential(d3.interpolateYlGnBu).domain([0, 1]);
 
-    // ======= Header SVG =======
-    const headerHeight = headerMargin.top + rowHeight;
-    const svgHeader = d3
-      .select(headerRef.current)
-      .append("svg")
-      .attr("width", width)
-      .attr("height", headerHeight);
+   // ======= Header SVG =======
+const headerHeight = headerMargin.top + rowHeight;
+const svgHeader = d3
+  .select(headerRef.current)
+  .append("svg")
+  .attr("width", width)
+  .attr("height", headerHeight);
 
+// Dataset labels
+svgHeader
+  .append("g")
+  .attr("transform", `translate(${columnWidth / 4},${headerMargin.top - 20 })`)
+  .call(
+    d3.axisTop(
+      d3.scalePoint()
+        .domain(datasets)
+        .range([
+          headerMargin.left + columnWidth / 2,
+          headerMargin.left +
+            datasets.length * (columnWidth + columnGap) -
+            columnGap -
+            columnWidth / 2,
+        ])
+    )
+  )
+  .call(g => {
+    g.select(".domain").remove();   // 去掉横线
+    g.selectAll("line").remove();   // 去掉小刻度
+    g.selectAll("text")             // 修改文字样式
+      .style("font-size", "14px")
+      .style("fill", "black");
+  })
+  .selectAll("text")
+  .attr("transform", "rotate(-30)")
+  .style("text-anchor", "end");
 
-    // Dataset labels
-    svgHeader
+if (hasCeiling) {
+  const ceilingData = [];
+  datasets.forEach((dataset) => {
+    const vals = data[roi]["ceiling"]?.[dataset];
+    const score = vals?.[1];
+    ceilingData.push({ model: "ceiling", dataset, value: score });
+  });
+
+  svgHeader
+    .selectAll("rect")
+    .data(ceilingData)
+    .enter()
+    .append("rect")
+    .attr(
+      "x",
+      (d) =>
+        headerMargin.left +
+        datasets.indexOf(d.dataset) * (columnWidth + columnGap)
+    )
+    .attr("y", headerMargin.top)
+    .attr("width", columnWidth)
+    .attr("height", rowHeight)
+    .attr("fill", (d) =>
+      d.value != null ? colorScale(d.value) : "#f0f0f0"
+    );
+
+  svgHeader
+    .selectAll("text.cell-label")
+    .data(ceilingData.filter((d) => d.value != null))
+    .enter()
+    .append("text")
+    .attr(
+      "x",
+      (d) =>
+        headerMargin.left +
+        datasets.indexOf(d.dataset) * (columnWidth + columnGap) +
+        columnWidth / 2
+    )
+    .attr("y", headerMargin.top + rowHeight / 2)
+    .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "central")
+    .style("fill", "black")
+    .style("font-size", "14px")
+    .text((d) => d.value.toFixed(2));
+
+  svgHeader
     .append("g")
-    .attr("transform", `translate(${columnWidth / 4},${headerMargin.top - 20 })`)
+    .attr("transform", `translate(${headerMargin.left - 10},0)`)
     .call(
-        d3.axisTop(
-        d3.scalePoint()
-            .domain(datasets)
+      d3
+        .axisLeft(
+          d3
+            .scalePoint()
+            .domain(["ceiling"])
             .range([
-            headerMargin.left + columnWidth / 2,
-            headerMargin.left +
-                datasets.length * (columnWidth + columnGap) -
-                columnGap -
-                columnWidth / 2,
+              headerMargin.top + rowHeight / 2,
+              headerMargin.top + rowHeight / 2,
             ])
         )
     )
     .call(g => {
-        g.select(".domain").remove();   // 去掉横线
-        g.selectAll("line").remove();   // 去掉小刻度
-    })
-    .selectAll("text")
-    .attr("transform", "rotate(-30)")
-    .style("text-anchor", "end");
+      g.select(".domain").remove();   // 去掉竖的黑框线
+      g.selectAll("line").remove();   // 去掉小刻度
+      g.selectAll("text")             // 修改 label 样式
+        .style("font-size", "14px")
+        .style("fill", "black");
+    });
+}
 
-
-    if (hasCeiling) {
-      const ceilingData = [];
-      datasets.forEach((dataset) => {
-        const vals = data[roi]["ceiling"]?.[dataset];
-        const score = vals?.[1];
-        ceilingData.push({ model: "ceiling", dataset, value: score });
-      });
-
-      svgHeader
-        .selectAll("rect")
-        .data(ceilingData)
-        .enter()
-        .append("rect")
-        .attr(
-          "x",
-          (d) =>
-            headerMargin.left +
-            datasets.indexOf(d.dataset) * (columnWidth + columnGap)
-        )
-        .attr("y", headerMargin.top)
-        .attr("width", columnWidth)
-        .attr("height", rowHeight)
-        .attr("fill", (d) =>
-          d.value != null ? colorScale(d.value) : "#f0f0f0"
-        );
-
-      svgHeader
-        .selectAll("text.cell-label")
-        .data(ceilingData.filter((d) => d.value != null))
-        .enter()
-        .append("text")
-        .attr(
-          "x",
-          (d) =>
-            headerMargin.left +
-            datasets.indexOf(d.dataset) * (columnWidth + columnGap) +
-            columnWidth / 2
-        )
-        .attr("y", headerMargin.top + rowHeight / 2)
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "central")
-        .style("fill", "black")
-        .style("font-size", "10px")
-        .text((d) => d.value.toFixed(2));
-
-      svgHeader
-        .append("g")
-        .attr("transform", `translate(${headerMargin.left - 10},0)`)
-        .call(
-          d3
-            .axisLeft(
-              d3
-                .scalePoint()
-                .domain(["ceiling"])
-                .range([
-                  headerMargin.top + rowHeight / 2,
-                  headerMargin.top + rowHeight / 2,
-                ])
-            )
-        );
-    }
 
     // ======= Body SVG (scrollable models) =======
     const svgBody = d3
@@ -193,7 +202,7 @@ const HeatmapByROI = ({ data, roi}) => {
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "central")
       .style("fill", "black")
-      .style("font-size", "10px")
+      .style("font-size", "14px")
       .text((d) => d.value.toFixed(2));
 
      svgBody
@@ -214,6 +223,9 @@ const HeatmapByROI = ({ data, roi}) => {
     .call(g => {
         g.select(".domain").remove();   // 去掉竖的黑框线
         // g.selectAll("line").remove();   // 去掉小刻度
+        g.selectAll("text")             // 修改文字样式
+          .style("font-size", "14px")
+          .style("fill", "black");
     });
 
     // ======= Legend (右侧竖直 colorbar) =======
