@@ -258,7 +258,7 @@ datasets.forEach(dataset => {
 const d_orth = [1/Math.sqrt(2), -1/Math.sqrt(2)];
 
 // 先随便放在中间
-const center = [mainSize/2, -mainSize/2];
+const center = [300, -300];
 
 function kernelDensityEstimator(xGrid, sample, bandwidth) {
   const kernel = v => Math.exp(-0.5 * v * v) / Math.sqrt(2 * Math.PI);
