@@ -146,7 +146,7 @@ const RoiBarChart = ({ data, roi, dataset }) => {
  
 
       {/* 横向滚动容器 */}
-      <div style={{ overflowX: "auto", border: "1px solid #ccc" ,  marginTop: "-85px"}}>
+      <div style={{ overflowX: "auto", border: "1px solid #ccc" , justifyContent:"center"}}>
         <svg ref={svgRef}></svg>
       </div>
     </div>

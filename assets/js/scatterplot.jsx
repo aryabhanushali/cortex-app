@@ -330,7 +330,7 @@ datasets.forEach(dataset => {
 
   
 
-  return <div ref={containerRef}></div>;
+  return <div style={{ justifyContent: "center"    }}ref={containerRef}></div>;
 };
 
 export default ScatterMurtyVsNsd;

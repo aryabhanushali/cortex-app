@@ -19,7 +19,7 @@ const DatasetSelect = ({ dataset, setDataset, training, allowToggle, mode}) => {
   };
 
   return (
-    <FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
+    <FormControl sx={{ minWidth: 120 }} fullWidth>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <FormLabel
           id="dataset-label"

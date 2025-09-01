@@ -20,7 +20,7 @@ const TrainingSelect = ({ training, setTraining, dataset, mode }) => {
   };
 
   return (
-    <FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
+    <FormControl sx={{minWidth: 120 }} fullWidth>
       <FormLabel
         id="training-buttons-group-label"
         sx={{

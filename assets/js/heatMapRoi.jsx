@@ -14,7 +14,8 @@ const HeatmapByROI = ({ data, roi}) => {
     d3.select(bodyRef.current).select("svg").remove();
     d3.select(legendRef.current).select("svg").remove();
 
-    const headerMargin = { top: 80, right: 40, bottom: 0, left: 200 };
+
+    const headerMargin = { top: 60, right: 40, bottom: 10, left: 200 };
     const bodyMargin = { top: 0, right: 40, bottom: 0, left: 200 };
     const rowHeight = 25;
     const rowGap = 2;
@@ -31,6 +32,7 @@ const HeatmapByROI = ({ data, roi}) => {
 
     const chartWidth = datasets.length * (columnWidth + columnGap);
     const bodyHeight = otherModels.length * (rowHeight + rowGap);
+    
     const width = chartWidth + headerMargin.left + headerMargin.right;
 
     const colorScale = d3.scaleSequential(d3.interpolateYlGnBu).domain([0, 1]);
@@ -44,12 +46,10 @@ const HeatmapByROI = ({ data, roi}) => {
       .attr("height", headerHeight);
 
 
-
-
     // Dataset labels
     svgHeader
     .append("g")
-    .attr("transform", `translate(${columnWidth / 4},${headerMargin.top - 20})`)
+    .attr("transform", `translate(${columnWidth / 4},${headerMargin.top - 20 })`)
     .call(
         d3.axisTop(
         d3.scalePoint()
@@ -163,7 +163,7 @@ const HeatmapByROI = ({ data, roi}) => {
       )
       .attr(
         "y",
-        (d) => otherModels.indexOf(d.model) * (rowHeight + rowGap)
+        (d) => bodyMargin.top+otherModels.indexOf(d.model) * (rowHeight + rowGap)
       )
       .attr("width", columnWidth)
       .attr("height", rowHeight)
@@ -187,7 +187,7 @@ const HeatmapByROI = ({ data, roi}) => {
       .attr(
         "y",
         (d) =>
-          otherModels.indexOf(d.model) * (rowHeight + rowGap) +
+          bodyMargin.top + otherModels.indexOf(d.model) * (rowHeight + rowGap) +
           rowHeight / 2
       )
       .attr("text-anchor", "middle")
@@ -204,8 +204,8 @@ const HeatmapByROI = ({ data, roi}) => {
         d3.scalePoint()
             .domain(otherModels)
             .range([
-            rowHeight / 2,
-            otherModels.length * (rowHeight + rowGap) -
+             bodyMargin.top + rowHeight / 2,
+             bodyMargin.top + otherModels.length * (rowHeight + rowGap) -
                 rowGap -
                 rowHeight / 2,
             ])
@@ -258,26 +258,30 @@ const HeatmapByROI = ({ data, roi}) => {
   }, [data, roi]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "row" }}>
-      <div style={{ flex: 1 }}>
+    <div style={{ display: "flex", flexDirection: "row", justifyContent: "center"   }}>
+      <div style={{ flex: 0,alignSelf: "flex-start"  }}>
         <div
           ref={headerRef}
           style={{
-            marginTop: "-20px", // ✅ 保留你原来的
+            lineHeight: "0",// ✅ 保留你原来的
+            alignSelf: "flex-start" 
+
           }}
         ></div>
         <div
           ref={bodyRef}
           style={{
-            maxHeight: "300px",
+            maxHeight: "400px",
             overflowY: "scroll",
-            marginTop: "-65px", // ✅ 保留你原来的
+
+            marginTop: "10px", // ✅ 保留你原来的
           }}
         ></div>
       </div>
-      <div ref={legendRef} style={{ marginLeft: "0px", marginTop: "150px", }}></div>
+      <div ref={legendRef} style={{ marginLeft: "0px", marginTop: "100px", }}></div>
     </div>
   );
+//   return <div ref={headerRef}></div>;
 };
 
 export default HeatmapByROI;

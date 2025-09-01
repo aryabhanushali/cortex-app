@@ -33,7 +33,7 @@ const ROISelect = ({ region, setRegion, dataset, allowToggle, mode }) => {
     ));
 
   return (
-    <FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
+    <FormControl sx={{ minWidth: 120 }} fullWidth>
       <FormLabel
         id="region-buttons-group-label"
         sx={{
