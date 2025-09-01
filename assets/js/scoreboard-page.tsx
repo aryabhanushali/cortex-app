@@ -263,7 +263,7 @@ const ScoreboardPage: React.FC = () => {
           {!loadingNew && (
             <div className="chart-title">
               { region === "" && training === "" && datasetEmpty === "" && newData
-                ? `Dataset and ROIs Effects`
+                ? `Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
                 : training === "" && datasetEmpty === ""
                 ? `${region} Performance (Trained on Murty185 and Trained on NSD)`
                 : training === "Murty185" && datasetEmpty === ""
@@ -357,7 +357,7 @@ const ScoreboardPage: React.FC = () => {
           {!loadingNew && (
             <div className="chart-title">
               { regionEmpty === "" && training === "" && dataset === "" && newData
-                ? `Dataset and ROIs Effects`
+                ? `Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
                 : training === "" && regionEmpty === ""
                 ? `Performance on ${dataset}(Trained on Murty185 and Trained on NSD)`
                 : training === "Murty185" && datasetEmpty === ""
