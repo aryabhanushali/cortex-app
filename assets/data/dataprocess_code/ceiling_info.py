@@ -1,18 +1,6 @@
 import os
 import json
 
-# === Dataset 映射 ===
-DATASET_MAP = {
-    "bmd_2024": "BMD",
-    "bold_5000": "bold5000",
-    "bonner_2021": "bonner",
-    "kingbaker_2019": "kingbaker",
-    "murty185": "murty185",
-    "nsd_syn": "nsd_syn",
-    "nsd_1000": "nsd1000",
-    "wardle_2020": "wardle"
-}
-
 # 输入文件夹
 INPUT_DIR = "./ceiling_info_only"
 # 输出文件
@@ -28,7 +16,7 @@ for dataset_dir in os.listdir(INPUT_DIR):
     if not os.path.isdir(dataset_path):
         continue
 
-    dataset = DATASET_MAP.get(dataset_dir, dataset_dir)
+    dataset = dataset_dir  # ❌ 不做映射，直接用原始文件夹名
 
     for f in os.listdir(dataset_path):
         if not f.endswith(".json"):

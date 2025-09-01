@@ -17,7 +17,7 @@ import HeatmapByROI from './heatMapRoi.jsx';
 import RoiBarChart from './roiDatasetBarChart.jsx';
 
 import ChartSelect from './chartselect.jsx';
-
+import ScatterGapCeiling from './roiDatasetanalysis.jsx';
 
 const ScoreboardPage: React.FC = () => {
   const { token } = theme.useToken();
@@ -117,10 +117,21 @@ const ScoreboardPage: React.FC = () => {
   
 
  type newData = {
+  //group by ppa
   murty_uni?: Record<string, any>;
   nsd_uni?: Record<string, any>;
   murty_multi?: Record<string, any>;
   nsd_multi?: Record<string, any>;
+
+  // 
+  ceiling_uni?: Record<string, any>;
+  ceiling_multi?: Record<string, any>;
+
+    
+  roi_dataset_Murty185_uni?: Record<string, any>;
+  roi_dataset_Murty185_multi?: Record<string, any>;
+  roi_dataset_NSD_uni?: Record<string, any>;
+  roi_dataset_NSD_multi?: Record<string, any>;
 };
 
   const { data: newData, loading: loadingNew } = useLoadDataNew() as {
@@ -274,7 +285,12 @@ const ScoreboardPage: React.FC = () => {
             <HeatChartOverall dataset={roiData} title={`${region} Performance on all Datasets`} />
           )} */}
 
-          {!loadingNew && datasetEmpty === "" && training === "Murty185" && (
+
+          {!loadingNew && datasetEmpty === "" && training === ""  && region === ""&& (
+            <ScatterGapCeiling nsdData={newData.roi_dataset_NSD_uni} murtyData={newData.roi_dataset_Murty185_uni} ceilingData={newData.ceiling_uni}/>
+          )}
+
+          {/* {!loadingNew && datasetEmpty === "" && training === "Murty185" && (
             <HeatmapByROI
               data={newData.murty_uni}
               roi ={region.toLowerCase()}
@@ -288,7 +304,7 @@ const ScoreboardPage: React.FC = () => {
               roi ={region.toLowerCase()}
              
             />
-          )}
+          )} */}
 
 
           {/* {!loading && filtereROIData.length > 0 && (

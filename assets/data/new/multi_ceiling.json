@@ -12,7 +12,7 @@
         0.6192393898963928
       ]
     },
-    "wardle": {
+    "wardle_2020": {
       "ceiling_mean": 0.008236944660893641,
       "ceiling_max": 0.1180114820599556,
       "correlation_points": [
@@ -138,7 +138,7 @@
         0.10253239423036575
       ]
     },
-    "BMD": {
+    "bmd_2024": {
       "ceiling_mean": 0.28039299249649047,
       "ceiling_max": 0.46558287739753723,
       "correlation_points": [
@@ -189,7 +189,7 @@
         0.3799392580986023
       ]
     },
-    "kingbaker": {
+    "kingbaker_2019": {
       "ceiling_mean": 0.06846484183333815,
       "ceiling_max": 0.22938621044158936,
       "correlation_points": [
@@ -249,7 +249,7 @@
         0.219946950674057
       ]
     },
-    "bold5000": {
+    "bold_5000": {
       "ceiling_mean": 0.18294604122638702,
       "ceiling_max": 0.21100759506225586,
       "correlation_points": [
@@ -258,7 +258,7 @@
         0.15089638531208038
       ]
     },
-    "nsd1000": {
+    "nsd_1000": {
       "ceiling_mean": 0.40070786078770954,
       "ceiling_max": 0.5003489851951599,
       "correlation_points": [
@@ -270,7 +270,7 @@
         0.330046147108078
       ]
     },
-    "bonner": {
+    "bonner_2021": {
       "ceiling_mean": 0.3396948277950287,
       "ceiling_max": 0.4349556267261505,
       "correlation_points": [
@@ -296,7 +296,7 @@
         0.7370851039886475
       ]
     },
-    "BMD": {
+    "bmd_2024": {
       "ceiling_mean": 0.40275429752137926,
       "ceiling_max": 0.580989420413971,
       "correlation_points": [
@@ -381,7 +381,7 @@
         0.2058347463607788
       ]
     },
-    "nsd1000": {
+    "nsd_1000": {
       "ceiling_mean": 0.5168718546628952,
       "ceiling_max": 0.5818215012550354,
       "correlation_points": [
@@ -407,7 +407,7 @@
         0.5989484786987305
       ]
     },
-    "wardle": {
+    "wardle_2020": {
       "ceiling_mean": 0.031975013613434085,
       "ceiling_max": 0.26000726222991943,
       "correlation_points": [
@@ -533,7 +533,7 @@
         -0.08672156929969788
       ]
     },
-    "BMD": {
+    "bmd_2024": {
       "ceiling_mean": 0.39871280524465774,
       "ceiling_max": 0.5053552985191345,
       "correlation_points": [
@@ -584,7 +584,7 @@
         0.31980711221694946
       ]
     },
-    "kingbaker": {
+    "kingbaker_2019": {
       "ceiling_mean": 0.048880210268544035,
       "ceiling_max": 0.12020958214998245,
       "correlation_points": [
@@ -644,7 +644,7 @@
         0.16746380925178528
       ]
     },
-    "nsd1000": {
+    "nsd_1000": {
       "ceiling_mean": 0.46374890208244324,
       "ceiling_max": 0.5599455237388611,
       "correlation_points": [
