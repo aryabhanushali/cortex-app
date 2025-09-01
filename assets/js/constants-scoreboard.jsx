@@ -27,20 +27,20 @@ export const OVERALL_OPTION = [
 
 export const REGION_OPTIONS = [
   { value: 'Overall', label: 'Cross-Regions' },
-  { value: 'PPA', label: 'PPA' },
-  { value: 'FFA', label: 'FFA' },
-  { value: 'EBA', label: 'EBA' }
+  { value: 'ppa', label: 'PPA' },
+  { value: 'ffa', label: 'FFA' },
+  { value: 'eba', label: 'EBA' }
 
 ];
 
 export const DATASET_OPTIONS_LEFT = [
     { value: 'murty185', label: 'Murty185' },
-    { value: 'nsd1000', label: 'NSD' },
-    { value: 'bold5000', label: 'BOLD5000' },
-    { value: 'bonner', label: 'Bonner' },
-    { value: 'BMD', label: 'BMD' },
-    { value: 'kingbaker', label: 'KingBaker' },
-    { value: 'wardle', label: 'Wardle' },
+    { value: 'nsd_1000', label: 'NSD' },
+    { value: 'bold_5000', label: 'BOLD5000' },
+    { value: 'bonner_2021', label: 'Bonner' },
+    { value: 'bmd_2024', label: 'BMD' },
+    { value: 'kingbaker_2019', label: 'KingBaker' },
+    { value: 'wardle_2020', label: 'Wardle' },
     { value: 'nsd_syn', label: 'NSD_SYN' },
   ];
 
@@ -62,8 +62,8 @@ export const CHART_SCOPE_OPTIONS = [
 
 
     
-export const MURTY185_DATASET = ['nsd1000', 'bold5000', 'bonner','BMD','kingbaker','wardle','nsd_syn' ];
-export const NSD_DATASET = ['murty185','bold5000', 'bonner','BMD','kingbaker','wardle','nsd_syn'];
+export const MURTY185_DATASET = ['nsd_1000', 'bold_5000', 'bonner_2021','bmd_2024','kingbaker_2019','wardle_2020','nsd_syn' ];
+export const NSD_DATASET = ['murty185','bold_5000', 'bonner_2021','bmd_2024','kingbaker_2019','wardle_2020','nsd_syn'];
 
 
 export const VOXEL_OPTIONS = [

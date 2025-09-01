@@ -23,7 +23,7 @@ const RoiBarChart = ({ data, roi, dataset }) => {
       })
       .filter((d) => d.val !== undefined);
 
-    const ceilingVals = roiData["ceiling"]?.[dataset] || [];
+    const ceilingVals = Object.values(roiData["ceiling"] || {}).map((d) => d[0]);
     const ceilingMax = ceilingVals.length ? d3.max(ceilingVals) : null;
     const ceilingMedian = ceilingVals.length ? d3.median(ceilingVals) : null;
 
@@ -198,7 +198,7 @@ const RoiBarChart = ({ data, roi, dataset }) => {
       <div
         style={{
           position: "absolute",
-          top: scaleY(stats.max) - 150,   // 在红线之上 10px
+          top: scaleY(stats.max) - 100,   // 在红线之上 10px
           right: 0,
           color: "red",
           fontSize: "12px"
@@ -211,7 +211,7 @@ const RoiBarChart = ({ data, roi, dataset }) => {
       <div
         style={{
           position: "absolute",
-          top: scaleY(stats.median) - 150,  // 在蓝线之上 10px
+          top: scaleY(stats.median) - 100,  // 在蓝线之上 10px
           right: 0,
           color: "blue",
           fontSize: "12px"

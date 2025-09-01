@@ -11,19 +11,19 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi}) => {
     d3.select(containerRef.current).select("svg").remove();
 
     const width = 910;
-    const height = 910;
-    const margin = { top: 160, right: 160, bottom: 50, left: 50 };
+    const height = 930;
+    const margin = { top: 180, right: 160, bottom: 50, left: 50 };
     const mainSize = 700; // 主散点区域大小
     const histHeight = 150; // 直方图高度
     const histWidth = 150;  // 直方图宽度
 
     const color_map = {
 
-      "bold5000": "#1f78b4",   // deep blue
-      "bonner": "#4dd0e1", // bright teal-blue
-      "BMD": "#60bd68",        // muted green
-      "kingbaker": "#9e75d6",  // soft purple
-      "wardle": "#e377c2",     // pink
+      "bold_5000": "#1f78b4",   // deep blue
+      "bonner_2021": "#4dd0e1", // bright teal-blue
+      "bmd_2024": "#60bd68",        // muted green
+      "kingbaker_2019": "#9e75d6",  // soft purple
+      "wardle_2020": "#e377c2",     // pink
       "nsd_syn": "#ffdd57"          // matte yellow
     };
 
@@ -44,7 +44,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi}) => {
         const x = murtyVals[dataset]?.[0];
         const y = nsdVals[dataset]?.[0];
 
-        if (["murty185", "nsd1000"].includes(dataset)) {
+        if (["murty185", "nsd_1000"].includes(dataset)) {
           return;
         }
         if (x != null && y != null) {
@@ -147,7 +147,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi}) => {
       .style("font-weight", "bold")
 
     // === legend ===
-    const legendData = Object.keys(color_map); // 用 dataset 名字生成 legend
+    const legendData = Array.from(new Set(points.map(d => d.dataset))); // 用 dataset 名字生成 legend
 
     const legend = svg.append("g")
       .attr("class", "legend")

@@ -6,7 +6,7 @@ import { CHART_TYPE_OPTIONS, CHART_SCOPE_OPTIONS } from './constants-scoreboard'
 
 const ChartSelect = ({ chartType, setChartType, chartScope, setChartScope }) => {
   return (
-    <div style={{ display: "flex", justifyContent: "center", gap: "20px", margin: "10px 0" }}>
+    <div style={{ display: "flex", justifyContent: "center" }}>
       {/* 第一组：Uni vs Multi */}
       <ButtonGroup>
         {CHART_TYPE_OPTIONS.map((option) => (
@@ -21,7 +21,7 @@ const ChartSelect = ({ chartType, setChartType, chartScope, setChartScope }) => 
       </ButtonGroup>
 
       {/* 第二组：All vs Top10 */}
-      <ButtonGroup>
+      {/* <ButtonGroup>
         {CHART_SCOPE_OPTIONS.map((option) => (
           <Button
             key={option.value}
@@ -31,7 +31,7 @@ const ChartSelect = ({ chartType, setChartType, chartScope, setChartScope }) => 
             {option.label}
           </Button>
         ))}
-      </ButtonGroup>
+      </ButtonGroup> */}
     </div>
   );
 };

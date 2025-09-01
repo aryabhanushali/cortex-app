@@ -140,12 +140,17 @@ const ScoreboardPage: React.FC = () => {
   };
 
 
-  const murtyUni = newData?.murty_uni;
-  const nsdUni   = newData?.nsd_uni;
+  const murtyData = chartType === "uni" ? newData?.murty_uni : newData?.murty_multi;
+  const nsdData   = chartType === "uni" ? newData?.nsd_uni   : newData?.nsd_multi;
+  const ROI_DATASET_Murty = chartType === "uni" ? newData?.roi_dataset_Murty185_uni : newData?.roi_dataset_Murty185_multi;
+  const ROI_DATASET_NSD = chartType === "uni" ? newData?.roi_dataset_NSD_uni : newData?.roi_dataset_NSD_multi;
+  const Ceiling = chartType === "uni" ? newData?.ceiling_uni : newData?.ceiling_multi;
+
+
  
 
   const contentStyle: React.CSSProperties = {
-    lineHeight: '260px',
+    // lineHeight: '260px',
     textAlign: 'center',
     color: token.colorTextTertiary,
     backgroundColor: 'transparent',
@@ -196,8 +201,8 @@ const ScoreboardPage: React.FC = () => {
 
         {!loadingNew && newData && training === "" && datasetEmpty === ""  && (
           <ScatterMurtyVsNsd 
-            murtyData={newData.murty_uni} 
-            nsdData={newData.nsd_uni} 
+            murtyData={murtyData} 
+            nsdData={nsdData} 
             roi= {region}
           />
         )}
@@ -226,11 +231,12 @@ const ScoreboardPage: React.FC = () => {
             <BarChartSpecific dataset={filteredOverallData} title={`Cross-Regions Performance on ${datasetEmpty}`} />
           )} */}
 
-          {!loadingNew  && datasetEmpty != "" && training === "NSD" && (
+          {/* {!loadingNew  && datasetEmpty != "" && training === "NSD" && (
              <RoiBarChart
               data={newData.nsd_uni}
               roi ={region}
               dataset={datasetEmpty}
+              
             />
 
           )}
@@ -240,9 +246,10 @@ const ScoreboardPage: React.FC = () => {
               data={newData.murty_uni}
               roi ={region}
               dataset={datasetEmpty}
+            
             />
 
-          )}
+          )} */}
 
         </div>
       ),
@@ -287,10 +294,10 @@ const ScoreboardPage: React.FC = () => {
 
 
           {!loadingNew && datasetEmpty === "" && training === ""  && region === ""&& (
-            <ScatterGapCeiling nsdData={newData.roi_dataset_NSD_uni} murtyData={newData.roi_dataset_Murty185_uni} ceilingData={newData.ceiling_uni}/>
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling}/>
           )}
 
-          {/* {!loadingNew && datasetEmpty === "" && training === "Murty185" && (
+          {!loadingNew && datasetEmpty === "" && training === "Murty185" && (
             <HeatmapByROI
               data={newData.murty_uni}
               roi ={region.toLowerCase()}
@@ -304,7 +311,7 @@ const ScoreboardPage: React.FC = () => {
               roi ={region.toLowerCase()}
              
             />
-          )} */}
+          )}
 
 
           {/* {!loading && filtereROIData.length > 0 && (
@@ -324,6 +331,7 @@ const ScoreboardPage: React.FC = () => {
               data={newData.nsd_uni}
               roi ={region.toLowerCase()}
               dataset={datasetEmpty}
+              
             />
 
           )}
@@ -333,6 +341,7 @@ const ScoreboardPage: React.FC = () => {
               data={newData.murty_uni}
               roi ={region.toLowerCase()}
               dataset={datasetEmpty}
+             
             />
 
           )}
@@ -411,14 +420,17 @@ const ScoreboardPage: React.FC = () => {
                     setRegion("Overall");
                     setDatasetEmpty("");
                     setTraining("");
+                    setChartType("uni")
                 } else if (index === 1) {
                     setRegion("");
                     setDatasetEmpty("");
                     setTraining("");
+                    setChartType("uni");
                 } else if(index == 2) {
                     setRegionEmpty("");
                     setDataset("");
                     setTraining("");
+                    setChartType("uni");
                 }
                 
                 
