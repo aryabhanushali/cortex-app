@@ -1,13 +1,16 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
 const RoiBarChart = ({ data, roi, dataset }) => {
   const ceilingRef = useRef();
   const barsRef = useRef();
+  const [stats, setStats] = useState({ max: null, median: null });
+  const [scaleY, setScaleY] = useState(null);
 
   useEffect(() => {
 
     if (!data || !roi || !data[roi]) return;
+    
 
     const roiData = data[roi];
 
@@ -20,9 +23,11 @@ const RoiBarChart = ({ data, roi, dataset }) => {
       })
       .filter((d) => d.val !== undefined);
 
-    const ceilingVals = Object.values(roiData["ceiling"] || {}).map((d) => d[0]);
+    const ceilingVals = roiData["ceiling"]?.[dataset] || [];
     const ceilingMax = ceilingVals.length ? d3.max(ceilingVals) : null;
     const ceilingMedian = ceilingVals.length ? d3.median(ceilingVals) : null;
+
+    setStats({ max: ceilingMax, median: ceilingMedian });
 
     // ==== 尺寸 ====
     const barWidth = 30;
@@ -30,7 +35,8 @@ const RoiBarChart = ({ data, roi, dataset }) => {
     const height = 400;
 
     // y scale
-    const y = d3.scaleLinear().domain([0, 0.9]).range([height - margin.bottom, margin.top]);
+      const y = d3.scaleLinear().domain([0, 0.9]).range([height - margin.bottom, margin.top]);
+  setScaleY(() => y); 
 
     // ================= 左边 ceiling SVG =================
     const ceilingSvg = d3.select(ceilingRef.current);
@@ -140,34 +146,25 @@ const RoiBarChart = ({ data, roi, dataset }) => {
       )
       .text((d) => d.model);
 
-      function drawLine(svg, label, value, color, svgWidth) {
-      if (value == null) return;
-      svg
-        .append("line")
-        .attr("x1", 0)
-        .attr("x2", svgWidth)
-        .attr("y1", y(value))
-        .attr("y2", y(value))
-        .attr("stroke", color)
-        .attr("stroke-dasharray", "4 2")
-        .attr("stroke-width", 1);
-
-      svg
-        .append("text")
-        .attr("x", svgWidth - 5)
-        .attr("y", y(value) - 5)
-        .attr("text-anchor", "end")
-        .style("font-size", "10px")
-        .style("fill", color)
-        .text(`${label}: ${value.toFixed(2)}`);
-    }
+      function drawLine(svg, value, color, svgWidth) {
+        if (value == null) return;
+        svg
+          .append("line")
+          .attr("x1", 0)
+          .attr("x2", svgWidth)
+          .attr("y1", y(value))
+          .attr("y2", y(value))
+          .attr("stroke", color)
+          .attr("stroke-dasharray", "4 2")
+          .attr("stroke-width", 1);
+      }
 
     // 在左右 svg 都画
-    drawLine(ceilingSvg, "Max", ceilingMax, "#1f77b4", ceilingWidth);
-    drawLine(ceilingSvg, "Median", ceilingMedian, "#74C5F7", ceilingWidth);
+        drawLine(ceilingSvg, ceilingMax, "red", ceilingWidth);
+        drawLine(ceilingSvg, ceilingMedian, "blue", ceilingWidth);
+        drawLine(barsSvg, ceilingMax, "red", width);
+        drawLine(barsSvg, ceilingMedian, "blue", width);
 
-    drawLine(barsSvg, "Max", ceilingMax, "#1f77b4", width);
-    drawLine(barsSvg, "Median", ceilingMedian, "#74C5F7", width);
 
   }, [data, roi, dataset]);
 
@@ -175,18 +172,60 @@ const RoiBarChart = ({ data, roi, dataset }) => {
   
 
   return (
-    <div style={{ display: "flex", flexDirection: "row" }}>
-      {/* 左边 ceiling + y 轴 */}
-      <div>
-        <svg ref={ceilingRef}></svg>
-      </div>
-
-      {/* 右边模型 bars */}
-      <div style={{ overflowX: "auto" }}>
-        <svg ref={barsRef}></svg>
-      </div>
+  <div style={{ display: "flex", flexDirection: "row", position: "relative" }}>
+    {/* 左边 ceiling + y 轴 */}
+    <div>
+      <svg ref={ceilingRef}></svg>
     </div>
-  );
+
+    {/* 右边模型 bars */}
+    <div style={{ overflowX: "auto" }}>
+      <svg ref={barsRef}></svg>
+    </div>
+
+{/* 固定在右边的 label */}
+{scaleY && (
+  <div
+    style={{
+      position: "absolute",
+      right: 0,
+      top: 0,
+      width: "80px",
+      pointerEvents: "none"
+    }}
+  >
+    {stats.max !== null && (
+      <div
+        style={{
+          position: "absolute",
+          top: scaleY(stats.max) - 150,   // 在红线之上 10px
+          right: 0,
+          color: "red",
+          fontSize: "12px"
+        }}
+      >
+        Max: {stats.max.toFixed(2)}
+      </div>
+    )}
+    {stats.median !== null && (
+      <div
+        style={{
+          position: "absolute",
+          top: scaleY(stats.median) - 150,  // 在蓝线之上 10px
+          right: 0,
+          color: "blue",
+          fontSize: "12px"
+        }}
+      >
+        Median: {stats.median.toFixed(2)}
+      </div>
+    )}
+  </div>
+)}
+
+  </div>
+);
+
 };
 
 export default RoiBarChart;

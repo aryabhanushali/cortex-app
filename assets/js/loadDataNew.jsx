@@ -49,10 +49,28 @@ export default function useLoadDataNew() {
 
   useEffect(() => {
     const files = {
+
+      // group by regions
       murty_multi: 'assets/data/new/standardized_results_murty185_models_multivariate.json',
       murty_uni:   'assets/data/new/standardized_results_murty185_models_univariate.json',
       nsd_multi:   'assets/data/new/standardized_results_nsd_1000_models_multivariate.json',
       nsd_uni:     'assets/data/new/standardized_results_nsd_1000_models_univariate.json',
+
+
+      // for barchart
+      ceiling_uni: 'assets/data/new/uni_ceiling.json',
+      ceiling_multi: 'assets/data/new/multi_ceiling.json',
+
+      // for linechart
+      roi_dataset_Murty185_uni:'assets/data/new/Roi_Dataset_murty.json',
+      roi_dataset_Murty185_multi:'assets/data/new/Roi_Dataset_murty_multi.json',
+      roi_dataset_NSD_uni:'assets/data/new/Roi_Dataset_nsd.json',
+      roi_dataset_NSD_multi:'assets/data/new/Roi_Dataset_nsd_multi.json'
+
+
+
+
+      
     };
 
     Promise.all(

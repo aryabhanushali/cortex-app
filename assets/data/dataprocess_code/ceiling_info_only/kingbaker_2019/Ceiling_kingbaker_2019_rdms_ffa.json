@@ -1,0 +1,114 @@
+{
+    "eval_dataset_name": "kingbaker_2019",
+    "roi": "ffa",
+    "ceiling_mean": 0.048880210268544035,
+    "ceiling_std": 0.009065550138369667,
+    "ceiling_median": 0.05266346409916878,
+    "ceiling_max": 0.12020958214998245,
+    "ceiling_raw": [
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s2",
+            "correlation": 0.039307817816734314
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s3",
+            "correlation": 0.06558753550052643
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s4",
+            "correlation": 0.09580627083778381
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s5",
+            "correlation": 0.09922433644533157
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s3",
+            "correlation": 0.07452280819416046
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s4",
+            "correlation": 0.05481754615902901
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s5",
+            "correlation": 0.07011760771274567
+        },
+        {
+            "subject_id_1": "s3",
+            "subject_id_2": "s4",
+            "correlation": 0.12020958214998245
+        },
+        {
+            "subject_id_1": "s3",
+            "subject_id_2": "s5",
+            "correlation": 0.03380804881453514
+        },
+        {
+            "subject_id_1": "s4",
+            "subject_id_2": "s5",
+            "correlation": 0.0640847384929657
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s2",
+            "correlation": -0.010587374679744244
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s3",
+            "correlation": 0.11337254196405411
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s4",
+            "correlation": 0.07258619368076324
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s5",
+            "correlation": -0.011965024285018444
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s3",
+            "correlation": -0.0013182115508243442
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s4",
+            "correlation": -0.01133504044264555
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s5",
+            "correlation": 0.0042184689082205296
+        },
+        {
+            "subject_id_1": "s3",
+            "subject_id_2": "s4",
+            "correlation": 0.03198804706335068
+        },
+        {
+            "subject_id_1": "s3",
+            "subject_id_2": "s5",
+            "correlation": 0.022648930549621582
+        },
+        {
+            "subject_id_1": "s4",
+            "subject_id_2": "s5",
+            "correlation": 0.05050938203930855
+        }
+    ],
+    "metadata": {
+        "timestamp": "2025-07-07 15:30:24",
+        "user": "rwang822"
+    }
+}

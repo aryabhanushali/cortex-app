@@ -1,0 +1,44 @@
+{
+    "eval_dataset_name": "nsd_1000",
+    "roi": "ppa",
+    "ceiling_mean": 0.7042574385801951,
+    "ceiling_std": 0.020324901812884825,
+    "ceiling_median": 0.6934482157230377,
+    "ceiling_max": 0.7814945578575134,
+    "ceiling_raw": [
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s2",
+            "correlation": 0.750364363193512
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s5",
+            "correlation": 0.7196446061134338
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s7",
+            "correlation": 0.653460681438446
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s5",
+            "correlation": 0.7814945578575134
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s7",
+            "correlation": 0.6672518253326416
+        },
+        {
+            "subject_id_1": "s5",
+            "subject_id_2": "s7",
+            "correlation": 0.6533285975456238
+        }
+    ],
+    "metadata": {
+        "timestamp": "2025-07-07 15:44:27",
+        "user": "rwang822"
+    }
+}

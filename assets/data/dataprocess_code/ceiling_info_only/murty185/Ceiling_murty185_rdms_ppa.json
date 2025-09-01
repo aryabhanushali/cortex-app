@@ -1,0 +1,44 @@
+{
+    "eval_dataset_name": "murty185",
+    "roi": "ppa",
+    "ceiling_mean": 0.5658220946788788,
+    "ceiling_std": 0.01426313589505585,
+    "ceiling_median": 0.564702183008194,
+    "ceiling_max": 0.6192393898963928,
+    "ceiling_raw": [
+        {
+            "subject_id_1": "p1",
+            "subject_id_2": "p2",
+            "correlation": 0.5306486487388611
+        },
+        {
+            "subject_id_1": "p1",
+            "subject_id_2": "p3",
+            "correlation": 0.5970545411109924
+        },
+        {
+            "subject_id_1": "p1",
+            "subject_id_2": "p4",
+            "correlation": 0.5185856223106384
+        },
+        {
+            "subject_id_1": "p2",
+            "subject_id_2": "p3",
+            "correlation": 0.5612455606460571
+        },
+        {
+            "subject_id_1": "p2",
+            "subject_id_2": "p4",
+            "correlation": 0.5681588053703308
+        },
+        {
+            "subject_id_1": "p3",
+            "subject_id_2": "p4",
+            "correlation": 0.6192393898963928
+        }
+    ],
+    "metadata": {
+        "timestamp": "2025-07-07 15:44:40",
+        "user": "rwang822"
+    }
+}

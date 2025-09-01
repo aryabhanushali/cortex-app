@@ -1,0 +1,239 @@
+{
+    "eval_dataset_name": "bmd_2024",
+    "roi": "ppa",
+    "ceiling_mean": 0.5368694643179576,
+    "ceiling_std": 0.015207883619392274,
+    "ceiling_median": 0.5519822835922241,
+    "ceiling_max": 0.7154751420021057,
+    "ceiling_raw": [
+        {
+            "subject_id_1": "s01",
+            "subject_id_2": "s02",
+            "correlation": 0.4650424122810364
+        },
+        {
+            "subject_id_1": "s01",
+            "subject_id_2": "s03",
+            "correlation": 0.6599271297454834
+        },
+        {
+            "subject_id_1": "s01",
+            "subject_id_2": "s04",
+            "correlation": 0.6267063021659851
+        },
+        {
+            "subject_id_1": "s01",
+            "subject_id_2": "s05",
+            "correlation": 0.6709180474281311
+        },
+        {
+            "subject_id_1": "s01",
+            "subject_id_2": "s06",
+            "correlation": 0.6398190855979919
+        },
+        {
+            "subject_id_1": "s01",
+            "subject_id_2": "s07",
+            "correlation": 0.5967762470245361
+        },
+        {
+            "subject_id_1": "s01",
+            "subject_id_2": "s08",
+            "correlation": 0.5976434350013733
+        },
+        {
+            "subject_id_1": "s01",
+            "subject_id_2": "s09",
+            "correlation": 0.7154751420021057
+        },
+        {
+            "subject_id_1": "s01",
+            "subject_id_2": "s10",
+            "correlation": 0.5883259177207947
+        },
+        {
+            "subject_id_1": "s02",
+            "subject_id_2": "s03",
+            "correlation": 0.4354226291179657
+        },
+        {
+            "subject_id_1": "s02",
+            "subject_id_2": "s04",
+            "correlation": 0.4620404541492462
+        },
+        {
+            "subject_id_1": "s02",
+            "subject_id_2": "s05",
+            "correlation": 0.39827725291252136
+        },
+        {
+            "subject_id_1": "s02",
+            "subject_id_2": "s06",
+            "correlation": 0.32843372225761414
+        },
+        {
+            "subject_id_1": "s02",
+            "subject_id_2": "s07",
+            "correlation": 0.3682616949081421
+        },
+        {
+            "subject_id_1": "s02",
+            "subject_id_2": "s08",
+            "correlation": 0.38912320137023926
+        },
+        {
+            "subject_id_1": "s02",
+            "subject_id_2": "s09",
+            "correlation": 0.3161678612232208
+        },
+        {
+            "subject_id_1": "s02",
+            "subject_id_2": "s10",
+            "correlation": 0.27426326274871826
+        },
+        {
+            "subject_id_1": "s03",
+            "subject_id_2": "s04",
+            "correlation": 0.6054738759994507
+        },
+        {
+            "subject_id_1": "s03",
+            "subject_id_2": "s05",
+            "correlation": 0.6053842902183533
+        },
+        {
+            "subject_id_1": "s03",
+            "subject_id_2": "s06",
+            "correlation": 0.5940165519714355
+        },
+        {
+            "subject_id_1": "s03",
+            "subject_id_2": "s07",
+            "correlation": 0.5101442933082581
+        },
+        {
+            "subject_id_1": "s03",
+            "subject_id_2": "s08",
+            "correlation": 0.48308008909225464
+        },
+        {
+            "subject_id_1": "s03",
+            "subject_id_2": "s09",
+            "correlation": 0.6607789993286133
+        },
+        {
+            "subject_id_1": "s03",
+            "subject_id_2": "s10",
+            "correlation": 0.5832643508911133
+        },
+        {
+            "subject_id_1": "s04",
+            "subject_id_2": "s05",
+            "correlation": 0.5917611718177795
+        },
+        {
+            "subject_id_1": "s04",
+            "subject_id_2": "s06",
+            "correlation": 0.5201716423034668
+        },
+        {
+            "subject_id_1": "s04",
+            "subject_id_2": "s07",
+            "correlation": 0.4773823618888855
+        },
+        {
+            "subject_id_1": "s04",
+            "subject_id_2": "s08",
+            "correlation": 0.48590025305747986
+        },
+        {
+            "subject_id_1": "s04",
+            "subject_id_2": "s09",
+            "correlation": 0.6175167560577393
+        },
+        {
+            "subject_id_1": "s04",
+            "subject_id_2": "s10",
+            "correlation": 0.49863559007644653
+        },
+        {
+            "subject_id_1": "s05",
+            "subject_id_2": "s06",
+            "correlation": 0.5914013385772705
+        },
+        {
+            "subject_id_1": "s05",
+            "subject_id_2": "s07",
+            "correlation": 0.5519822835922241
+        },
+        {
+            "subject_id_1": "s05",
+            "subject_id_2": "s08",
+            "correlation": 0.48013246059417725
+        },
+        {
+            "subject_id_1": "s05",
+            "subject_id_2": "s09",
+            "correlation": 0.6662757992744446
+        },
+        {
+            "subject_id_1": "s05",
+            "subject_id_2": "s10",
+            "correlation": 0.5677986145019531
+        },
+        {
+            "subject_id_1": "s06",
+            "subject_id_2": "s07",
+            "correlation": 0.5349938273429871
+        },
+        {
+            "subject_id_1": "s06",
+            "subject_id_2": "s08",
+            "correlation": 0.4613151550292969
+        },
+        {
+            "subject_id_1": "s06",
+            "subject_id_2": "s09",
+            "correlation": 0.6838135123252869
+        },
+        {
+            "subject_id_1": "s06",
+            "subject_id_2": "s10",
+            "correlation": 0.5199792385101318
+        },
+        {
+            "subject_id_1": "s07",
+            "subject_id_2": "s08",
+            "correlation": 0.5360647439956665
+        },
+        {
+            "subject_id_1": "s07",
+            "subject_id_2": "s09",
+            "correlation": 0.5976414680480957
+        },
+        {
+            "subject_id_1": "s07",
+            "subject_id_2": "s10",
+            "correlation": 0.4845656454563141
+        },
+        {
+            "subject_id_1": "s08",
+            "subject_id_2": "s09",
+            "correlation": 0.6027578115463257
+        },
+        {
+            "subject_id_1": "s08",
+            "subject_id_2": "s10",
+            "correlation": 0.491493821144104
+        },
+        {
+            "subject_id_1": "s09",
+            "subject_id_2": "s10",
+            "correlation": 0.6227761507034302
+        }
+    ],
+    "metadata": {
+        "timestamp": "2025-07-07 15:47:03",
+        "user": "rwang822"
+    }
+}

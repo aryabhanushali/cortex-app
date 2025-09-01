@@ -1,0 +1,154 @@
+{
+    "eval_dataset_name": "nsd_syn",
+    "roi": "ffa",
+    "ceiling_mean": 0.14089100076151745,
+    "ceiling_std": 0.01876231283163745,
+    "ceiling_median": 0.14896224439144135,
+    "ceiling_max": 0.35489702224731445,
+    "ceiling_raw": [
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s2",
+            "correlation": 0.31696927547454834
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s3",
+            "correlation": 0.1330440789461136
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s4",
+            "correlation": 0.17910347878932953
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s5",
+            "correlation": 0.11871976405382156
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s6",
+            "correlation": 0.17585264146327972
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s7",
+            "correlation": 0.19722440838813782
+        },
+        {
+            "subject_id_1": "s1",
+            "subject_id_2": "s8",
+            "correlation": 0.0330527126789093
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s3",
+            "correlation": 0.20755642652511597
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s4",
+            "correlation": 0.35489702224731445
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s5",
+            "correlation": 0.1666407734155655
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s6",
+            "correlation": -0.036395952105522156
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s7",
+            "correlation": 0.14107127487659454
+        },
+        {
+            "subject_id_1": "s2",
+            "subject_id_2": "s8",
+            "correlation": 0.2890205979347229
+        },
+        {
+            "subject_id_1": "s3",
+            "subject_id_2": "s4",
+            "correlation": 0.12291795760393143
+        },
+        {
+            "subject_id_1": "s3",
+            "subject_id_2": "s5",
+            "correlation": 0.16981691122055054
+        },
+        {
+            "subject_id_1": "s3",
+            "subject_id_2": "s6",
+            "correlation": 0.10786747932434082
+        },
+        {
+            "subject_id_1": "s3",
+            "subject_id_2": "s7",
+            "correlation": 0.2283656746149063
+        },
+        {
+            "subject_id_1": "s3",
+            "subject_id_2": "s8",
+            "correlation": 0.24660645425319672
+        },
+        {
+            "subject_id_1": "s4",
+            "subject_id_2": "s5",
+            "correlation": 0.1569688618183136
+        },
+        {
+            "subject_id_1": "s4",
+            "subject_id_2": "s6",
+            "correlation": 0.10920971632003784
+        },
+        {
+            "subject_id_1": "s4",
+            "subject_id_2": "s7",
+            "correlation": 0.07989101856946945
+        },
+        {
+            "subject_id_1": "s4",
+            "subject_id_2": "s8",
+            "correlation": 0.030024541541934013
+        },
+        {
+            "subject_id_1": "s5",
+            "subject_id_2": "s6",
+            "correlation": 0.022741025313735008
+        },
+        {
+            "subject_id_1": "s5",
+            "subject_id_2": "s7",
+            "correlation": 0.03599990904331207
+        },
+        {
+            "subject_id_1": "s5",
+            "subject_id_2": "s8",
+            "correlation": 0.14222534000873566
+        },
+        {
+            "subject_id_1": "s6",
+            "subject_id_2": "s7",
+            "correlation": 0.15569914877414703
+        },
+        {
+            "subject_id_1": "s6",
+            "subject_id_2": "s8",
+            "correlation": -0.10142207890748978
+        },
+        {
+            "subject_id_1": "s7",
+            "subject_id_2": "s8",
+            "correlation": 0.161279559135437
+        }
+    ],
+    "metadata": {
+        "timestamp": "2025-07-07 15:44:58",
+        "user": "rwang822"
+    }
+}
