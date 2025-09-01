@@ -170,7 +170,7 @@ const ScoreboardPage: React.FC = () => {
 
   const steps = [
     {
-      title: 'Overall Performance ',
+      title: 'Training Sources',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
@@ -256,7 +256,7 @@ const ScoreboardPage: React.FC = () => {
       icon: <SmileOutlined />,
     },
     {
-      title: 'A specific ROI',
+      title: 'ROI',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
@@ -352,7 +352,7 @@ const ScoreboardPage: React.FC = () => {
       icon: <SmileOutlined />,
     },
     {
-      title: 'A specific Dataset',
+      title: 'Dataset',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
@@ -391,10 +391,6 @@ const ScoreboardPage: React.FC = () => {
           )}
         </div>
       ),
-      icon: <SmileOutlined />,
-    },
-    {
-      title:'Duplicate Table',
       icon: <SmileOutlined />,
     },
     {
