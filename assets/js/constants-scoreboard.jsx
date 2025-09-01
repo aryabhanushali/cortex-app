@@ -34,12 +34,14 @@ export const REGION_OPTIONS = [
 ];
 
 export const DATASET_OPTIONS_LEFT = [
-    { value: 'Murty185', label: 'Murty185' },
+    { value: 'murty185', label: 'Murty185' },
     { value: 'nsd1000', label: 'NSD' },
-    { value: 'algonauts', label: 'algonauts' },
     { value: 'bold5000', label: 'BOLD5000' },
-    { value: 'bonner', label: 'BonnerEpstein' },
-    { value: 'kingbaker', label: 'KingBaker' }
+    { value: 'bonner', label: 'Bonner' },
+    { value: 'BMD', label: 'BMD' },
+    { value: 'kingbaker', label: 'KingBaker' },
+    { value: 'wardle', label: 'Wardle' },
+    { value: 'nsd_syn', label: 'NSD_SYN' },
   ];
 
 export const DATASET_OPTIONS_RIGHT = [
@@ -60,8 +62,8 @@ export const CHART_SCOPE_OPTIONS = [
 
 
     
-// export const MURTY185_DATASET = ['NSD','algonauts', 'BOLD5000', 'BonnerEpstein','KingBaker'];
-// export const NSD_DATASET = ['Murty185','algonauts', 'BOLD5000', 'BonnerEpstein','KingBaker'];
+export const MURTY185_DATASET = ['nsd1000', 'bold5000', 'bonner','BMD','kingbaker','wardle','nsd_syn' ];
+export const NSD_DATASET = ['murty185','bold5000', 'bonner','BMD','kingbaker','wardle','nsd_syn'];
 
 
 export const VOXEL_OPTIONS = [
