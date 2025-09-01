@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-const HeatmapByROI = ({ data, roi}) => {
+const HeatmapByROI = ({ data, roi }) => {
   const headerRef = useRef();
   const bodyRef = useRef();
   const legendRef = useRef();
@@ -13,7 +13,6 @@ const HeatmapByROI = ({ data, roi}) => {
     d3.select(headerRef.current).select("svg").remove();
     d3.select(bodyRef.current).select("svg").remove();
     d3.select(legendRef.current).select("svg").remove();
-
 
     const headerMargin = { top: 60, right: 40, bottom: 10, left: 200 };
     const bodyMargin = { top: 0, right: 40, bottom: 0, left: 200 };
@@ -32,118 +31,115 @@ const HeatmapByROI = ({ data, roi}) => {
 
     const chartWidth = datasets.length * (columnWidth + columnGap);
     const bodyHeight = otherModels.length * (rowHeight + rowGap);
-    
     const width = chartWidth + headerMargin.left + headerMargin.right;
 
-    const colorScale = d3.scaleSequential(d3.interpolateYlGnBu).domain([0, 1]);
+    // ===== 自定义颜色映射：0 → 灰，1 → 蓝 =====
+    const colorScale = d3.scaleLinear()
+      .domain([0, 1])
+      .range(["#D3D3D3", "#9CC9FF"]);
 
-   // ======= Header SVG =======
-const headerHeight = headerMargin.top + rowHeight;
-const svgHeader = d3
-  .select(headerRef.current)
-  .append("svg")
-  .attr("width", width)
-  .attr("height", headerHeight);
+    // ======= Header SVG =======
+    const headerHeight = headerMargin.top + rowHeight;
+    const svgHeader = d3
+      .select(headerRef.current)
+      .append("svg")
+      .attr("width", width)
+      .attr("height", headerHeight);
 
-// Dataset labels
-svgHeader
-  .append("g")
-  .attr("transform", `translate(${columnWidth / 4},${headerMargin.top - 20 })`)
-  .call(
-    d3.axisTop(
-      d3.scalePoint()
-        .domain(datasets)
-        .range([
-          headerMargin.left + columnWidth / 2,
-          headerMargin.left +
-            datasets.length * (columnWidth + columnGap) -
-            columnGap -
-            columnWidth / 2,
-        ])
-    )
-  )
-  .call(g => {
-    g.select(".domain").remove();   // 去掉横线
-    g.selectAll("line").remove();   // 去掉小刻度
-    g.selectAll("text")             // 修改文字样式
-      .style("font-size", "14px")
-      .style("fill", "black");
-  })
-  .selectAll("text")
-  .attr("transform", "rotate(-30)")
-  .style("text-anchor", "end");
-
-if (hasCeiling) {
-  const ceilingData = [];
-  datasets.forEach((dataset) => {
-    const vals = data[roi]["ceiling"]?.[dataset];
-    const score = vals?.[1];
-    ceilingData.push({ model: "ceiling", dataset, value: score });
-  });
-
-  svgHeader
-    .selectAll("rect")
-    .data(ceilingData)
-    .enter()
-    .append("rect")
-    .attr(
-      "x",
-      (d) =>
-        headerMargin.left +
-        datasets.indexOf(d.dataset) * (columnWidth + columnGap)
-    )
-    .attr("y", headerMargin.top)
-    .attr("width", columnWidth)
-    .attr("height", rowHeight)
-    .attr("fill", (d) =>
-      d.value != null ? colorScale(d.value) : "#f0f0f0"
-    );
-
-  svgHeader
-    .selectAll("text.cell-label")
-    .data(ceilingData.filter((d) => d.value != null))
-    .enter()
-    .append("text")
-    .attr(
-      "x",
-      (d) =>
-        headerMargin.left +
-        datasets.indexOf(d.dataset) * (columnWidth + columnGap) +
-        columnWidth / 2
-    )
-    .attr("y", headerMargin.top + rowHeight / 2)
-    .attr("text-anchor", "middle")
-    .attr("dominant-baseline", "central")
-    .style("fill", "black")
-    .style("font-size", "14px")
-    .text((d) => d.value.toFixed(2));
-
-  svgHeader
-    .append("g")
-    .attr("transform", `translate(${headerMargin.left - 10},0)`)
-    .call(
-      d3
-        .axisLeft(
-          d3
-            .scalePoint()
-            .domain(["ceiling"])
+    // Dataset labels
+    svgHeader
+      .append("g")
+      .attr("transform", `translate(${columnWidth / 4},${headerMargin.top - 20})`)
+      .call(
+        d3.axisTop(
+          d3.scalePoint()
+            .domain(datasets)
             .range([
-              headerMargin.top + rowHeight / 2,
-              headerMargin.top + rowHeight / 2,
+              headerMargin.left + columnWidth / 2,
+              headerMargin.left +
+                datasets.length * (columnWidth + columnGap) -
+                columnGap -
+                columnWidth / 2,
             ])
         )
-    )
-    .call(g => {
-      g.select(".domain").remove();   // 去掉竖的黑框线
-      g.selectAll("line").remove();   // 去掉小刻度
-      g.selectAll("text")             // 修改 label 样式
+      )
+      .call((g) => {
+        g.select(".domain").remove();
+        g.selectAll("line").remove();
+        g.selectAll("text")
+          .style("font-size", "14px")
+          .style("fill", "black");
+      })
+      .selectAll("text")
+      .attr("transform", "rotate(-30)")
+      .style("text-anchor", "end");
+
+    if (hasCeiling) {
+      const ceilingData = [];
+      datasets.forEach((dataset) => {
+        const vals = data[roi]["ceiling"]?.[dataset];
+        const score = vals?.[1];
+        ceilingData.push({ model: "ceiling", dataset, value: score });
+      });
+
+      svgHeader
+        .selectAll("rect")
+        .data(ceilingData)
+        .enter()
+        .append("rect")
+        .attr(
+          "x",
+          (d) =>
+            headerMargin.left +
+            datasets.indexOf(d.dataset) * (columnWidth + columnGap)
+        )
+        .attr("y", headerMargin.top)
+        .attr("width", columnWidth)
+        .attr("height", rowHeight)
+        .attr("fill", (d) =>
+          d.value != null ? (d.value < 0 ? "#D3D3D3" : colorScale(d.value)) : "#f0f0f0"
+        );
+
+      svgHeader
+        .selectAll("text.cell-label")
+        .data(ceilingData.filter((d) => d.value != null))
+        .enter()
+        .append("text")
+        .attr(
+          "x",
+          (d) =>
+            headerMargin.left +
+            datasets.indexOf(d.dataset) * (columnWidth + columnGap) +
+            columnWidth / 2
+        )
+        .attr("y", headerMargin.top + rowHeight / 2)
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "central")
+        .style("fill", "black")
         .style("font-size", "14px")
-        .style("fill", "black");
-    });
-}
+        .text((d) => d.value.toFixed(2));
 
+      svgHeader
+        .append("g")
+        .attr("transform", `translate(${headerMargin.left - 10},0)`)
+        .call(
+          d3
+            .axisLeft(
+              d3.scalePoint()
+                .domain(["ceiling"])
+                .range([headerMargin.top + rowHeight / 2, headerMargin.top + rowHeight / 2])
+            )
+        )
+        .call((g) => {
+          g.select(".domain").remove();
+          g.selectAll("line").remove();
+          g.selectAll("text")
+            .style("font-size", "14px")
+            .style("fill", "black");
+        });
+    }
 
-    // ======= Body SVG (scrollable models) =======
+    // ======= Body SVG =======
     const svgBody = d3
       .select(bodyRef.current)
       .append("svg")
@@ -172,12 +168,12 @@ if (hasCeiling) {
       )
       .attr(
         "y",
-        (d) => bodyMargin.top+otherModels.indexOf(d.model) * (rowHeight + rowGap)
+        (d) => bodyMargin.top + otherModels.indexOf(d.model) * (rowHeight + rowGap)
       )
       .attr("width", columnWidth)
       .attr("height", rowHeight)
       .attr("fill", (d) =>
-        d.value != null ? colorScale(d.value) : "#f0f0f0"
+        d.value != null ? (d.value < 0 ? "#D3D3D3" : colorScale(d.value)) : "#f0f0f0"
       );
 
     svgBody
@@ -192,11 +188,11 @@ if (hasCeiling) {
           datasets.indexOf(d.dataset) * (columnWidth + columnGap) +
           columnWidth / 2
       )
-      
       .attr(
         "y",
         (d) =>
-          bodyMargin.top + otherModels.indexOf(d.model) * (rowHeight + rowGap) +
+          bodyMargin.top +
+          otherModels.indexOf(d.model) * (rowHeight + rowGap) +
           rowHeight / 2
       )
       .attr("text-anchor", "middle")
@@ -205,30 +201,29 @@ if (hasCeiling) {
       .style("font-size", "14px")
       .text((d) => d.value.toFixed(2));
 
-     svgBody
-    .append("g")
-    .attr("transform", `translate(${bodyMargin.left - 10},0)`)
-    .call(
+    svgBody
+      .append("g")
+      .attr("transform", `translate(${bodyMargin.left - 10},0)`)
+      .call(
         d3.axisLeft(
-        d3.scalePoint()
+          d3.scalePoint()
             .domain(otherModels)
             .range([
-             bodyMargin.top + rowHeight / 2,
-             bodyMargin.top + otherModels.length * (rowHeight + rowGap) -
+              bodyMargin.top + rowHeight / 2,
+              bodyMargin.top + otherModels.length * (rowHeight + rowGap) -
                 rowGap -
                 rowHeight / 2,
             ])
         )
-    )
-    .call(g => {
-        g.select(".domain").remove();   // 去掉竖的黑框线
-        // g.selectAll("line").remove();   // 去掉小刻度
-        g.selectAll("text")             // 修改文字样式
+      )
+      .call((g) => {
+        g.select(".domain").remove();
+        g.selectAll("text")
           .style("font-size", "14px")
           .style("fill", "black");
-    });
+      });
 
-    // ======= Legend (右侧竖直 colorbar) =======
+    // ======= Legend (灰到蓝) =======
     const legendHeight = 250;
     const legendWidth = 12;
 
@@ -247,12 +242,8 @@ if (hasCeiling) {
       .attr("x2", "0%")
       .attr("y2", "0%");
 
-    d3.range(0, 1.01, 0.1).forEach((t) => {
-      gradient
-        .append("stop")
-        .attr("offset", `${t * 100}%`)
-        .attr("stop-color", colorScale(t));
-    });
+    gradient.append("stop").attr("offset", "0%").attr("stop-color", "#D3D3D3");
+    gradient.append("stop").attr("offset", "100%").attr("stop-color", "#9CC9FF");
 
     svgLegend
       .append("rect")
@@ -270,30 +261,21 @@ if (hasCeiling) {
   }, [data, roi]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "row", justifyContent: "center"   }}>
-      <div style={{ flex: 0,alignSelf: "flex-start"  }}>
-        <div
-          ref={headerRef}
-          style={{
-            lineHeight: "0",// ✅ 保留你原来的
-            alignSelf: "flex-start" 
-
-          }}
-        ></div>
+    <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
+      <div style={{ flex: 0, alignSelf: "flex-start" }}>
+        <div ref={headerRef} style={{ lineHeight: "0", alignSelf: "flex-start" }}></div>
         <div
           ref={bodyRef}
           style={{
             maxHeight: "400px",
             overflowY: "scroll",
-
-            marginTop: "10px", // ✅ 保留你原来的
+            marginTop: "10px",
           }}
         ></div>
       </div>
-      <div ref={legendRef} style={{ marginLeft: "0px", marginTop: "100px", }}></div>
+      <div ref={legendRef} style={{ marginLeft: "0px", marginTop: "100px" }}></div>
     </div>
   );
-//   return <div ref={headerRef}></div>;
 };
 
 export default HeatmapByROI;
