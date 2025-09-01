@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-const RoiBarChart = ({ data, roi, title, dataset }) => {
+const RoiBarChart = ({ data, roi, dataset }) => {
   const svgRef = useRef();
 
   useEffect(() => {
@@ -138,22 +138,12 @@ const RoiBarChart = ({ data, roi, title, dataset }) => {
       .attr("transform", `rotate(-90, ${margin.left - 50}, ${height / 2})`)
       .style("font-size", "12px")
       .text("Pearson Correlation");
-  }, [data, roi, title, dataset]);
+  }, [data, roi, dataset]);
 
   return (
     <div>
-      {/* 标题单独放在 SVG 外，始终居中，不随滚动 */}
-      <div
-        style={{
-          textAlign: "center",
-          fontSize: "16px",
-          fontWeight: "bold",
-          marginTop: "-40px"
 
-        }}
-      >
-        {title} — ROI: {roi.toUpperCase()} — Dataset: {dataset}
-      </div>
+ 
 
       {/* 横向滚动容器 */}
       <div style={{ overflowX: "auto", border: "1px solid #ccc" ,  marginTop: "-85px"}}>

@@ -199,7 +199,7 @@ const ScoreboardPage: React.FC = () => {
             <HeatmapByROI
               data={newData.murty_uni}
               roi ={region}
-              title="Cross-Regions Performance (Trained on Murty185)"
+     
             />
           )}
 
@@ -207,7 +207,7 @@ const ScoreboardPage: React.FC = () => {
             <HeatmapByROI
               data={newData.nsd_uni}
               roi ={region}
-              title="Cross-Regions Performance (Trained on NSD)"
+              
             />
           )}
 
@@ -220,7 +220,6 @@ const ScoreboardPage: React.FC = () => {
               data={newData.nsd_uni}
               roi ={region}
               dataset={datasetEmpty}
-              title={`${region} Performance on ${datasetEmpty}  (Trained on NSD)`}
             />
 
           )}
@@ -230,7 +229,6 @@ const ScoreboardPage: React.FC = () => {
               data={newData.murty_uni}
               roi ={region}
               dataset={datasetEmpty}
-              title={`${region} Performance on ${datasetEmpty}  (Trained on Murty 185)`}
             />
 
           )}
@@ -280,7 +278,7 @@ const ScoreboardPage: React.FC = () => {
             <HeatmapByROI
               data={newData.murty_uni}
               roi ={region.toLowerCase()}
-              title={`${region} Performance on all Datasets (Trained on Murty 185)`}
+             
             />
           )}
 
@@ -288,7 +286,7 @@ const ScoreboardPage: React.FC = () => {
             <HeatmapByROI
               data={newData.nsd_uni}
               roi ={region.toLowerCase()}
-              title={`${region} Performance on all Datasets (Trained on NSD 1000)`}
+             
             />
           )}
 
@@ -310,7 +308,6 @@ const ScoreboardPage: React.FC = () => {
               data={newData.nsd_uni}
               roi ={region.toLowerCase()}
               dataset={datasetEmpty}
-              title={`${region} Performance on ${datasetEmpty}  (Trained on NSD)`}
             />
 
           )}
@@ -320,7 +317,6 @@ const ScoreboardPage: React.FC = () => {
               data={newData.murty_uni}
               roi ={region.toLowerCase()}
               dataset={datasetEmpty}
-              title={`${region} Performance on ${datasetEmpty}  (Trained on Murty 185)`}
             />
 
           )}

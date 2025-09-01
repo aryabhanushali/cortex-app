@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-const HeatmapByROI = ({ data, roi, title }) => {
+const HeatmapByROI = ({ data, roi}) => {
   const headerRef = useRef();
   const bodyRef = useRef();
   const legendRef = useRef();
@@ -43,15 +43,8 @@ const HeatmapByROI = ({ data, roi, title }) => {
       .attr("width", width)
       .attr("height", headerHeight);
 
-    // Title
-    svgHeader
-      .append("text")
-      .attr("x", width / 2)
-      .attr("y", 20)
-      .attr("text-anchor", "middle")
-      .style("font-size", "18px")
-      .style("font-weight", "bold")
-      .text(title || `${roi.toUpperCase()} — Heatmap`);
+
+
 
     // Dataset labels
     svgHeader
@@ -262,7 +255,7 @@ const HeatmapByROI = ({ data, roi, title }) => {
       .append("g")
       .attr("transform", `translate(42,0)`)
       .call(d3.axisRight(legendScale).ticks(5));
-  }, [data, roi, title]);
+  }, [data, roi]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
