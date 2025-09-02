@@ -139,4 +139,27 @@ export const MODELCARD_INFO_LOOKUP = {
   }
 };
 
+export const DATASETCARD_OPTIONS = [
+  { value: "nsd_1000", label: "NSD1000" },
+  { value: "murty185", label: "Murty185" }
+  // add more datasets...
+];
+
+export const DATASETCARD_INFO_LOOKUP = {
+  nsd_1000: {
+    category: "Natural Scenes",
+    size: "1000 images",
+    subjects: 8,
+    description: "The Natural Scenes Dataset subset with 1000 stimuli and fMRI responses from 8 participants.",
+    cardUrl: "https://naturalscenesdataset.org/"
+  },
+  murty185: {
+    category: "Faces & Objects",
+    size: "185 images",
+    subjects: 4,
+    description: "Dataset of fMRI responses to 185 face/object stimuli, collected by Murty et al.",
+    cardUrl: "https://www.nature.com/articles/s41467-021-25409-6"
+  },
+};
+
   
