@@ -319,19 +319,10 @@ const ScoreboardPage: React.FC = () => {
             />
           )}
 
-
+          {/* barchart */}
            
 
-          {/* {!loadingNew && newData && training !== "" && datasetEmpty === ""  && (
-              <ScatterMurtyVsNsd 
-                murtyData={murtyData} 
-                nsdData={nsdData} 
-                roi= {region}
-              />
-            )}  */}
-
-
-         {/* {!loadingNew  && datasetEmpty != "" && training === "NSD" && (
+         {!loadingNew  && datasetEmpty != "" && training === "NSD" && (
              <RoiBarChart
               data={newData.nsd_uni}
               roi ={region.toLowerCase()}
@@ -351,7 +342,7 @@ const ScoreboardPage: React.FC = () => {
              
             />
 
-          )} */}
+          )}
 
           
         </div>
