@@ -375,6 +375,17 @@ const ScoreboardPage: React.FC = () => {
          
           <ChartSelect chartType={chartType} setChartType={setChartType} chartScope={chartScope} setChartScope={setChartScope}/>
           
+  
+
+          {/* ScatterGapCeiling */}
+          {!loadingNew && dataset === "" && training === ""  && region === "" && (
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
+          )}
+          {/* {!loadingNew && dataset === "" && training === ""  && region !== "" &&(
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
+          )} */}
+
+
           {!loading &&  filteredData.length > 0 && region === "" &&(
             <RoiHeatChart dataset={filteredData} title={`Models Performance on Evaluation Datasets: ${dataset}`}/>
           )}
