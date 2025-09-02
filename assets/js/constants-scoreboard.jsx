@@ -11,9 +11,9 @@ export const TRAINING_OPTIONS = [
   
 export const ROI_OPTIONS = [
   
-  { value: 'PPA', label: 'PPA' },
-  { value: 'FFA', label: 'FFA' },
-  { value: 'EBA', label: 'EBA' },
+  { value: 'ppa', label: 'PPA' },
+  { value: 'ffa', label: 'FFA' },
+  { value: 'eba', label: 'EBA' },
   // { value: 'FBA', label: 'FBA'},
   // { value: 'OFA', label: 'OFA'},
   // { value: 'OPA', label: 'OPA'},

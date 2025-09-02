@@ -177,7 +177,7 @@ const ScoreboardPage: React.FC = () => {
           {/* panel display logic */}
            <TrainingSelect training={training} setTraining={setTraining} dataset={dataset} mode = {1}/> 
           {training !== "" && (<DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true} mode = {1}/>)}
-          {dataset !== "" && training !== "" && (<ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false} mode={3}/>)
+          {datasetEmpty !== "" && training !== "" && (<ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={1}/>)
          } 
           
           
@@ -185,23 +185,27 @@ const ScoreboardPage: React.FC = () => {
           {/* title display logic */}
           {!loadingNew && (
             <div className="chart-title">
-              {training === "" && datasetEmpty === "" && newData
-                ? `Overall Performence (Trained on Murty vs Trained on NSD) `
-                : training === "Murty185" && datasetEmpty === ""
-                ? "Cross-Regions Performance (Trained on Murty185)"
-                : training === "NSD" && datasetEmpty === ""
-                ? "Cross-Regions Performance (Trained on NSD)"
-                : training === "NSD" && datasetEmpty !== ""
-                ? `Cross-Regions Performance on ${datasetEmpty} (Trained on NSD)`
-                : training === "Murty185" && datasetEmpty !== ""
-                ? `Cross-Regions Performance on ${datasetEmpty} (Trained on Murty185)`
+              {training === "" && datasetEmpty === "" &&  region === ""
+                ? `Across-Regions Performence (Trained on Murty vs Trained on NSD1000) `
+                : training === "Murty185" && datasetEmpty === "" && region === ""
+                ? "Across-Regions Performance (Trained on Murty185)"
+                : training === "NSD" && datasetEmpty === ""  && region === ""
+                ? "Across-Regions Performance (Trained on NSD1000)"
+                : training === "Murty185" && datasetEmpty !== "" && region === ""
+                ? `Across-Regions Performance on ${datasetEmpty} (Trained on Murty185)`
+                : training === "NSD" && datasetEmpty !== "" && region !== "Overall"
+                ? `Across-Regions Performance on ${datasetEmpty} (Trained on NSD1000)`
+                : training === "Murty185" && datasetEmpty !== "" && region !== "Overall"
+                ? `${region.toUpperCase()}  Performance on ${datasetEmpty} (Trained on Murty185)`
+                : training === "NSD" && datasetEmpty !== "" && region !== "Overall"
+                ? `${region.toUpperCase()}  Performance on ${datasetEmpty} (Trained on NSD1000)`
                 : ""}
             </div>
           )}
 
           <ChartSelect chartType={chartType} setChartType={setChartType} chartScope={chartScope} setChartScope={setChartScope}/>
 
-
+        {/* scatter */}
         {!loadingNew && newData && training === "" && datasetEmpty === ""  && region === "" && (
           <ScatterMurtyVsNsd 
             murtyData={murtyData} 
@@ -210,49 +214,38 @@ const ScoreboardPage: React.FC = () => {
           />
         )}
           
-          {/* {!loading && overallData.length > 0 && datasetEmpty === "" && (
-            <HeatChartOverall dataset={overallData} title="Cross-Regions Performance on all Datasets" />
-          )} */}
-
-          {!loadingNew && datasetEmpty === "" && training === "Murty185" && (
+          {/* heatmap */}
+          {!loadingNew && datasetEmpty === "" && training === "Murty185" &&  region === "" &&(
             <HeatmapByROI
-              data={newData.murty_uni}
-              roi ={region}
-     
+              data={murtyData}
+              roi ={"Overall"}
             />
           )}
 
-          {!loadingNew && datasetEmpty === "" && training === "NSD" && (
+          {!loadingNew && datasetEmpty === "" && training === "NSD" &&  region === "" && (
             <HeatmapByROI
-              data={newData.nsd_uni}
-              roi ={region}
-              
+              data={nsdData}
+              roi ={"Overall"}
             />
           )}
 
-          {/* {!loading && filteredOverallData.length > 0 && (
-            <BarChartSpecific dataset={filteredOverallData} title={`Cross-Regions Performance on ${datasetEmpty}`} />
-          )} */}
+          {/* BarChart */}
 
-          {/* {!loadingNew  && datasetEmpty != "" && training === "NSD" && (
-             <RoiBarChart
-              data={newData.nsd_uni}
-              roi ={region}
+          {!loadingNew && datasetEmpty !== "" && training === "NSD" && (
+            <RoiBarChart
+              data={nsdData}
+              roi={region === "" ? "Overall" : region.toLowerCase()}   // ✅ region为空 → overall
               dataset={datasetEmpty}
-              
             />
-
           )}
 
-             {!loadingNew  && datasetEmpty != "" && training === "Murty185" && (
-             <RoiBarChart
-              data={newData.murty_uni}
-              roi ={region}
+          {!loadingNew && datasetEmpty !== "" && training === "Murty185" && (
+            <RoiBarChart
+              data={murtyData}
+              roi={region === "" ? "Overall" : region.toLowerCase()}   // ✅ 同理
               dataset={datasetEmpty}
-            
             />
-
-          )} */}
+          )}
 
         </div>
       ),

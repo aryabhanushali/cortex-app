@@ -45,7 +45,7 @@ const ROISelect = ({ region, setRegion, dataset, allowToggle, mode }) => {
         Region of Interest:
       </FormLabel>
       <ButtonGroup fullWidth>
-        {mode === 1 && renderButtons(OVERALL_OPTION)}
+        {mode === 1 && renderButtons(ROI_OPTIONS)}
         {mode === 2 && renderButtons(ROI_OPTIONS)}
         {mode === 3 && renderButtons(REGION_OPTIONS)}
       </ButtonGroup>
