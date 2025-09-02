@@ -289,10 +289,10 @@ const ScoreboardPage: React.FC = () => {
 
           {/* ScatterGapCeiling */}
           {!loadingNew && dataset === "" && training === ""  && region === "" && (
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset}/>
           )}
           {!loadingNew && dataset === "" && training === ""  && region !== "" &&(
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset}/>
           )}
 
           {/* murty vs nsd */}
@@ -359,6 +359,9 @@ const ScoreboardPage: React.FC = () => {
             <div className="chart-title">
               { region === "" && training === "" && dataset === "" && newData
                 ? `Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
+                : training === "" && region === "" && dataset !== ""
+
+                ? `Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
                 : training === "" && region === ""
                 ? `Performance on ${dataset}(Trained on Murty185 and Trained on NSD)`
                 : training === "Murty185" && dataset === ""
@@ -379,17 +382,17 @@ const ScoreboardPage: React.FC = () => {
 
           {/* ScatterGapCeiling */}
           {!loadingNew && dataset === "" && training === ""  && region === "" && (
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset}/>
           )}
-          {/* {!loadingNew && dataset === "" && training === ""  && region !== "" &&(
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
-          )} */}
 
+          {!loadingNew && dataset !== "" && training === ""  && region === "" && (
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset}/>
+          )}
 
-          {!loading &&  filteredData.length > 0 && region === "" &&(
+          {/* {!loading &&  filteredData.length > 0 && region === "" &&(
             <RoiHeatChart dataset={filteredData} title={`Models Performance on Evaluation Datasets: ${dataset}`}/>
           )}
-          
+           */}
         </div>
       ),
       icon: <SmileOutlined />,

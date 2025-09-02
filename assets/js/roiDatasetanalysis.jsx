@@ -25,7 +25,7 @@ const datasetTypeLabels = {
   diamond: "Synthetic / OOD",
 };
 
-export default function ScatterGapCeiling({ murtyData, nsdData, ceilingData, roi }) {
+export default function ScatterGapCeiling({ murtyData, nsdData, ceilingData, roi, dataset }) {
   const svgRef = useRef();
 
   useEffect(() => {
@@ -35,19 +35,18 @@ export default function ScatterGapCeiling({ murtyData, nsdData, ceilingData, roi
     const entries = [
       ...Object.entries(murtyData || {})
         .map(([key, value]) => {
-          const [dataset, roiName] = key.split("/");
-          return { Dataset: dataset, ROI: roiName, Train: "Murty185", ...value };
+          const [ds, roiName] = key.split("/");
+          return { Dataset: ds, ROI: roiName, Train: "Murty185", ...value };
         })
-        .filter(d => roi === "" || d.ROI === roi),   // ✅ 加过滤
-    
+        .filter(d => (roi === "" || d.ROI === roi) && (dataset === "" || d.Dataset === dataset)),
+
       ...Object.entries(nsdData || {})
         .map(([key, value]) => {
-          const [dataset, roiName] = key.split("/");
-          return { Dataset: dataset, ROI: roiName, Train: "NSD1000", ...value };
+          const [ds, roiName] = key.split("/");
+          return { Dataset: ds, ROI: roiName, Train: "NSD1000", ...value };
         })
-        .filter(d => roi === "" || d.ROI === roi),   // ✅ 加过滤
+        .filter(d => (roi === "" || d.ROI === roi) && (dataset === "" || d.Dataset === dataset)),
     ];
-
     // === 对于同一个 dataset+ROI，把 Murty 和 NSD 的结果取平均 ===
     const grouped = d3.rollups(
       entries,
@@ -179,7 +178,7 @@ export default function ScatterGapCeiling({ murtyData, nsdData, ceilingData, roi
       shapeLegend.append("path").attr("d", path).attr("transform", `translate(0,${i * 24 -2})`).attr("fill", "white").attr("stroke", "black");
       shapeLegend.append("text").attr("x", 15).attr("y", i * 24 + 4).attr("font-size", 20).text(label);
     });
-  }, [murtyData, nsdData, ceilingData, roi]);
+  }, [murtyData, nsdData, ceilingData, roi, dataset]);
 
 return (
   <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
