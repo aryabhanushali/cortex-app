@@ -284,30 +284,48 @@ const ScoreboardPage: React.FC = () => {
           )}
 
           <ChartSelect chartType={chartType} setChartType={setChartType} chartScope={chartScope} setChartScope={setChartScope}/>
-         
-          
-          {/* {!loading && roiData.length > 0 && datasetEmpty === "" && (
-            <HeatChartOverall dataset={roiData} title={`${region} Performance on all Datasets`} />
-          )} */}
 
-
+          {/* ScatterGapCeiling */}
           {!loadingNew && datasetEmpty === "" && training === ""  && region === ""&& (
             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
           )}
-
-
           {!loadingNew && datasetEmpty === "" && training === ""  && (
             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
           )}
 
 
-            {!loadingNew && newData && training !== "" && datasetEmpty === ""  && (
-          <ScatterMurtyVsNsd 
-            murtyData={murtyData} 
-            nsdData={nsdData} 
-            roi= {region}
-          />
-        )} 
+
+          {/* heatmap */}
+          {!loadingNew && datasetEmpty === "" && training === "Murty185" &&(
+            <HeatmapByROI
+              data={murtyData}
+              roi ={region}
+            />
+          )}
+          {!loadingNew && datasetEmpty === "" && training === "NSD" &&(
+            <HeatmapByROI
+              data={murtyData}
+              roi ={region}
+            />
+          )}
+
+
+            {/* {!loadingNew && newData && training !== "" && datasetEmpty === ""  && (
+            <ScatterMurtyVsNsd 
+              murtyData={murtyData} 
+              nsdData={nsdData} 
+              roi= {region}
+            />
+          )}  */}
+
+          {/* {!loadingNew && newData && training !== "" && datasetEmpty === ""  && (
+              <ScatterMurtyVsNsd 
+                murtyData={murtyData} 
+                nsdData={nsdData} 
+                roi= {region}
+              />
+            )}  */}
+
 
          {/* {!loadingNew  && datasetEmpty != "" && training === "NSD" && (
              <RoiBarChart
