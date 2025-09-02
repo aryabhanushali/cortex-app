@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
-
-const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi}) => {
+   
+const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
   const containerRef = useRef();
 
   useEffect(() => {
@@ -40,17 +40,19 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi}) => {
       const nsdVals = nsdData[roi][model];
       if (!murtyVals || !nsdVals) return;
 
-      Object.keys(murtyVals).forEach((dataset) => {
-        const x = murtyVals[dataset]?.[0];
-        const y = nsdVals[dataset]?.[0];
+      Object.keys(murtyVals).forEach((ds) => {
+        if (dataset && ds !== dataset) return;   
+  
+        const x = murtyVals[ds]?.[0];
+        const y = nsdVals[ds]?.[0];
 
-        if (["murty185", "nsd_1000"].includes(dataset)) {
+        if (["murty185", "nsd_1000"].includes(ds)) {
           return;
         }
         if (x != null && y != null) {
           points.push({
             model,
-            dataset,
+            dataset: ds,
             x,
             y,
           });
@@ -326,7 +328,7 @@ datasets.forEach(dataset => {
 
 
 
-  }, [murtyData, nsdData, roi]);
+  }, [murtyData, nsdData, roi, dataset]);
 
   
 

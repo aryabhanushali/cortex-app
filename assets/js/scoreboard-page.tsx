@@ -147,7 +147,7 @@ const ScoreboardPage: React.FC = () => {
  
 
   const contentStyle: React.CSSProperties = {
-    // lineHeight: '260px',
+
     textAlign: 'center',
     color: token.colorTextTertiary,
     backgroundColor: 'transparent',
@@ -208,6 +208,7 @@ const ScoreboardPage: React.FC = () => {
             murtyData={murtyData} 
             nsdData={nsdData} 
             roi= {"Overall"}
+            dataset = {dataset}
           />
         )}
           
@@ -267,11 +268,15 @@ const ScoreboardPage: React.FC = () => {
               { region === "" && training === "" && dataset === "" && newData
                 ? `Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
                 : training === "" && dataset === ""
-                ? `${region.toLocaleUpperCase} : Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
+                ? `${region.toUpperCase()} : Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
+                : training === "VS" && dataset === ""
+                ? `${region.toUpperCase()} Performance (Trained on Murty185 and Trained on NSD)`
                 : training === "Murty185" && dataset === ""
                 ? `${region.toUpperCase()} Performance (Trained on Murty185)`
                 : training === "NSD" && dataset === ""
                 ? `${region.toUpperCase()} Performance (Trained on NSD)`
+                : training === "VS" && dataset !== ""
+                ? `${region.toUpperCase()} Performance on ${dataset}(Trained on Murty185 and Trained on NSD)`
                 : training === "NSD" && dataset !== ""
                 ? `${region.toUpperCase()} Performance on ${dataset} (Trained on NSD)`
                 : training === "Murty185" && dataset !== ""
@@ -290,15 +295,14 @@ const ScoreboardPage: React.FC = () => {
             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
           )}
 
-        {/* murty vs nsd */}
-
+          {/* murty vs nsd */}
            {!loadingNew && newData && dataset === "" && training === "VS"  && (
-            <ScatterMurtyVsNsd 
-              murtyData={murtyData} 
-              nsdData={nsdData} 
-              roi= {region}
-            />
+            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {region} dataset = {dataset} />
           )} 
+          {!loadingNew && newData && dataset !== "" && training === "VS"  && (
+            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {region} dataset = {dataset} />
+          )} 
+
 
 
 
@@ -374,9 +378,7 @@ const ScoreboardPage: React.FC = () => {
           {!loading &&  filteredData.length > 0 && region === "" &&(
             <RoiHeatChart dataset={filteredData} title={`Models Performance on Evaluation Datasets: ${dataset}`}/>
           )}
-          {!loading && filteredRegionData.length > 0 && (
-            <BarChartSpecific dataset={filteredRegionData} title={`${region} Performance on ${dataset}`} />
-          )}
+          
         </div>
       ),
       icon: <SmileOutlined />,
