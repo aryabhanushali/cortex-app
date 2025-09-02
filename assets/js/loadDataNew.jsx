@@ -74,18 +74,18 @@ export default function useLoadDataNew() {
     };
 
     Promise.all(
-  Object.entries(files).map(([key, path]) =>
-    d3.json(path).then(content => {
-      // ceiling 文件不需要 addOverall
-      if (key === "ceiling_uni" || key === "ceiling_multi") {
-        console.log("📂 Loaded ceiling file:", key, content);
-        return { key, content }; 
-      }
-      // 其它结果文件需要 addOverall
-      return { key, content: addOverall(content) };
-    })
-  )
-)
+      Object.entries(files).map(([key, path]) =>
+        d3.json(path).then(content => {
+          // ceiling 文件不需要 addOverall
+          if (key === "ceiling_uni" || key === "ceiling_multi") {
+            console.log("📂 Loaded ceiling file:", key, content);
+            return { key, content }; 
+          }
+          // 其它结果文件需要 addOverall
+          return { key, content: addOverall(content) };
+        })
+      )
+    )
       .then(results => {
         const loadedData = {};
         results.forEach(({ key, content }) => {

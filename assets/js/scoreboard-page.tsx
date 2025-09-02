@@ -293,7 +293,7 @@ const ScoreboardPage: React.FC = () => {
             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
           )}
 
-
+        {/* murty vs nsd */}
 
            {!loadingNew && newData && datasetEmpty === "" && training === "VS"  && (
             <ScatterMurtyVsNsd 
@@ -314,7 +314,7 @@ const ScoreboardPage: React.FC = () => {
           )}
           {!loadingNew && datasetEmpty === "" && training === "NSD" &&(
             <HeatmapByROI
-              data={murtyData}
+              data={nsdData}
               roi ={region}
             />
           )}
@@ -324,7 +324,7 @@ const ScoreboardPage: React.FC = () => {
 
          {!loadingNew  && datasetEmpty != "" && training === "NSD" && (
              <RoiBarChart
-              data={newData.nsd_uni}
+              data={nsdData}
               roi ={region.toLowerCase()}
               dataset={datasetEmpty}
               ceiling = {Ceiling}
@@ -335,8 +335,8 @@ const ScoreboardPage: React.FC = () => {
 
              {!loadingNew  && datasetEmpty != "" && training === "Murty185" && (
              <RoiBarChart
-              data={newData.murty_uni}
-              roi ={region.toLowerCase()}
+              data={murtyData}
+              roi ={region}
               dataset={datasetEmpty}
               ceiling = {Ceiling}
              
