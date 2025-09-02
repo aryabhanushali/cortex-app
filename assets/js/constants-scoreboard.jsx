@@ -8,6 +8,12 @@ export const TRAINING_OPTIONS = [
   // { value: 'VS', label: 'Murty185 VS NSD1000'},
   { value: 'NSD', label: 'NSD' },
 ];
+
+export const TRAINING_OPTIONS_VS= [
+  { value: 'Murty185', label: 'Murty185' },
+  { value: 'VS', label: 'Murty185 VS NSD1000'},
+  { value: 'NSD', label: 'NSD' },
+];
   
 export const ROI_OPTIONS = [
   

@@ -4,7 +4,8 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-import { TRAINING_OPTIONS } from './constants-scoreboard';
+
+import { TRAINING_OPTIONS, TRAINING_OPTIONS_VS } from './constants-scoreboard';
 
 const TrainingSelect = ({ training, setTraining, dataset, mode }) => {
   const isEnabled = (option) => {
@@ -16,44 +17,46 @@ const TrainingSelect = ({ training, setTraining, dataset, mode }) => {
         return false; // NSD dataset 禁止 Training 选 NSD
       }
     }
-    return true; // 其他情况正常
+    return true;
   };
 
+  const renderButtons = (options) =>
+    options.map((option) => (
+      <Button
+        key={option.value}
+        onClick={() => {
+          if (!isEnabled(option)) return;
+          setTraining((prev) => (prev === option.value ? "" : option.value));
+        }}
+        variant={training === option.value ? "contained" : "outlined"}
+        disabled={!isEnabled(option)}
+        sx={{
+          "&.Mui-disabled": {
+            backgroundColor: "#f3f3f3",
+            color: "#c0c0c0",
+          },
+        }}
+      >
+        {option.label}
+      </Button>
+    ));
+
   return (
-    <FormControl sx={{minWidth: 120 }} fullWidth>
+    <FormControl sx={{ minWidth: 120 }} fullWidth>
       <FormLabel
         id="training-buttons-group-label"
         sx={{
-          textAlign: 'left',
-          color: 'black',
-          marginBottom: 0,
+          textAlign: "left",
+          color: "black",
+          marginBottom: 1,
         }}
       >
         Training Dataset:
       </FormLabel>
-      <ButtonGroup 
-        aria-labelledby="training-buttons-group-label"
-        fullWidth
-      >
-        {TRAINING_OPTIONS.map((option) => (
-          <Button
-            key={option.value}
-            onClick={() => {
-              if (!isEnabled(option)) return; // 禁用不响应
-              setTraining(prev => prev === option.value ? "" : option.value);
-            }}
-            variant={training === option.value ? "contained" : "outlined"}
-            disabled={!isEnabled(option)}
-            sx={{
-              "&.Mui-disabled": {
-                backgroundColor: "#f3f3f3",
-                color: "#c0c0c0"
-              }
-            }}
-          >
-            {option.label}
-          </Button>
-        ))}
+      <ButtonGroup fullWidth>
+        {mode === 1 && renderButtons(TRAINING_OPTIONS)}
+        {mode === 2 && renderButtons(TRAINING_OPTIONS_VS)}
+        {mode === 3 && renderButtons(TRAINING_OPTIONS_VS)}
       </ButtonGroup>
     </FormControl>
   );
