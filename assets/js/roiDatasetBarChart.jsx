@@ -74,6 +74,27 @@ const RoiBarChart = ({ data, roi, dataset, ceiling }) => {
         .attr("font-size", "12px")
         .attr("fill", "black")
         .text(ceilingMax.toFixed(2));
+
+      // 如果有 correlation_points，就画小蓝点
+     const points = ceiling[roi][dataset]?.correlation_points || [];
+      if (points.length > 0) {
+        const jitter = d3.scaleLinear()
+          .domain([0, points.length - 1])
+          .range([-barWidth / 4, barWidth / 4]); // 控制水平散开范围
+
+        ceilingSvg
+          .append("g")
+          .selectAll("circle")
+          .data(points)
+          .enter()
+          .append("circle")
+          .attr("cx", (_, i) => margin.left + 15 + barWidth / 2 + jitter(i))
+          .attr("cy", (d) => y(d))
+          .attr("r", 5)
+          .attr("fill", "#74C5F7")
+          .attr("stroke", "black")
+          .attr("stroke-width", 0.6);
+      }
     }
 
     // y 轴
