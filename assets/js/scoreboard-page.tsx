@@ -286,12 +286,22 @@ const ScoreboardPage: React.FC = () => {
           <ChartSelect chartType={chartType} setChartType={setChartType} chartScope={chartScope} setChartScope={setChartScope}/>
 
           {/* ScatterGapCeiling */}
-          {!loadingNew && datasetEmpty === "" && training === ""  && region === ""&& (
+          {!loadingNew && datasetEmpty === "" && training === ""  && region === "" && (
             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
           )}
-          {!loadingNew && datasetEmpty === "" && training === ""  && (
+          {!loadingNew && datasetEmpty === "" && training === ""  && region !== "" &&(
             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
           )}
+
+
+
+           {!loadingNew && newData && datasetEmpty === "" && training === "VS"  && (
+            <ScatterMurtyVsNsd 
+              murtyData={murtyData} 
+              nsdData={nsdData} 
+              roi= {region}
+            />
+          )} 
 
 
 
@@ -310,13 +320,7 @@ const ScoreboardPage: React.FC = () => {
           )}
 
 
-            {/* {!loadingNew && newData && training !== "" && datasetEmpty === ""  && (
-            <ScatterMurtyVsNsd 
-              murtyData={murtyData} 
-              nsdData={nsdData} 
-              roi= {region}
-            />
-          )}  */}
+           
 
           {/* {!loadingNew && newData && training !== "" && datasetEmpty === ""  && (
               <ScatterMurtyVsNsd 
