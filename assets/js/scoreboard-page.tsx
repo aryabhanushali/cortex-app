@@ -28,7 +28,7 @@ const ScoreboardPage: React.FC = () => {
 
   const DEFAULT_TRAINING = ""
   const DEFAULT_DATASET_EMPTY= ""   
-  const DEFAULT_REGION = "Overall";
+  const DEFAULT_REGION = "";
   const DEFAULT_DATASET = "";
   const DEFAULT_REGION_EMPTY = "";
   
@@ -175,15 +175,18 @@ const ScoreboardPage: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
           {/* panel display logic */}
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false} mode={1}/>
-          {region != "" && ( <TrainingSelect training={training} setTraining={setTraining} dataset={dataset} mode = {1}/> ) }
-          {region !== "" && training !== "" && (<DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true} mode = {1}/>)}
+           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset} mode = {1}/> 
+          {training !== "" && (<DatasetSelect dataset={datasetEmpty} setDataset={setDatasetEmpty} training={training} allowToggle={true} mode = {1}/>)}
+          {dataset !== "" && training !== "" && (<ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={false} mode={3}/>)
+         } 
+          
+          
           
           {/* title display logic */}
           {!loadingNew && (
             <div className="chart-title">
               {training === "" && datasetEmpty === "" && newData
-                ? `Cross-Regions Performence (Trained on Murty and Trained on NSD) `
+                ? `Overall Performence (Trained on Murty vs Trained on NSD) `
                 : training === "Murty185" && datasetEmpty === ""
                 ? "Cross-Regions Performance (Trained on Murty185)"
                 : training === "NSD" && datasetEmpty === ""
@@ -199,11 +202,11 @@ const ScoreboardPage: React.FC = () => {
           <ChartSelect chartType={chartType} setChartType={setChartType} chartScope={chartScope} setChartScope={setChartScope}/>
 
 
-        {!loadingNew && newData && training === "" && datasetEmpty === ""  && (
+        {!loadingNew && newData && training === "" && datasetEmpty === ""  && region === "" && (
           <ScatterMurtyVsNsd 
             murtyData={murtyData} 
             nsdData={nsdData} 
-            roi= {region}
+            roi= {"Overall"}
           />
         )}
           
@@ -413,7 +416,7 @@ const ScoreboardPage: React.FC = () => {
                 setManualStepChange(true); 
                 setCurrent(index);
                 if (index === 0) {
-                    setRegion("Overall");
+                    setRegion("");
                     setDatasetEmpty("");
                     setTraining("");
                     setChartType("uni")

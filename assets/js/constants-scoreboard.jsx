@@ -5,6 +5,7 @@ export const MODEL_OPTIONS = [
   
 export const TRAINING_OPTIONS = [
   { value: 'Murty185', label: 'Murty185' },
+  // { value: 'VS', label: 'Murty185 VS NSD1000'},
   { value: 'NSD', label: 'NSD' },
 ];
   
