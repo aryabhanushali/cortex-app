@@ -25,7 +25,7 @@ const datasetTypeLabels = {
   diamond: "Synthetic / OOD",
 };
 
-export default function ScatterGapCeiling({ murtyData, nsdData, ceilingData }) {
+export default function ScatterGapCeiling({ murtyData, nsdData, ceilingData, roi }) {
   const svgRef = useRef();
 
   useEffect(() => {
@@ -33,16 +33,20 @@ export default function ScatterGapCeiling({ murtyData, nsdData, ceilingData }) {
 
     // === flatten dict into array with Train info ===
     const entries = [
-      ...Object.entries(murtyData || {}).map(([key, value]) => {
-        const [dataset, roi] = key.split("/");
-        return { Dataset: dataset, ROI: roi, Train: "Murty185", ...value };
-      }),
-      ...Object.entries(nsdData || {}).map(([key, value]) => {
-        const [dataset, roi] = key.split("/");
-        return { Dataset: dataset, ROI: roi, Train: "NSD1000", ...value };
-      }),
+      ...Object.entries(murtyData || {})
+        .map(([key, value]) => {
+          const [dataset, roiName] = key.split("/");
+          return { Dataset: dataset, ROI: roiName, Train: "Murty185", ...value };
+        })
+        .filter(d => roi === "" || d.ROI === roi),   // ✅ 加过滤
+    
+      ...Object.entries(nsdData || {})
+        .map(([key, value]) => {
+          const [dataset, roiName] = key.split("/");
+          return { Dataset: dataset, ROI: roiName, Train: "NSD1000", ...value };
+        })
+        .filter(d => roi === "" || d.ROI === roi),   // ✅ 加过滤
     ];
-    if (!entries.length) return;
 
     // === 对于同一个 dataset+ROI，把 Murty 和 NSD 的结果取平均 ===
     const grouped = d3.rollups(
@@ -155,9 +159,15 @@ export default function ScatterGapCeiling({ murtyData, nsdData, ceilingData }) {
 
     // === Legend: ROI Colors ===
     const roiLegend = svg.append("g").attr("transform", `translate(${width - plotWidth + 20},${margin.top + 150})`);
-    Object.entries(roiColors).forEach(([roi, color], i) => {
-    //   roiLegend.append("circle").attr("cx", 0).attr("cy", i * 20).attr("r", 6).attr("fill", color).attr("stroke", "black");
-      roiLegend.append("text").attr("x", 15).attr("y", i * 28 + 4).attr("font-size", 24).attr("fill",color).text(roi.toUpperCase());
+    Object.entries(roiColors)
+    .filter(([roiKey]) => roi === "" || roiKey === roi) // ✅ 加过滤
+    .forEach(([roiKey, color], i) => {
+      roiLegend.append("text")
+        .attr("x", 15)
+        .attr("y", i * 28 + 4)
+        .attr("font-size", 24)
+        .attr("fill", color)
+        .text(roiKey.toUpperCase());
     });
 
     // === Legend: Dataset Shapes ===
@@ -169,7 +179,7 @@ export default function ScatterGapCeiling({ murtyData, nsdData, ceilingData }) {
       shapeLegend.append("path").attr("d", path).attr("transform", `translate(0,${i * 24 -2})`).attr("fill", "white").attr("stroke", "black");
       shapeLegend.append("text").attr("x", 15).attr("y", i * 24 + 4).attr("font-size", 20).text(label);
     });
-  }, [murtyData, nsdData, ceilingData]);
+  }, [murtyData, nsdData, ceilingData, roi]);
 
 return (
   <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>

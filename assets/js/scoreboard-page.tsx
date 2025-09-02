@@ -270,7 +270,7 @@ const ScoreboardPage: React.FC = () => {
               { region === "" && training === "" && datasetEmpty === "" && newData
                 ? `Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
                 : training === "" && datasetEmpty === ""
-                ? `${region} Performance (Trained on Murty185 and Trained on NSD)`
+                ? `${region.toUpperCase()} : Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
                 : training === "Murty185" && datasetEmpty === ""
                 ? `${region} Performance (Trained on Murty185)`
                 : training === "NSD" && datasetEmpty === ""
@@ -292,39 +292,24 @@ const ScoreboardPage: React.FC = () => {
 
 
           {!loadingNew && datasetEmpty === "" && training === ""  && region === ""&& (
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling}/>
-          )}
-
-          {!loadingNew && datasetEmpty === "" && training === "Murty185" && (
-            <HeatmapByROI
-              data={newData.murty_uni}
-              roi ={region.toLowerCase()}
-             
-            />
-          )}
-
-          {!loadingNew && datasetEmpty === "" && training === "NSD" && (
-            <HeatmapByROI
-              data={newData.nsd_uni}
-              roi ={region.toLowerCase()}
-             
-            />
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
           )}
 
 
-          {/* {!loading && filtereROIData.length > 0 && (
-            <BarChartSpecific dataset={filtereROIData} title={`${region} Performance on ${datasetEmpty}`} />
-          )} */}
+          {!loadingNew && datasetEmpty === "" && training === ""  && (
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region}/>
+          )}
 
-            {!loadingNew && newData && training === "" && datasetEmpty === ""  && (
+
+            {!loadingNew && newData && training !== "" && datasetEmpty === ""  && (
           <ScatterMurtyVsNsd 
-            murtyData={newData.murty_uni} 
-            nsdData={newData.nsd_uni} 
-            roi= {region.toLowerCase()}
+            murtyData={murtyData} 
+            nsdData={nsdData} 
+            roi= {region}
           />
-        )}
+        )} 
 
-         {!loadingNew  && datasetEmpty != "" && training === "NSD" && (
+         {/* {!loadingNew  && datasetEmpty != "" && training === "NSD" && (
              <RoiBarChart
               data={newData.nsd_uni}
               roi ={region.toLowerCase()}
@@ -344,7 +329,7 @@ const ScoreboardPage: React.FC = () => {
              
             />
 
-          )}
+          )} */}
 
           
         </div>
