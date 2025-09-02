@@ -1,3 +1,29 @@
+// constants-scoreboard.js
+export const UNAVAILABILITY = {
+  trainingToDataset: {
+    Murty185: ['murty185'], 
+    NSD:['nsd1000' ],   //
+  },
+
+  datasetToTraining: {
+    murty185: ["Murty185"], 
+    nsd1000: ["NSD"],                             
+  },
+  datasetToROI: {           
+    bold_5000: ["ffa", "eba"], 
+    bonner_2021: ["ffa", "eba"], 
+    kingbaker_2019: ["eba"],
+    wardle_2020: ["eba"],
+  },
+  roiToDataset: {
+    ffa: ["bold_5000","bonner_2021"],
+    eba: ["bold_5000", "bonner_2021","wardle_2020"],
+  },
+};
+
+
+
+
 export const MODEL_OPTIONS = [
     { value: 'clip_rn50', label: 'CLIP-ResNet50' },
     { value: 'dinov2', label: 'dinov2' },

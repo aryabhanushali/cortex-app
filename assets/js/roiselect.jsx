@@ -47,7 +47,7 @@ const ROISelect = ({ region, setRegion, dataset, allowToggle, mode }) => {
       <ButtonGroup fullWidth>
         {mode === 1 && renderButtons(ROI_OPTIONS)}
         {mode === 2 && renderButtons(ROI_OPTIONS)}
-        {mode === 3 && renderButtons(REGION_OPTIONS)}
+        {mode === 3 && renderButtons(ROI_OPTIONS)}
       </ButtonGroup>
     </FormControl>
   );
