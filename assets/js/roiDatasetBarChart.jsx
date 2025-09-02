@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-const RoiBarChart = ({ data, roi, dataset }) => {
+const RoiBarChart = ({ data, roi, dataset, ceiling }) => {
   const ceilingRef = useRef();
   const barsRef = useRef();
-  const [stats, setStats] = useState({ max: null, median: null });
+  const [stats, setStats] = useState({ max: null, mean: null });
   const [scaleY, setScaleY] = useState(null);
 
   useEffect(() => {
+    console.log("🔍 RoiBarChart props:", { roi, dataset, ceiling, data });
 
     if (!data || !roi || !data[roi]) return;
-    
+    if (!ceiling || !ceiling[roi] || !ceiling[roi][dataset]) return;
 
     const roiData = data[roi];
 
@@ -23,37 +24,57 @@ const RoiBarChart = ({ data, roi, dataset }) => {
       })
       .filter((d) => d.val !== undefined);
 
-    const ceilingVals = Object.values(roiData["ceiling"] || {}).map((d) => d[0]);
-    const ceilingMax = ceilingVals.length ? d3.max(ceilingVals) : null;
-    const ceilingMedian = ceilingVals.length ? d3.median(ceilingVals) : null;
+    const ceilingMean = ceiling[roi][dataset]?.ceiling_mean ?? null;
+    const ceilingMax = ceiling[roi][dataset]?.ceiling_max ?? null;
 
-    setStats({ max: ceilingMax, median: ceilingMedian });
+    setStats({ max: ceilingMax, mean: ceilingMean });
 
     // ==== 尺寸 ====
     const barWidth = 30;
-    const margin = { top: 10, right: 20, bottom: 100, left: 60 };
+    const margin = { top: 10, right: 20, bottom: 180, left: 60 };
     const height = 400;
 
-    // y scale
-      const y = d3.scaleLinear().domain([0, 0.9]).range([height - margin.bottom, margin.top]);
-  setScaleY(() => y); 
+    // ==== 动态 y domain ====
+    const allVals = results.map((d) => d.val)
+      .concat([ceilingMean, ceilingMax])
+      .filter((v) => v != null);
+
+    const maxVal = d3.max(allVals);
+    const minVal = d3.min(allVals);
+
+    const y = d3
+      .scaleLinear()
+      .domain([Math.min(0, minVal), Math.max(1.0, maxVal * 1.1)]) // 自动扩展
+      .range([height - margin.bottom, margin.top]);
+
+    setScaleY(() => y);
 
     // ================= 左边 ceiling SVG =================
     const ceilingSvg = d3.select(ceilingRef.current);
     ceilingSvg.selectAll("*").remove();
-    const ceilingWidth = margin.left + 70; // y轴 + ceiling bar
+    const ceilingWidth = margin.left + 50;
 
     ceilingSvg.attr("width", ceilingWidth).attr("height", height);
 
     // ceiling bar
-    ceilingSvg
-      .append("rect")
-      .attr("x", margin.left + 15) // 画在 y 轴右边
-      .attr("y", ceilingMax ? y(ceilingMax) : y(0))
-      .attr("width", barWidth)
-      .attr("height", ceilingMax ? y(0) - y(ceilingMax) : 0)
-      .attr("fill", "#d3d3d3")
-      .attr("stroke", "black");
+    if (ceilingMax != null) {
+      ceilingSvg
+        .append("rect")
+        .attr("x", margin.left + 15)
+        .attr("y", Math.min(y(0), y(ceilingMax)))
+        .attr("width", barWidth)
+        .attr("height", Math.abs(y(0) - y(ceilingMax)))
+        .attr("fill", "#d3d3d3")
+        .attr("stroke", "black");
+      ceilingSvg
+        .append("text")
+        .attr("x", margin.left + 15 + barWidth / 2)
+        .attr("y", y(ceilingMax) - 10)  // 上方 10px
+        .attr("text-anchor", "middle")
+        .attr("font-size", "12px")
+        .attr("fill", "black")
+        .text(ceilingMax.toFixed(2));
+    }
 
     // y 轴
     ceilingSvg
@@ -66,39 +87,31 @@ const RoiBarChart = ({ data, roi, dataset }) => {
         g.selectAll("text").attr("fill", "black");
       });
 
-    // ceiling max/median text
-    // if (ceilingMax !== null) {
-    //   ceilingSvg
-    //     .append("text")
-    //     .attr("x", margin.left + barWidth + 3)
-    //     .attr("y", y(ceilingMax) - 10)
-    //     .attr("text-anchor", "middle")
-    //     .style("font-size", "10px")
-    //     .style("fill", "#1f77b4")
-    //     // .text(`Max: ${ceilingMax.toFixed(2)}`);
-    // }
-    // if (ceilingMedian !== null) {
-    //   ceilingSvg
-    //     .append("text")
-    //     .attr("x", margin.left + barWidth + 3)
-    //     .attr("y", y(ceilingMedian) - 10)
-    //     .attr("text-anchor", "middle")
-    //     .style("font-size", "10px")
-    //     .style("fill", "#74C5F7")
-    //     // .text(`Median: ${ceilingMedian.toFixed(2)}`);
-    // }
-
-    
     // y 轴 label
+      const centerY = (height - margin.bottom) / 2;
+
+      ceilingSvg
+        .append("text")
+        .attr("text-anchor", "middle")
+        .style("font-size", "14px")
+        .attr("fill", "black")
+        // 先平移到 margin.left - 45 的 X，centerY 的 Y
+        // 再绕这个点旋转 -90 度
+        .attr("transform", `translate(${margin.left - 45}, ${centerY}) rotate(-90)`)
+        .text("Pearson Correlation");
+    // x label for ceiling
     ceilingSvg
       .append("text")
-      .attr("x", margin.left - 45)
-      .attr("y", height / 2)
-      .attr("text-anchor", "middle")
-      .attr("transform", `rotate(-90, ${margin.left - 45}, ${height / 2})`)
-      .style("font-size", "14px")
+      .attr("x", margin.left + barWidth / 2 + 15)
+      .attr("y", height - margin.bottom + 10)
+      .attr("text-anchor", "start")
+      .attr("font-size", "9px")
       .attr("fill", "black")
-      .text("Pearson Correlation");
+      .attr(
+        "transform",
+        `rotate(60, ${margin.left + barWidth / 2 + 15}, ${height - margin.bottom + 10})`
+      )
+      .text("Ceiling");
 
     // ================= 右边 bars SVG =================
     const barsSvg = d3.select(barsRef.current);
@@ -121,11 +134,25 @@ const RoiBarChart = ({ data, roi, dataset }) => {
       .enter()
       .append("rect")
       .attr("x", (d) => x(d.model))
-      .attr("y", (d) => y(d.val))
+      .attr("y", (d) => Math.min(y(0), y(d.val)))
+      .attr("height", (d) => Math.abs(y(0) - y(d.val)))
       .attr("width", x.bandwidth())
-      .attr("height", (d) => y(0) - y(d.val))
       .attr("fill", "#d3d3d3")
       .attr("stroke", "black");
+
+    // bar 数值 label (统一在 bar 顶部 5px 位置)
+    barsSvg
+      .append("g")
+      .selectAll("text.value-label")
+      .data(results)
+      .enter()
+      .append("text")
+      .attr("x", (d) => x(d.model) + x.bandwidth() / 2)
+      .attr("y", (d) => y(d.val) - 10) // bar 顶端上方 5px
+      .attr("text-anchor", "middle")
+      .attr("font-size", "12px")
+      .attr("fill", "black")
+      .text((d) => d.val.toFixed(2));
 
     // X labels
     barsSvg
@@ -146,86 +173,83 @@ const RoiBarChart = ({ data, roi, dataset }) => {
       )
       .text((d) => d.model);
 
-      function drawLine(svg, value, color, svgWidth) {
-        if (value == null) return;
-        svg
-          .append("line")
-          .attr("x1", 0)
-          .attr("x2", svgWidth)
-          .attr("y1", y(value))
-          .attr("y2", y(value))
-          .attr("stroke", color)
-          .attr("stroke-dasharray", "4 2")
-          .attr("stroke-width", 1);
-      }
+    function drawLine(svg, value, color, svgWidth, offsetX = 0) {
+      if (value == null) return;
 
-    // 在左右 svg 都画
-        drawLine(ceilingSvg, ceilingMax, "red", ceilingWidth);
-        drawLine(ceilingSvg, ceilingMedian, "blue", ceilingWidth);
-        drawLine(barsSvg, ceilingMax, "red", width);
-        drawLine(barsSvg, ceilingMedian, "blue", width);
+      const [yMin, yMax] = y.domain();
+      const safeVal = Math.min(Math.max(value, yMin), yMax);
 
+      svg
+        .append("line")
+        .attr("x1", offsetX)
+        .attr("x2", svgWidth)
+        .attr("y1", y(safeVal))
+        .attr("y2", y(safeVal))
+        .attr("stroke", color)
+        .attr("stroke-dasharray", "4 2")
+        .attr("stroke-width", 1);
+    }
 
-  }, [data, roi, dataset]);
-
-
-  
+    // 画 ceiling mean/max
+    drawLine(ceilingSvg, ceilingMax, "red", ceilingWidth, margin.left);
+    drawLine(ceilingSvg, ceilingMean, "blue", ceilingWidth, margin.left);
+    drawLine(barsSvg, ceilingMax, "red", width, 0);
+    drawLine(barsSvg, ceilingMean, "blue", width, 0);
+  }, [data, roi, dataset, ceiling]);
 
   return (
-  <div style={{ display: "flex", flexDirection: "row", position: "relative" }}>
-    {/* 左边 ceiling + y 轴 */}
-    <div>
-      <svg ref={ceilingRef}></svg>
-    </div>
-
-    {/* 右边模型 bars */}
-    <div style={{ overflowX: "auto" }}>
-      <svg ref={barsRef}></svg>
-    </div>
-
-{/* 固定在右边的 label */}
-{scaleY && (
-  <div
-    style={{
-      position: "absolute",
-      right: 0,
-      top: 0,
-      width: "80px",
-      pointerEvents: "none"
-    }}
-  >
-    {stats.max !== null && (
-      <div
-        style={{
-          position: "absolute",
-          top: scaleY(stats.max) - 100,   // 在红线之上 10px
-          right: 0,
-          color: "red",
-          fontSize: "12px"
-        }}
-      >
-        Max: {stats.max.toFixed(2)}
+    <div style={{ display: "flex", flexDirection: "row", position: "relative" }}>
+      {/* 左边 ceiling + y 轴 */}
+      <div>
+        <svg ref={ceilingRef}></svg>
       </div>
-    )}
-    {stats.median !== null && (
-      <div
-        style={{
-          position: "absolute",
-          top: scaleY(stats.median) - 100,  // 在蓝线之上 10px
-          right: 0,
-          color: "blue",
-          fontSize: "12px"
-        }}
-      >
-        Median: {stats.median.toFixed(2)}
+
+      {/* 右边模型 bars */}
+      <div style={{ overflowX: "auto" }}>
+        <svg ref={barsRef}></svg>
       </div>
-    )}
-  </div>
-)}
 
-  </div>
-);
-
+      {/* 固定在右边的 label */}
+      {scaleY && (
+        <div
+          style={{
+            position: "absolute",
+            right: 0,
+            top: 0,
+            width: "150px",
+            pointerEvents: "none",
+          }}
+        >
+          {stats.max !== null && (
+            <div
+              style={{
+                position: "absolute",
+                top: scaleY(stats.max) - 60,
+                right: 0,
+                color: "red",
+                fontSize: "12px",
+              }}
+            >
+              Ceiling Max: {stats.max.toFixed(2)}
+            </div>
+          )}
+          {stats.mean !== null && (
+            <div
+              style={{
+                position: "absolute",
+                top: scaleY(stats.mean) - 60,
+                right: 0,
+                color: "blue",
+                fontSize: "12px",
+              }}
+            >
+              Ceiling Mean: {stats.mean.toFixed(2)}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default RoiBarChart;

@@ -236,6 +236,7 @@ const ScoreboardPage: React.FC = () => {
               data={nsdData}
               roi={region === "" ? "Overall" : region.toLowerCase()}   // ✅ region为空 → overall
               dataset={datasetEmpty}
+              ceiling = {Ceiling}
             />
           )}
 
@@ -244,6 +245,7 @@ const ScoreboardPage: React.FC = () => {
               data={murtyData}
               roi={region === "" ? "Overall" : region.toLowerCase()}   // ✅ 同理
               dataset={datasetEmpty}
+              ceiling = {Ceiling}
             />
           )}
 
@@ -327,6 +329,7 @@ const ScoreboardPage: React.FC = () => {
               data={newData.nsd_uni}
               roi ={region.toLowerCase()}
               dataset={datasetEmpty}
+              ceiling = {Ceiling}
               
             />
 
@@ -337,6 +340,7 @@ const ScoreboardPage: React.FC = () => {
               data={newData.murty_uni}
               roi ={region.toLowerCase()}
               dataset={datasetEmpty}
+              ceiling = {Ceiling}
              
             />
 

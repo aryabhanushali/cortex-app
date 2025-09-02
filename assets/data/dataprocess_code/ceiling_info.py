@@ -16,7 +16,7 @@ for dataset_dir in os.listdir(INPUT_DIR):
     if not os.path.isdir(dataset_path):
         continue
 
-    dataset = dataset_dir  # ❌ 不做映射，直接用原始文件夹名
+    dataset = dataset_dir  # 保留原始文件夹名
 
     for f in os.listdir(dataset_path):
         if not f.endswith(".json"):
@@ -31,7 +31,6 @@ for dataset_dir in os.listdir(INPUT_DIR):
         ceiling_max = data.get("ceiling_max")
         ceiling_raw = data.get("ceiling_raw", [])
 
-        # correlation points 只要数值
         corr_points = [item.get("correlation") for item in ceiling_raw]
 
         # 判断是 uni 还是 multi
@@ -50,6 +49,39 @@ for dataset_dir in os.listdir(INPUT_DIR):
             "ceiling_max": ceiling_max,
             "correlation_points": corr_points
         }
+
+# ===== 加入 Overall 处理 =====
+def add_overall(result_dict):
+    overall = {}
+    # 遍历每个 dataset
+    datasets = set()
+    for roi, ds_dict in result_dict.items():
+        datasets.update(ds_dict.keys())
+
+    for dataset in datasets:
+        means = []
+        maxs = []
+        for roi, ds_dict in result_dict.items():
+            if dataset in ds_dict:
+                m = ds_dict[dataset].get("ceiling_mean")
+                x = ds_dict[dataset].get("ceiling_max")
+                if m is not None:
+                    means.append(m)
+                if x is not None:
+                    maxs.append(x)
+
+        if means and maxs:
+            overall[dataset] = {
+                "ceiling_mean": sum(means) / len(means),
+                "ceiling_max": sum(maxs) / len(maxs)
+                # 不写 correlation_points
+            }
+
+    result_dict["Overall"] = overall
+
+
+add_overall(uni_result)
+add_overall(multi_result)
 
 # 保存两个文件
 with open(UNI_OUT, "w") as f:
