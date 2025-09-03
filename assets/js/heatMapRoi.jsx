@@ -7,6 +7,18 @@ const HeatmapByROI = ({ data, roi, dataset, rank  }) => {
   const bodyRef = useRef();
   const legendRef = useRef();
 
+  const datasetLabelMap = {
+  murty185: "Murty185",
+  nsd_1000: "NSD1000",
+  bold_5000: "BOLD5000v2",
+  bonner_2021: "Bonner2021",
+  bmd_2024: "BMD2024",
+  kingbaker_2019: "King2019",
+  wardle_2020: "Wardle2020",
+  nsd_syn: "NSD synthetic",
+  global_score: "Global Score" // 特殊列
+};
+
   useEffect(() => {
     if (!data) return;
 
@@ -163,7 +175,7 @@ const HeatmapByROI = ({ data, roi, dataset, rank  }) => {
     // 顶部 X 轴
     svgHeader
       .append("g")
-      .attr("transform", `translate(${columnWidth / 4},${headerMargin.top - 40})`)
+      .attr("transform", `translate(${columnWidth / 2},${headerMargin.top - 40})`)
       .call(
         d3
           .axisTop(
@@ -185,6 +197,7 @@ const HeatmapByROI = ({ data, roi, dataset, rank  }) => {
         g.selectAll("text").style("font-size", "14px").style("fill", "black");
       })
       .selectAll("text")
+      .text((d) => datasetLabelMap[d] || d)  
       .attr("transform", "rotate(-30)")
       .style("text-anchor", "end");
 

@@ -71,7 +71,7 @@ export const DATASET_OPTIONS_LEFT = [
     { value: 'nsd_1000', label: 'NSD1000' },
     { value: 'bold_5000', label: 'BOLD5000v2' },
     { value: 'bonner_2021', label: 'Bonner2021' },
-    { value: 'bmd_2024', label: 'BMD2024(videos)' },
+    { value: 'bmd_2024', label: 'BMD2024' },
     { value: 'kingbaker_2019', label: 'King2019' },
     { value: 'wardle_2020', label: 'Wardle2020' },
     { value: 'nsd_syn', label: 'NSD synthetic' },
