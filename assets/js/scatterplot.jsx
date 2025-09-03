@@ -136,7 +136,9 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
         tooltip
           .style("visibility", "visible")
           .html(`
-              <div style="font-weight:600; margin-bottom:2px;">${d.model}</div>
+              <div style="color:#666; margin-bottom:6px;">
+                Model: <span style="font-weight:500; color:#333;">${d.model}</span>
+              </div>
               <div style="color:#666; margin-bottom:6px;">
                 Evaluation Dataset: <span style="font-weight:500; color:#333;">${d.dataset}</span>
               </div>
