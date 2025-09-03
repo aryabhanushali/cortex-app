@@ -217,6 +217,7 @@ const ScoreboardPage: React.FC = () => {
             <HeatmapByROI
               data={murtyData}
               roi ={"Overall"}
+              dataset = {dataset}
             />
           )}
 
@@ -224,6 +225,7 @@ const ScoreboardPage: React.FC = () => {
             <HeatmapByROI
               data={nsdData}
               roi ={"Overall"}
+              dataset = {dataset}
             />
           )}
 
@@ -311,12 +313,14 @@ const ScoreboardPage: React.FC = () => {
             <HeatmapByROI
               data={murtyData}
               roi ={region}
+              dataset={dataset}
             />
           )}
           {!loadingNew && dataset === "" && training === "NSD" &&(
             <HeatmapByROI
               data={nsdData}
               roi ={region}
+              dataset ={dataset}
             />
           )}
 
@@ -360,18 +364,19 @@ const ScoreboardPage: React.FC = () => {
               { region === "" && training === "" && dataset === "" && newData
                 ? `Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
                 : training === "" && region === "" && dataset !== ""
-
                 ? `Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
-                : training === "" && region === ""
-                ? `Performance on ${dataset}(Trained on Murty185 and Trained on NSD)`
+                : training === "VS" && region === "" 
+                ? `Accross-Regions Performance on ${dataset}(Trained on Murty185 and Trained on NSD)`
                 : training === "Murty185" && dataset === ""
                 ? `Performance on ${dataset} (Trained on Murty185)`
                 : training === "NSD" && region === ""
                 ? `Performance on ${dataset} (Trained on NSD)`
+                : training === "VS" && region !== "" 
+                ? `${region.toUpperCase()}Performance on ${dataset}(Trained on Murty185 and Trained on NSD)`
                 : training === "NSD" && dataset !== ""
-                ? `${region} Performance on ${dataset} (Trained on NSD)`
+                ? `${region.toUpperCase()} Performance on ${dataset} (Trained on NSD)`
                 : training === "Murty185" && dataset !== ""
-                ? `${region} Performance on ${dataset} (Trained on Murty185)`
+                ? `${region.toUpperCase()} Performance on ${dataset} (Trained on Murty185)`
                 : ""}
             </div>
           )}
@@ -389,10 +394,46 @@ const ScoreboardPage: React.FC = () => {
             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset}/>
           )}
 
-          {/* {!loading &&  filteredData.length > 0 && region === "" &&(
-            <RoiHeatChart dataset={filteredData} title={`Models Performance on Evaluation Datasets: ${dataset}`}/>
+
+          {/* murty vs nsd */}
+           {!loadingNew && newData && region === "" && training === "VS"  && (
+            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {'Overall'} dataset = {dataset} />
+          )} 
+          {!loadingNew && newData && region !== "" && training === "VS"  && (
+            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {region} dataset = {dataset} />
+          )} 
+
+
+             {/* heatmap */}
+          {!loadingNew && region === "" && training === "Murty185" &&(
+            <HeatmapByROI
+              data={murtyData}
+              dataset ={dataset}
+              roi = {region}
+            />
           )}
-           */}
+          {!loadingNew && region === "" && training === "NSD" &&(
+            <HeatmapByROI
+              data={nsdData}
+              dataset ={dataset}
+              roi = {region}
+            />
+          )}
+
+          
+         {!loadingNew  && region !== "" && training === "NSD" && 
+          (<RoiBarChart data={nsdData} roi ={region.toLowerCase()} dataset={dataset} ceiling = {Ceiling}/>)
+         }
+
+          {!loadingNew  && region !== "" && training === "Murty185" && (
+             <RoiBarChart
+              data={murtyData}
+              roi ={region}
+              dataset={dataset}
+              ceiling = {Ceiling}
+            />
+          )}
+       
         </div>
       ),
       icon: <SmileOutlined />,
