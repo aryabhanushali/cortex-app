@@ -2,11 +2,9 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-// === ROI style ===
 const roiColors = { ppa: "#1f77b4", ffa: "#ff7f0e", eba: "#2ca02c" };
 const roiSize = { ppa: 120, ffa: 120, eba: 120 };
 
-// === Dataset shape map ===
 const datasetShapes = {
   bold_5000: d3.symbolCircle,
   bonner_2021: d3.symbolCircle,
@@ -18,109 +16,139 @@ const datasetShapes = {
   murty185: d3.symbolCircle,
 };
 
-// === Dataset shape legend labels ===
 const datasetTypeLabels = {
   circle: "Natural Dataset",
   triangle: "Video Dataset (BMD)",
   diamond: "Synthetic / OOD",
 };
 
-export default function ScatterGapCeiling({ murtyData, nsdData, ceilingData, roi, dataset }) {
+export default function ScatterGapCeiling({
+  murtyData,
+  nsdData,
+  ceilingData,
+  roi,
+  dataset,
+}) {
   const svgRef = useRef();
 
   useEffect(() => {
     if (!murtyData && !nsdData) return;
 
-    // === flatten dict into array with Train info ===
     const entries = [
-      ...Object.entries(murtyData || {})
-        .map(([key, value]) => {
-          const [ds, roiName] = key.split("/");
-          return { Dataset: ds, ROI: roiName, Train: "Murty185", ...value };
-        })
-        .filter(d => (roi === "" || d.ROI === roi) && (dataset === "" || d.Dataset === dataset)),
-
-      ...Object.entries(nsdData || {})
-        .map(([key, value]) => {
-          const [ds, roiName] = key.split("/");
-          return { Dataset: ds, ROI: roiName, Train: "NSD1000", ...value };
-        })
-        .filter(d => (roi === "" || d.ROI === roi) && (dataset === "" || d.Dataset === dataset)),
-    ];
-    // === 对于同一个 dataset+ROI，把 Murty 和 NSD 的结果取平均 ===
-    const grouped = d3.rollups(
-      entries,
-      v => ({
-        ceiling_mean: d3.mean(v, d => d.ceiling_mean),
-        normalized_gap: d3.mean(v, d => d.normalized_gap),
-        sem: d3.mean(v, d => d.sem_normalized_model || 0),
-        variance: d3.mean(v, d => d.std_normalized_model || 0),
+      ...Object.entries(murtyData || {}).map(([key, value]) => {
+        const [ds, roiName] = key.split("/");
+        return { Dataset: ds, ROI: roiName, Train: "Murty185", ...value };
       }),
-      d => `${d.Dataset}/${d.ROI}`
+      ...Object.entries(nsdData || {}).map(([key, value]) => {
+        const [ds, roiName] = key.split("/");
+        return { Dataset: ds, ROI: roiName, Train: "NSD1000", ...value };
+      }),
+    ];
+
+    let filtered;
+    if (dataset === "murty185" || dataset === "nsd_1000") {
+      filtered = entries.filter(
+        (d) =>
+          d.Train.toLowerCase() === dataset.toLowerCase() &&
+          (roi === "" || d.ROI === roi)
+      );
+    } else {
+      filtered = entries.filter(
+        (d) =>
+          (roi === "" || d.ROI === roi) &&
+          (dataset === "" || d.Dataset === dataset)
+      );
+    }
+
+    const grouped = d3.rollups(
+      filtered,
+      (v) => ({
+        ceiling_mean: d3.mean(v, (d) => d.ceiling_mean),
+        normalized_gap: d3.mean(v, (d) => d.normalized_gap),
+        sem: d3.mean(v, (d) => d.sem_normalized_model || 0),
+        variance: d3.mean(v, (d) => d.std_normalized_model || 0),
+        rawPoints: v,
+      }),
+      (d) => `${d.Dataset}/${d.ROI}`
     );
 
     const aggregated = grouped.map(([key, stats]) => {
       const [dataset, roi] = key.split("/");
-      return { Dataset: dataset, ROI: roi, ...stats };
+      return { Dataset: dataset, ROI: roi, id: key, ...stats };
     });
 
-    // === Start drawing ===
     const margin = { top: 40, right: 20, bottom: 60, left: 80 };
     const width = 1080;
     const height = 800;
 
-    const svg = d3.select(svgRef.current).attr("width", width).attr("height", height);
+    const svg = d3
+      .select(svgRef.current)
+      .attr("width", width)
+      .attr("height", height);
     svg.selectAll("*").remove();
 
     const plotWidth = width - margin.left - margin.right;
     const plotHeight = height - margin.top - margin.bottom;
 
-    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    const g = svg
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // === Scales ===
     const x = d3.scaleLinear().domain([-0.4, 1.0]).range([0, plotWidth]);
     const y = d3.scaleLinear().domain([0, 1.0]).range([plotHeight, 0]);
 
-    // Axes
-    g.append("g").attr("transform", `translate(0,${plotHeight})`).call(d3.axisBottom(x).tickValues(d3.range(-0.4, 1.05, 0.1)));
-    g.append("g").call(d3.axisLeft(y));
+    g.append("g")
+      .attr("transform", `translate(0,${plotHeight})`)
+      .call(d3.axisBottom(x).tickValues(d3.range(-0.4, 1.05, 0.1)))
+      .attr("class", "axis");
+    g.append("g").call(d3.axisLeft(y)).attr("class", "axis");
 
-    // Labels
-    svg.append("text").attr("x", width / 2).attr("y", height - 10).attr("text-anchor", "middle").style("font-size", "16px").text("Dataset Ceiling: Mean Subject Pairwise Correlations ± Variability");
-    svg.append("text").attr("transform", "rotate(-90)").attr("x", -height / 2).attr("y", 15).attr("text-anchor", "middle").style("font-size", "16px").text("Normalized Gap Between Model Performance and Dataset Ceiling");
-    
+    svg
+      .append("text")
+      .attr("x", width / 2)
+      .attr("y", height - 10)
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .text("Dataset Ceiling: Mean Subject Pairwise Correlations ± Variability");
+    svg
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -height / 2)
+      .attr("y", 15)
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .text("Normalized Gap Between Model Performance and Dataset Ceiling");
 
-    // Zero line
-    // g.append("line").attr("x1", 0).attr("x2", plotWidth).attr("y1", y(0)).attr("y2", y(0)).attr("stroke", "black").attr("stroke-dasharray", "4 2");
+    const hoverLayer = g.append("g").attr("class", "hover-layer");
 
-    // === Draw aggregated points ===
-    aggregated.forEach(row => {
+    aggregated.forEach((row) => {
+      const { Dataset, ROI, id } = row;
       if (
-            row.ceiling_mean == null || 
-            row.normalized_gap == null || 
-            isNaN(row.ceiling_mean) || 
-            isNaN(row.normalized_gap)
-        ) {
-            return; // 跳过无效点
-        }
+        row.ceiling_mean == null ||
+        row.normalized_gap == null ||
+        isNaN(row.ceiling_mean) ||
+        isNaN(row.normalized_gap)
+      )
+        return;
+
       const cx = x(row.ceiling_mean);
       const cy = y(row.normalized_gap);
-      const roi = row.ROI;
-      const dataset = row.Dataset;
 
-      const color = roiColors[roi] || "gray";
-      const size = roiSize[roi] || 100;
+      const color = roiColors[ROI] || "gray";
+      const size = roiSize[ROI] || 100;
 
-      const shapeFn = datasetShapes[dataset] || d3.symbolCircle;
+      const shapeFn = datasetShapes[Dataset] || d3.symbolCircle;
       const shape = d3.symbol().type(shapeFn).size(size)();
 
-      // === Horizontal range bar from ceilingData ===
-      if (ceilingData?.[roi]?.[dataset]?.correlation_points) {
-        const rawVals = ceilingData[roi][dataset].correlation_points;
+      // ceiling range
+      if (ceilingData?.[ROI]?.[Dataset]?.correlation_points) {
+        const rawVals = ceilingData[ROI][Dataset].correlation_points;
         if (rawVals.length > 0) {
           const rawMin = d3.min(rawVals);
           const rawMax = d3.max(rawVals);
           g.append("line")
+            .attr("class", "agg-item")
+            .attr("data-id", id)
             .attr("x1", x(rawMin))
             .attr("x2", x(rawMax))
             .attr("y1", cy)
@@ -131,58 +159,129 @@ export default function ScatterGapCeiling({ murtyData, nsdData, ceilingData, roi
         }
       }
 
-    //   // SEM bar
-    //   if (row.sem != null) {
-    //     g.append("line")
-    //       .attr("x1", cx)
-    //       .attr("x2", cx)
-    //       .attr("y1", y(row.normalized_gap - row.sem))
-    //       .attr("y2", y(row.normalized_gap + row.sem))
-    //       .attr("stroke", color)
-    //       .attr("stroke-width", 1.5);
-    //   }
-
-      // Main dot
-      g.append("path")
+      const mainDot = g
+        .append("path")
+        .attr("class", "agg-item")
+        .attr("data-id", id)
         .attr("d", shape)
         .attr("transform", `translate(${cx},${cy})`)
         .attr("fill", color)
         .attr("stroke", "black")
         .attr("stroke-width", 1);
 
-      // Label (only highlight big gap/variance)
       if (Math.abs(row.normalized_gap) > 0.2 || (row.variance ?? 0) > 0.05) {
-        g.append("text").attr("x", cx + 5).attr("y", cy).attr("font-size", 9).attr("fill", "black").text(`${dataset}/${roi}`);
+        g.append("text")
+          .attr("class", "agg-item")
+          .attr("data-id", id)
+          .attr("x", cx + 5)
+          .attr("y", cy)
+          .attr("font-size", 9)
+          .attr("fill", "black")
+          .text(`${Dataset}/${ROI}`);
       }
+      mainDot
+      .on("mouseover", () => {
+        g.selectAll(".agg-item").attr("display", "none");
+        // 保留 hover 的 aggregated 元素 (label + ceiling range)
+        g.selectAll(`.agg-item[data-id='${id}']`).attr("display", null);
+
+        // 主点变浅 + 动画
+        mainDot.transition().duration(200).attr("opacity", 0.3);
+
+        hoverLayer.selectAll("*").remove();
+
+        if (row.rawPoints?.length > 0) {
+          const sortedPoints = [...row.rawPoints].sort(
+            (a, b) => a.normalized_gap - b.normalized_gap
+          );
+
+          sortedPoints.forEach((pt, i) => {
+            const px = x(pt.ceiling_mean);
+            const py = y(pt.normalized_gap);
+            const subShape = d3.symbol().type(shapeFn).size(80)();
+
+            // 裂变子点带淡入动画
+            hoverLayer
+              .append("path")
+              .attr("d", subShape)
+              .attr("transform", `translate(${px},${py})`)
+              .attr("fill", color)
+              .attr("stroke", "black")
+              .attr("opacity", 0)
+              .transition()
+              .duration(300)
+              .attr("opacity", 1);
+
+            const labelY = i === 0 ? py + 15 : py - 11;
+            hoverLayer
+              .append("text")
+              .attr("x", px)
+              .attr("y", labelY)
+              .attr("text-anchor", "middle")
+              .attr("font-size", 10)
+              .attr("fill", "black")
+              .attr("opacity", 0)
+              .text(`Trained on ${pt.Train}`)
+              .transition()
+              .duration(300)
+              .attr("opacity", 1);
+          });
+        }
+      })
+      .on("mouseout", () => {
+        // 主点恢复不透明
+        mainDot.transition().duration(200).attr("opacity", 1);
+        g.selectAll(".agg-item").attr("display", null);
+        hoverLayer.selectAll("*").remove();
+      });
+
+  
     });
 
-    // === Legend: ROI Colors ===
-    const roiLegend = svg.append("g").attr("transform", `translate(${width - plotWidth + 20},${margin.top + 150})`);
+    const roiLegend = svg
+      .append("g")
+      .attr("transform", `translate(${width - plotWidth + 20},${margin.top + 150})`);
     Object.entries(roiColors)
-    .filter(([roiKey]) => roi === "" || roiKey === roi) // ✅ 加过滤
-    .forEach(([roiKey, color], i) => {
-      roiLegend.append("text")
-        .attr("x", 15)
-        .attr("y", i * 28 + 4)
-        .attr("font-size", 24)
-        .attr("fill", color)
-        .text(roiKey.toUpperCase());
-    });
+      .filter(([roiKey]) => roi === "" || roiKey === roi)
+      .forEach(([roiKey, color], i) => {
+        roiLegend
+          .append("text")
+          .attr("x", 15)
+          .attr("y", i * 28 + 4)
+          .attr("font-size", 24)
+          .attr("fill", color)
+          .text(roiKey.toUpperCase());
+      });
 
-    // === Legend: Dataset Shapes ===
-    const shapeLegend = svg.append("g").attr("transform", `translate(${width - plotWidth + 20},${margin.top + 40})`);
+    const shapeLegend = svg
+      .append("g")
+      .attr("transform", `translate(${width - plotWidth + 20},${margin.top + 40})`);
     Object.entries(datasetTypeLabels).forEach(([shapeName, label], i) => {
       const shapeFn =
-        shapeName === "circle" ? d3.symbolCircle : shapeName === "triangle" ? d3.symbolTriangle : d3.symbolDiamond;
+        shapeName === "circle"
+          ? d3.symbolCircle
+          : shapeName === "triangle"
+          ? d3.symbolTriangle
+          : d3.symbolDiamond;
       const path = d3.symbol().type(shapeFn).size(120)();
-      shapeLegend.append("path").attr("d", path).attr("transform", `translate(0,${i * 24 -2})`).attr("fill", "white").attr("stroke", "black");
-      shapeLegend.append("text").attr("x", 15).attr("y", i * 24 + 4).attr("font-size", 20).text(label);
+      shapeLegend
+        .append("path")
+        .attr("d", path)
+        .attr("transform", `translate(0,${i * 24 - 2})`)
+        .attr("fill", "white")
+        .attr("stroke", "black");
+      shapeLegend
+        .append("text")
+        .attr("x", 15)
+        .attr("y", i * 24 + 4)
+        .attr("font-size", 20)
+        .text(label);
     });
   }, [murtyData, nsdData, ceilingData, roi, dataset]);
 
-return (
-  <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-    <svg ref={svgRef} ></svg>
-  </div>
-);
+  return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <svg ref={svgRef}></svg>
+    </div>
+  );
 }
