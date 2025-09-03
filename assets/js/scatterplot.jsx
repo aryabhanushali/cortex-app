@@ -160,11 +160,16 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
       .style("font-weight", "bold")
 
     // === legend ===
-    const legendData = Array.from(new Set(points.map(d => d.dataset))); // 用 dataset 名字生成 legend
 
+    const legendData = Array.from(new Set(points.map(d => d.dataset)));
+
+    const legendPosition = (legendData.includes("nsd_syn"))
+        ? { x: margin.left, y: margin.top } // 左上角
+        : { x: width - 300, y: height - margin.bottom - 150 }; // 默认右下角
+      
     const legend = svg.append("g")
-      .attr("class", "legend")
-      .attr("transform", `translate(${width - 300}, ${height - margin.bottom - 150})`); // 放右下角
+        .attr("class", "legend")
+        .attr("transform", `translate(${legendPosition.x}, ${legendPosition.y})`);
 
     legend.selectAll("circle")
       .data(legendData)
