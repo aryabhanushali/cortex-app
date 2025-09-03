@@ -17,6 +17,8 @@ import RoiBarChart from './roiDatasetBarChart.jsx';
 
 import ChartSelect from './chartselect.jsx';
 import ScatterGapCeiling from './roiDatasetanalysis.jsx';
+import ROICard from './roicard.jsx';
+import DatasetCard from './datasetcard.jsx';
 
 const ScoreboardPage: React.FC = () => {
   const { token } = theme.useToken();
@@ -71,6 +73,9 @@ const ScoreboardPage: React.FC = () => {
     } 
     if (current === 2 && training === "") {
       setRegion("");
+    }
+    if(current === 2 && training === "VS" && (dataset === "bonner_2021" || dataset === "bold_5000")){
+      setRegion("ppa");
     }
   }, [current, dataset,training]);
 
@@ -138,7 +143,7 @@ const ScoreboardPage: React.FC = () => {
           {/* panel display logic */}
            <TrainingSelect training={training} setTraining={setTraining} dataset={dataset} mode = {1}/> 
           {training !== "" && (<DatasetSelect dataset={dataset} setDataset={setDataset} training={training} region = {region} allowToggle={true} mode = {1}/>)}
-          {dataset !== "" && training !== "" && (<ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={1}/>)
+          {dataset !== "" && training !== "" && (<ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={1} training={training}/>)
          } 
           
           
@@ -213,6 +218,24 @@ const ScoreboardPage: React.FC = () => {
             />
           )}
 
+          {training === "Murty185" && (
+            <DatasetCard dataset={"murty185"}/>
+          )
+          }
+          {training === "NSD" && (
+            <DatasetCard dataset={"nsd_1000"}/>
+          )
+          }
+
+          {dataset !== "" && (
+            <DatasetCard dataset={dataset}/>
+          )
+          }
+          {region !== "" && (
+            <ROICard region={region}/>
+          )
+          }
+          
         </div>
       ),
       icon: <SmileOutlined />,
@@ -223,7 +246,7 @@ const ScoreboardPage: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
           {/* panel display logic */}
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={2}/>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={2} training={training}/>
           {region !== "" && ( <TrainingSelect training={training} setTraining={setTraining} dataset={dataset} mode = {2}/>)}
           {region !== "" && training!== "" && ( <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} region = {region} allowToggle={true} mode = {2}/>)}
 
@@ -295,7 +318,7 @@ const ScoreboardPage: React.FC = () => {
           (<RoiBarChart data={nsdData} roi ={region.toLowerCase()} dataset={dataset} ceiling = {Ceiling}/>)
          }
 
-             {!loadingNew  && dataset != "" && training === "Murty185" && (
+          {!loadingNew  && dataset != "" && training === "Murty185" && (
              <RoiBarChart
               data={murtyData}
               roi ={region}
@@ -305,6 +328,28 @@ const ScoreboardPage: React.FC = () => {
             />
 
           )}
+
+           {region !== "" && (
+            <ROICard region={region}/>
+          )
+          }
+          {training === "Murty185" && (
+            <DatasetCard dataset={"murty185"}/>
+          )
+          }
+          {training === "NSD" && (
+            <DatasetCard dataset={"nsd_1000"}/>
+          )
+          }
+          {training === "VS" && [
+            <DatasetCard key="murty" dataset="murty185" />,
+            <DatasetCard key="nsd" dataset="nsd_1000" />
+          ]}
+          {dataset !== "" && (
+            <DatasetCard dataset={dataset}/>
+          )
+          }
+         
 
           
         </div>
@@ -319,7 +364,7 @@ const ScoreboardPage: React.FC = () => {
           {/* panel display logic */}
           <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} region = {region} allowToggle={true} mode ={3}/>
           {dataset !== "" && (<TrainingSelect training={training} setTraining={setTraining} dataset={dataset} mode = {3}/>)}
-          {dataset !== "" && training !== "" && (<ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={3}/>)}
+          {dataset !== "" && training !== "" && (<ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={3} training={training}/>)}
 
 
           {/* title display logic */}
@@ -397,6 +442,31 @@ const ScoreboardPage: React.FC = () => {
               ceiling = {Ceiling}
             />
           )}
+
+
+           {dataset !== "" && (
+            <DatasetCard dataset={dataset}/>
+          )
+          }
+         
+          {training === "Murty185" && (
+            <DatasetCard dataset={"murty185"}/>
+          )
+          }
+          {training === "NSD" && (
+            <DatasetCard dataset={"nsd_1000"}/>
+          )
+          }
+          {training === "VS" && [
+            <DatasetCard key="murty" dataset="murty185" />,
+            <DatasetCard key="nsd" dataset="nsd_1000" />
+          ]}
+
+           {region !== "" && (
+            <ROICard region={region}/>
+          )
+          }
+         
        
         </div>
       ),

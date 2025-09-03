@@ -1,29 +1,52 @@
 // RegionSelector.jsx
-import React from 'react';
+
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
+import React, { useState, useEffect } from 'react';
 
 import { ROI_OPTIONS, OVERALL_OPTION, REGION_OPTIONS } from './constants-scoreboard';
+import { all } from 'axios';
 
-const ROISelect = ({ region, setRegion, dataset, allowToggle, mode }) => {
+const ROISelect = ({ region, setRegion, dataset, allowToggle, mode,training }) => {
+   const [effectiveToggle, setEffectiveToggle] = useState(allowToggle);
+
  
   const isEnabled = (option) => {
     // === 互斥逻辑 ===
     if((dataset === 'bold_5000'|| dataset ==='bonner_2021') && (option.value === "ffa" || option.value === "eba")) return false;
     if((dataset === 'kingbaker_2019' || dataset === 'wardle_2020') && ( option.value === "eba")) return false;
     
-    
+    if (
+      training !== "" &&
+      (dataset === "bonner_2021" || dataset === "bold_5000")
+    ) {
+      return option.value === "ppa"; // 只允许 PPA
+    }
+
     return true;
   };
+
+   useEffect(() => {
+    if (
+      training !== "" &&
+      (dataset === "bonner_2021" || dataset === "bold_5000")
+    ) {
+      setRegion("ppa");
+      setEffectiveToggle(false); 
+    }
+    else{
+      setEffectiveToggle(allowToggle); // 其他情况恢复外部传入
+    }
+  }, [training, dataset, setRegion, allowToggle]);
   const renderButtons = (options) =>
     options.map((option) => (
       <Button
         key={option.value}
         onClick={() => {
           if (!isEnabled(option)) return;
-          if (allowToggle) {
+          if (effectiveToggle) {
             setRegion((prev) => (prev === option.value ? "" : option.value));
           } else {
             setRegion(option.value);

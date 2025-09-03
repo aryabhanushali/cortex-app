@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { Typography, Link } from '@mui/material';
-import { DATASETCARD_OPTIONS, DATASETCARD_INFO_LOOKUP } from './constants';
+import { DATASETCARD_OPTIONS, DATASETCARD_INFO_LOOKUP } from './constants-scoreboard';
 
 const DatasetCard = ({ dataset }) => {
   console.log("DatasetCard: dataset:", dataset);
@@ -18,7 +18,7 @@ const DatasetCard = ({ dataset }) => {
   const { category, size, subjects, description, cardUrl } = getInfo(dataset);
 
   return (
-    <Box sx={{ minWidth: 250, boxShadow: 3, borderRadius: 2 }}>
+    <Box sx={{ minWidth: 250, boxShadow: 3, borderRadius: 2, my: 2 }}>
       <Card variant="outlined" sx={{ borderRadius: 2 }}>
         <CardContent>
           <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
