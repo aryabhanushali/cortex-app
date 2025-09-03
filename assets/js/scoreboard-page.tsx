@@ -156,7 +156,7 @@ const ScoreboardPage: React.FC = () => {
 
   const steps = [
     {
-      title: 'Training Sources',
+      title: 'Training Source',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
