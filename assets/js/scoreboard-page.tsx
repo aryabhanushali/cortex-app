@@ -51,7 +51,7 @@ const ScoreboardPage: React.FC = () => {
     }
     if (current === 1) {
       // ROI 页：当 region 选中且 dataset 已经选定时才启用
-      return region !== ""  && training !== "";
+      return region !== ""  && (training === "Murty185" ||training === "NSD")  ;
     }
     if (current === 2) {
       // Dataset 页：当 dataset 已选择时才启用
