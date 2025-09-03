@@ -39,9 +39,11 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
       const murtyVals = murtyData[roi][model]; // { dataset: [score, pval] }
       const nsdVals = nsdData[roi][model];
       if (!murtyVals || !nsdVals) return;
+       
 
       Object.keys(murtyVals).forEach((ds) => {
         if (dataset && ds !== dataset) return;
+        if (ds === "ceiling") return; 
   
         const x = murtyVals[ds]?.[0];
         const y = nsdVals[ds]?.[0];
@@ -50,20 +52,6 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
           return;
         }
 
-         // ceiling 特殊处理
-        if (ds === "ceiling") {
-          if (x != null && y != null) {
-            // 保存 ceiling 信息到 model 层面
-            points.push({
-              model,
-              dataset: "for_plot", // dummy，不会真正绘制
-              x: null,             // 不画点
-              y: null,
-              ceiling: murtyVals["ceiling"]?.[0] ?? null
-            });
-          }
-          return;
-        }
         if (x != null && y != null) {
           points.push({
             model,
