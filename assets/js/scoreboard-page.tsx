@@ -279,9 +279,9 @@ const ScoreboardPage: React.FC = () => {
           {!loadingNew && (
             <div className="chart-title">
               { region === "" && training === "" && dataset === "" && newData
-                ? `Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
+                ? `Model Performance Gap to Ceiling vs Ceiling`
                 : training === "" && dataset === ""
-                ? `${region.toUpperCase()} : Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
+                ? `${region.toUpperCase()} : Model Performance Gap to Ceiling vs Ceiling`
                 : training === "VS" && dataset === ""
                 ? `${region.toUpperCase()} Performance (Trained on Murty185 and Trained on NSD)`
                 : training === "Murty185" && dataset === ""
@@ -398,9 +398,9 @@ const ScoreboardPage: React.FC = () => {
           {!loadingNew && (
             <div className="chart-title">
               { region === "" && training === "" && dataset === "" && newData
-                ? `Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
+                ? `Model Performance Gap to Ceiling vs Ceiling`
                 : training === "" && region === "" && dataset !== ""
-                ? `Averaged Normalized Gap vs. Ceiling (Across Train Sources)`
+                ? `Model Performance Gap to Ceiling vs Ceiling`
                 : training === "VS" && region === "" 
                 ? `Accross-Regions Performance on ${dataset}(Trained on Murty185 and Trained on NSD)`
                 : training === "Murty185" && dataset === ""
