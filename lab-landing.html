@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>The Lab - Virtual Visual Cortex</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="assets/img/logo.svg" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Poppins:wght@400;600&family=Nunito:wght@400;600&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <style>
+    .landing-section {
+      padding: 5rem 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 4rem;
+      flex-wrap: wrap;
+    }
+
+    .landing-left h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #012970;
+    }
+
+    .try-btn {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 1rem 2rem;
+  border-radius: 9999px;
+  background: linear-gradient(to bottom, #4154f1, #4154f1);
+  color: #ffffff; /* white text */
+  font-weight: 600;
+  font-size: 1.2rem;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.try-btn:hover {
+  background: linear-gradient(to bottom, #2d367f, #2d367f);
+  color: #ffffff; /* keep text white */
+  transform: translateY(-2px);
+}
+
+
+.landing-right {
+  background: linear-gradient(to bottom right, #f5f9fc, #e9f0f7);
+  border-radius: 20px;
+  padding: 2rem;
+  color: #012970;
+  font-size: 1rem;
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.1);
+  min-width: 300px;
+  max-width: 420px;
+  font-family: "Lato", sans-serif;
+}
+
+.landing-right h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  font-family: "Lato", sans-serif;
+}
+
+.landing-option {
+  padding: 0.8rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 10px;
+
+  font-weight: 600;
+  position: relative;
+}
+
+
+
+.landing-option span {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #555;
+  margin-top: 0.2rem;
+}
+
+
+
+  </style>
+</head>
+
+<body class="lab-page">
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+      <a href="index.html" class="logo d-flex align-items-center me-auto">
+        <img src="assets/img/logo.svg" alt="">
+        <h1 class="sitename">Cortex</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="index.html">Home<br></a></li>
+          <li><a href="lab-landing.html">The Lab</a></li>
+          <li><a href="scoreboard-landing.html" class="active">The Scoreboard</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+    </div>
+  </header>
+  <!-- End Header -->
+
+  <main class="main">
+    <section class="landing-section container">
+      <!-- Left Side -->
+      <div class="landing-left">
+        <h1>What is the Lab?</h1>
+        <p style="margin-top: 1rem; font-size: 1.1rem; color: #444; max-width: 500px;">
+          The lab is an interactive tool to compare model performance across
+          <strong>training sources</strong>, <strong>regions of interest</strong>, and
+          <strong>datasets</strong>. Explore how different models generalize across tasks,
+          and customize comparisons to fit your research needs.
+        </p>
+        <a href="lab-page.html" class="try-btn">Try it now</a>
+      </div>
+
+      <!-- Right Side -->
+     <div class="landing-right">
+  <h2>Explore the Lab</h2>
+
+  <div class="landing-option">
+    <i class="bi bi-bar-chart-fill"></i>
+    <strong>Overall Performance</strong>
+    <span> See how all models perform across datasets and regions.</span>
+  </div>
+
+  <div class="landing-option">
+    <i class="bi bi-database-fill"></i>
+    <strong>Training Sources</strong>
+    <span> Compare models trained on different datasets or conditions.</span>
+  </div>
+
+  <div class="landing-option">
+    <i class="fa-solid fa-brain"></i>
+    <strong>Region of Interest</strong>
+    <span> Explore performance across specific brain regions (ROIs).</span>
+  </div>
+
+  <div class="landing-option">
+    <i class="bi bi-folder2-open"></i>
+    <strong>Dataset</strong>
+    <span> View model performance on various evaluation datasets.</span>
+  </div>
+
+  <div class="landing-option">
+    <i class="bi bi-sliders"></i>
+    <strong>Customize</strong>
+    <span> Build your own comparisons with flexible settings.</span>
+  </div>
+</div>
+
+      </div>
+
+
+
+    </section>
+  </main>
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer" class="footer">
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1 sitename"><a href="https://www.murtylab.com" target="_blank" rel="noopener noreferrer">Murty Lab @ Georgia Tech</a></strong> <span>All Rights Reserved</span></p>
+      <div class="credits"></div>
+    </div>
+  </footer>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
