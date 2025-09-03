@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
+const RoiBarChart = ({ data, roi, dataset, ceiling, rank }) => {
   const ceilingRef = useRef();
   const barsRef = useRef();
   const [stats, setStats] = useState({ max: null, mean: null });
@@ -24,7 +24,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
       })
       .filter((d) => d.val !== undefined);
 
-     if (rank && rank !== "") {
+    if (rank && rank !== "") {
       results = [...results].sort((a, b) => d3.descending(a.val, b.val));
     }
 
@@ -35,20 +35,12 @@ const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
 
     // ==== 尺寸 ====
     const barWidth = 30;
-    const margin = { top: 10, right: 20, bottom: 180, left: 60 };
+    const margin = { top: 40, right: 20, bottom: 180, left: 60 };
     const height = 400;
-
-    // ==== 动态 y domain ====
-    const allVals = results.map((d) => d.val)
-      .concat([ceilingMean, ceilingMax])
-      .filter((v) => v != null);
-
-    const maxVal = d3.max(allVals);
-    const minVal = d3.min(allVals);
 
     const y = d3
       .scaleLinear()
-      .domain([Math.min(0, minVal), Math.max(1.0, maxVal * 1.1)]) // 自动扩展
+      .domain([-0.3, 1])
       .range([height - margin.bottom, margin.top]);
 
     setScaleY(() => y);
@@ -60,6 +52,19 @@ const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
 
     ceilingSvg.attr("width", ceilingWidth).attr("height", height);
 
+    // 灰色虚线 (先画，保证在 bar 下方)
+    if (ceilingMax != null) {
+      ceilingSvg
+        .append("line")
+        .attr("x1", margin.left + 15 + barWidth / 2)
+        .attr("x2", margin.left + 15 + barWidth / 2)
+        .attr("y1", y(0.9))
+        .attr("y2", y(-0.3))
+        .attr("stroke", "gray")
+        .attr("stroke-dasharray", "3 3")
+        .attr("stroke-width", 1);
+    }
+
     // ceiling bar
     if (ceilingMax != null) {
       ceilingSvg
@@ -70,21 +75,24 @@ const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
         .attr("height", Math.abs(y(0) - y(ceilingMax)))
         .attr("fill", "#d3d3d3")
         .attr("stroke", "black");
+
+      // ceiling label 固定在 0.9
       ceilingSvg
         .append("text")
         .attr("x", margin.left + 15 + barWidth / 2)
-        .attr("y", y(ceilingMax) - 10)  // 上方 10px
+        .attr("y", y(0.95))
         .attr("text-anchor", "middle")
         .attr("font-size", "12px")
         .attr("fill", "black")
         .text(ceilingMax.toFixed(2));
 
-      // 如果有 correlation_points，就画小蓝点
-     const points = ceiling[roi][dataset]?.correlation_points || [];
+      // correlation_points
+      const points = ceiling[roi][dataset]?.correlation_points || [];
       if (points.length > 0) {
-        const jitter = d3.scaleLinear()
+        const jitter = d3
+          .scaleLinear()
           .domain([0, points.length - 1])
-          .range([-barWidth / 4, barWidth / 4]); // 控制水平散开范围
+          .range([-barWidth / 4, barWidth / 4]);
 
         ceilingSvg
           .append("g")
@@ -113,17 +121,18 @@ const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
       });
 
     // y 轴 label
-      const centerY = (height - margin.bottom) / 2;
+    const centerY = (height - margin.bottom) / 2;
+    ceilingSvg
+      .append("text")
+      .attr("text-anchor", "middle")
+      .style("font-size", "14px")
+      .attr("fill", "black")
+      .attr(
+        "transform",
+        `translate(${margin.left - 45}, ${centerY}) rotate(-90)`
+      )
+      .text("Pearson Correlation");
 
-      ceilingSvg
-        .append("text")
-        .attr("text-anchor", "middle")
-        .style("font-size", "14px")
-        .attr("fill", "black")
-        // 先平移到 margin.left - 45 的 X，centerY 的 Y
-        // 再绕这个点旋转 -90 度
-        .attr("transform", `translate(${margin.left - 45}, ${centerY}) rotate(-90)`)
-        .text("Pearson Correlation");
     // x label for ceiling
     ceilingSvg
       .append("text")
@@ -134,7 +143,9 @@ const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
       .attr("fill", "black")
       .attr(
         "transform",
-        `rotate(60, ${margin.left + barWidth / 2 + 15}, ${height - margin.bottom + 10})`
+        `rotate(60, ${margin.left + barWidth / 2 + 15}, ${
+          height - margin.bottom
+        })`
       )
       .text("Ceiling");
 
@@ -151,6 +162,21 @@ const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
       .range([10, width - margin.right])
       .padding(0.2);
 
+    // 灰色虚线 (在 bar 下层)
+    barsSvg
+      .append("g")
+      .selectAll("line.value-dash")
+      .data(results)
+      .enter()
+      .append("line")
+      .attr("x1", (d) => x(d.model) + x.bandwidth() / 2)
+      .attr("x2", (d) => x(d.model) + x.bandwidth() / 2)
+      .attr("y1", y(0.9))
+      .attr("y2", y(-0.3))
+      .attr("stroke", "gray")
+      .attr("stroke-dasharray", "3 3")
+      .attr("stroke-width", 1);
+
     // bars
     barsSvg
       .append("g")
@@ -165,7 +191,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
       .attr("fill", "#d3d3d3")
       .attr("stroke", "black");
 
-    // bar 数值 label (统一在 bar 顶部 5px 位置)
+    // bar 数值 label (统一在 0.9)
     barsSvg
       .append("g")
       .selectAll("text.value-label")
@@ -173,7 +199,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
       .enter()
       .append("text")
       .attr("x", (d) => x(d.model) + x.bandwidth() / 2)
-      .attr("y", (d) => y(d.val) - 10) // bar 顶端上方 5px
+      .attr("y", y(0.95))
       .attr("text-anchor", "middle")
       .attr("font-size", "12px")
       .attr("fill", "black")
@@ -194,16 +220,16 @@ const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
       .attr(
         "transform",
         (d) =>
-          `rotate(60, ${x(d.model) + x.bandwidth() / 2}, ${height - margin.bottom + 10})`
+          `rotate(60, ${x(d.model) + x.bandwidth() / 2}, ${
+            height - margin.bottom
+          })`
       )
       .text((d) => d.model);
 
     function drawLine(svg, value, color, svgWidth, offsetX = 0) {
       if (value == null) return;
-
       const [yMin, yMax] = y.domain();
       const safeVal = Math.min(Math.max(value, yMin), yMax);
-
       svg
         .append("line")
         .attr("x1", offsetX)
@@ -220,7 +246,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
     drawLine(ceilingSvg, ceilingMean, "blue", ceilingWidth, margin.left);
     drawLine(barsSvg, ceilingMax, "red", width, 0);
     drawLine(barsSvg, ceilingMean, "blue", width, 0);
-  }, [data, roi, dataset, ceiling,rank]);
+  }, [data, roi, dataset, ceiling, rank]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row", position: "relative" }}>
@@ -249,7 +275,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
             <div
               style={{
                 position: "absolute",
-                top: scaleY(stats.max) - 60,
+                top: scaleY(stats.max) - 17,
                 right: 0,
                 color: "red",
                 fontSize: "12px",
@@ -262,7 +288,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
             <div
               style={{
                 position: "absolute",
-                top: scaleY(stats.mean) - 60,
+                top: scaleY(stats.mean),
                 right: 0,
                 color: "blue",
                 fontSize: "12px",
