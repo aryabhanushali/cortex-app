@@ -45,34 +45,34 @@ const ScoreboardPage: React.FC = () => {
   useEffect(() => {
     if (current === 0 && training === "") {
       setDataset("");
-    }
-  }, [current, training])
+      setRegion("");
+    } 
+    if (current === 0 && dataset === ""){
+      setRegion("");
+    } 
+  }, [current, training,dataset])
 
   //step 1 clear value logic
   useEffect(() => {
     if (current === 1 && region === "") {
       setTraining("");
       setDataset("");
-    }
-  }, [current, region]);
-  useEffect(() => {
+    } 
     if (current === 1 && training === "") {
       setDataset("");
     }
-  }, [current, training]);
+  }, [current, region,training]);
+  
 
-  // step 2 clear value logic
   useEffect(() => {
     if (current === 2 && dataset === "") {
       setTraining("");
       setRegion("");
-    }
-  }, [current, dataset]);
-  useEffect(() => {
+    } 
     if (current === 2 && training === "") {
       setRegion("");
     }
-  }, [current, training]);
+  }, [current, dataset,training]);
 
   
   const roiDataMap = {
