@@ -75,43 +75,7 @@ const ScoreboardPage: React.FC = () => {
   }, [current, dataset,training]);
 
   
-  const roiDataMap = {
-    PPA: (data as any)[training]?.ppaData,
-    FFA: (data as any)[training]?.ffaData,
-    EBA: (data as any)[training]?.ebaData,
-    FBA: (data as any)[training]?.fbaData,
-    OFA: (data as any)[training]?.ofaData,
-    OPA: (data as any)[training]?.opaData,
-    RSC: (data as any)[training]?.rscData,
-    VWFA: (data as any)[training]?.vwfaData,
-  };
-  type DataItem = {
-    model: string;
-    dataset: string;
-    roi: string;
-    pearsonr: number;
-  };
 
-  const roiData = (roiDataMap as any)[region] || [];
-
-
-
-  const overallData=(data as any)[training]?.overallData || [];
-
-
-
- 
-  
-  const unfilteredData: DataItem[] = (data as any)[training]?.unfilter || [];
-  const filteredData = unfilteredData.filter(d => {
-    if (current === 0 || current === 1) {
-      return d.dataset === dataset ;
-    } else {
-      return d.dataset === dataset;
-    }
-  });
-  const filteredRegionData : DataItem[] = filteredData.filter((d: DataItem) => d.roi === region);
-  
 
  type newData = {
   //group by ppa
@@ -167,7 +131,7 @@ const ScoreboardPage: React.FC = () => {
 
   const steps = [
     {
-      title: 'Training Sources',
+      title: 'Overview',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
