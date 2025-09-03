@@ -164,7 +164,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
     const legendData = Array.from(new Set(points.map(d => d.dataset)));
 
     const legendPosition = (legendData.includes("nsd_syn"))
-        ? { x: margin.left, y: margin.top } // 左上角
+        ? { x: margin.left + 20, y: margin.top + 20 } // 左上角
         : { x: width - 300, y: height - margin.bottom - 150 }; // 默认右下角
       
     const legend = svg.append("g")
