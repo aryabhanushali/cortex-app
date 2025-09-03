@@ -55,7 +55,7 @@ const ScoreboardPage: React.FC = () => {
     }
     if (current === 2) {
       // Dataset 页：当 dataset 已选择时才启用
-      return region !== "" && dataset !== "" && training !== "";
+      return dataset !== "" && training !== "";
     }
     return false;
   };
