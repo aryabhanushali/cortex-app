@@ -41,12 +41,27 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
       if (!murtyVals || !nsdVals) return;
 
       Object.keys(murtyVals).forEach((ds) => {
-        if (dataset && ds !== dataset) return;   
+        if (dataset && ds !== dataset) return;
   
         const x = murtyVals[ds]?.[0];
         const y = nsdVals[ds]?.[0];
 
         if (["murty185", "nsd_1000"].includes(ds)) {
+          return;
+        }
+
+         // ceiling 特殊处理
+        if (ds === "ceiling") {
+          if (x != null && y != null) {
+            // 保存 ceiling 信息到 model 层面
+            points.push({
+              model,
+              dataset: "for_plot", // dummy，不会真正绘制
+              x: null,             // 不画点
+              y: null,
+              ceiling: murtyVals["ceiling"]?.[0] ?? null
+            });
+          }
           return;
         }
         if (x != null && y != null) {
@@ -140,7 +155,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
                 Model: <span style="font-weight:500; color:#333;">${d.model}</span>
               </div>
               <div style="color:#666; margin-bottom:6px;">
-                Evaluation Dataset: <span style="font-weight:500; color:#333;">${d.dataset}</span>
+                Evaluation Dataset: <span style="font-weight:500; color:#333;">${d.dataset}(ceiling - ${d.ceiling.toFixed(3)</span>
               </div>
               <div style="font-weight:600; margin-bottom:4px;">Performance Trained on</div>
               <div>• Murty185 — ${d.x.toFixed(3)}</div>
