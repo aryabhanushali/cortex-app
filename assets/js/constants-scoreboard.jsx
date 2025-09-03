@@ -162,4 +162,32 @@ export const DATASETCARD_INFO_LOOKUP = {
   },
 };
 
+// =====================
+// ROI constants
+// =====================
+export const ROICARD_OPTIONS = [
+  { value: "ffa", label: "Fusiform Face Area (FFA)" },
+  { value: "ppa", label: "Parahippocampal Place Area (PPA)" },
+  { value: "eba", label: "Extrastriate Body Area (EBA)" },
+];
+
+export const ROICARD_INFO_LOOKUP = {
+  ffa: {
+    description:
+      "The fusiform face area (FFA) is a part of the human visual system that is specialized for facial recognition.",
+    cardUrl: "https://www.jneurosci.org/content/17/11/4302",
+  },
+  ppa: {
+    description:
+      "The Parahippocampal Place Area (PPA) is a brain region strongly activated by scenes and spatial layouts.",
+    cardUrl: "https://www.nature.com/articles/33402",
+  },
+  eba: {
+    description:
+      "The Extrastriate Body Area (EBA) responds selectively to images of human bodies and body parts.",
+    cardUrl: "https://www.science.org/doi/10.1126/science.1063414",
+  },
+};
+
+
   
