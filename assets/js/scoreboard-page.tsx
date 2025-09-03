@@ -172,7 +172,7 @@ const ScoreboardPage: React.FC = () => {
           {!loadingNew && (
             <div className="chart-title">
               {training === "" && dataset === "" &&  region === ""
-                ? `Across-ROIs Performence (Trained on Murty vs Trained on NSD1000) `
+                ? `Across-ROIs Performence (Trained on Murty185 vs Trained on NSD1000) `
                 : training === "Murty185" && dataset === "" && region === ""
                 ? "Across-ROIs Performance (Trained on Murty185)"
                 : training === "NSD" && dataset === ""  && region === ""
