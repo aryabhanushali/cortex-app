@@ -51,7 +51,7 @@ const ScoreboardPage: React.FC = () => {
     }
     if (current === 1) {
       // ROI 页：当 region 选中且 dataset 已经选定时才启用
-      return region !== "" && dataset !== "" && training !== "";
+      return region !== ""  && training !== "";
     }
     if (current === 2) {
       // Dataset 页：当 dataset 已选择时才启用
@@ -226,6 +226,7 @@ const ScoreboardPage: React.FC = () => {
               roi={region === "" ? "Overall" : region.toLowerCase()}   // ✅ region为空 → overall
               dataset={dataset}
               ceiling = {Ceiling}
+              rank = {rank}
             />
           )}
 
@@ -235,6 +236,7 @@ const ScoreboardPage: React.FC = () => {
               roi={region === "" ? "Overall" : region.toLowerCase()}   // ✅ 同理
               dataset={dataset}
               ceiling = {Ceiling}
+              rank = {rank}
             />
           )}
 
@@ -335,7 +337,7 @@ const ScoreboardPage: React.FC = () => {
            
 
          {!loadingNew  && dataset != "" && training === "NSD" && 
-          (<RoiBarChart data={nsdData} roi ={region.toLowerCase()} dataset={dataset} ceiling = {Ceiling}/>)
+          (<RoiBarChart data={nsdData} roi ={region.toLowerCase()} dataset={dataset} ceiling = {Ceiling} rank = {rank}/>)
          }
 
           {!loadingNew  && dataset != "" && training === "Murty185" && (
@@ -344,6 +346,7 @@ const ScoreboardPage: React.FC = () => {
               roi ={region}
               dataset={dataset}
               ceiling = {Ceiling}
+              rank = {rank}
              
             />
 
@@ -451,7 +454,7 @@ const ScoreboardPage: React.FC = () => {
 
           
          {!loadingNew  && region !== "" && training === "NSD" && 
-          (<RoiBarChart data={nsdData} roi ={region.toLowerCase()} dataset={dataset} ceiling = {Ceiling}/>)
+          (<RoiBarChart data={nsdData} roi ={region.toLowerCase()} dataset={dataset} ceiling = {Ceiling} rank = {rank}/>)
          }
 
           {!loadingNew  && region !== "" && training === "Murty185" && (
@@ -460,6 +463,7 @@ const ScoreboardPage: React.FC = () => {
               roi ={region}
               dataset={dataset}
               ceiling = {Ceiling}
+              rank = {rank}
             />
           )}
 

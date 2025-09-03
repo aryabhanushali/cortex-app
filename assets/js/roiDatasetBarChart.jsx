@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-const RoiBarChart = ({ data, roi, dataset, ceiling }) => {
+const RoiBarChart = ({ data, roi, dataset, ceiling,rank }) => {
   const ceilingRef = useRef();
   const barsRef = useRef();
   const [stats, setStats] = useState({ max: null, mean: null });
@@ -17,12 +17,16 @@ const RoiBarChart = ({ data, roi, dataset, ceiling }) => {
 
     // ==== 数据处理 ====
     const models = Object.keys(roiData).filter((m) => m !== "ceiling");
-    const results = models
+    let results = models
       .map((model) => {
         const val = roiData[model]?.[dataset]?.[0];
         return { model, val };
       })
       .filter((d) => d.val !== undefined);
+
+     if (rank && rank !== "") {
+      results = [...results].sort((a, b) => d3.descending(a.val, b.val));
+    }
 
     const ceilingMean = ceiling[roi][dataset]?.ceiling_mean ?? null;
     const ceilingMax = ceiling[roi][dataset]?.ceiling_max ?? null;
@@ -216,7 +220,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling }) => {
     drawLine(ceilingSvg, ceilingMean, "blue", ceilingWidth, margin.left);
     drawLine(barsSvg, ceilingMax, "red", width, 0);
     drawLine(barsSvg, ceilingMean, "blue", width, 0);
-  }, [data, roi, dataset, ceiling]);
+  }, [data, roi, dataset, ceiling,rank]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row", position: "relative" }}>
