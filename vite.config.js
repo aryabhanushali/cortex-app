@@ -24,6 +24,7 @@ export default defineConfig({
         scoreboard: 'scoreboard-page.html',
         scoreboardNew: 'scoreboard-page-new.html',
         scoreboardLanding: 'scoreboard-landing.html',
+        labLanding: 'lab-landing.html',
         overallPerformance: 'overall-performance-accross-all-regions.html',
         specificROI: 'specify-roi-page.html',
         specificDataset: 'specify-dataset-page.html',
