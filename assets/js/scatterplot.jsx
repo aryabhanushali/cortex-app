@@ -155,7 +155,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
                 Model: <span style="font-weight:500; color:#333;">${d.model}</span>
               </div>
               <div style="color:#666; margin-bottom:6px;">
-                Evaluation Dataset: <span style="font-weight:500; color:#333;">${d.dataset}(ceiling - ${d.ceiling.toFixed(3)</span>
+                  Evaluation Dataset: <span style="font-weight:500; color:#333;">${d.dataset} (ceiling - ${d.ceiling.toFixed(3)})
               </div>
               <div style="font-weight:600; margin-bottom:4px;">Performance Trained on</div>
               <div>• Murty185 — ${d.x.toFixed(3)}</div>
