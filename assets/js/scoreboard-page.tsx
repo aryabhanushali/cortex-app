@@ -207,6 +207,7 @@ const ScoreboardPage: React.FC = () => {
               data={murtyData}
               roi ={"Overall"}
               dataset = {dataset}
+              rank = {rank}
             />
           )}
 
@@ -215,6 +216,7 @@ const ScoreboardPage: React.FC = () => {
               data={nsdData}
               roi ={"Overall"}
               dataset = {dataset}
+              rank = {rank}
             />
           )}
 
@@ -323,6 +325,7 @@ const ScoreboardPage: React.FC = () => {
               data={murtyData}
               roi ={region}
               dataset={dataset}
+              rank = {rank}
             />
           )}
           {!loadingNew && dataset === "" && training === "NSD" &&(
@@ -330,6 +333,7 @@ const ScoreboardPage: React.FC = () => {
               data={nsdData}
               roi ={region}
               dataset ={dataset}
+              rank = {rank}
             />
           )}
 
@@ -442,6 +446,7 @@ const ScoreboardPage: React.FC = () => {
               data={murtyData}
               dataset ={dataset}
               roi = {region}
+              rank = {rank}
             />
           )}
           {!loadingNew && region === "" && training === "NSD" &&(
@@ -449,6 +454,7 @@ const ScoreboardPage: React.FC = () => {
               data={nsdData}
               dataset ={dataset}
               roi = {region}
+              rank = {rank}
             />
           )}
 

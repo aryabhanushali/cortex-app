@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-const HeatmapByROI = ({ data, roi, dataset }) => {
+const HeatmapByROI = ({ data, roi, dataset, rank  }) => {
   const headerRef = useRef();
   const bodyRef = useRef();
   const legendRef = useRef();
@@ -14,17 +14,15 @@ const HeatmapByROI = ({ data, roi, dataset }) => {
     d3.select(bodyRef.current).select("svg").remove();
     d3.select(legendRef.current).select("svg").remove();
 
-    const headerMargin = { top: 60, right: 40, bottom: 10, left: 200 };
-    const bodyMargin = { top: 0, right: 40, bottom: 0, left: 200 };
+    const headerMargin = { top: 80, right: 40, bottom: 10, left: 220 };
+    const bodyMargin = { top: 0, right: 40, bottom: 0, left: 220 };
     const rowHeight = 25;
     const rowGap = 2;
-    const columnWidth = 120;
+    const columnWidth = 100;
     const columnGap = 5;
 
-    const colorScale = d3
-      .scaleLinear()
-      .domain([0, 1])
-      .range(["#D3D3D3", "#9CC9FF"]);
+    // 颜色比例尺
+    const colorScale = d3.scaleLinear().domain([0, 1]).range(["#D3D3D3", "#9CC9FF"]);
 
     let xLabels = [];
     let models = [];
@@ -32,70 +30,121 @@ const HeatmapByROI = ({ data, roi, dataset }) => {
     let ceilingData = [];
 
     if (roi) {
-      // ✅ case 1: 固定 ROI，横轴 dataset
+      // case 1: 固定 ROI
       models = Object.keys(data[roi] || {}).filter((m) => m !== "ceiling");
-      xLabels = Array.from(
-        new Set(models.flatMap((m) => Object.keys(data[roi][m] || {})))
-      );
+      xLabels = Array.from(new Set(models.flatMap((m) => Object.keys(data[roi][m] || {}))));
 
       models.forEach((model) => {
+        let rawVals = [];
         xLabels.forEach((ds) => {
           const vals = data[roi][model]?.[ds];
-          const score = vals?.[1];
-          if (score != null) {
-            cellData.push({ model, x: ds, value: score });
+          if (vals) {
+            const raw = vals[0];
+            const norm = vals[1];
+            rawVals.push(raw);
+            cellData.push({ model, x: ds, raw, norm });
           }
         });
+        if (rawVals.length > 0) {
+          cellData.push({
+            model,
+            x: "global_score",
+            raw: d3.mean(rawVals),
+            norm: null,
+          });
+        }
       });
 
-      // ceiling 在 header
       ceilingData = xLabels.map((ds) => {
-        const score = data[roi]?.ceiling?.[ds]?.[1];
-        return { x: ds, value: score };
+        const vals = data[roi]?.ceiling?.[ds];
+        return vals ? { x: ds, raw: vals[0], norm: vals[1] } : {};
       });
-    } else if (dataset) {
-      // ✅ case 2: 固定 Dataset，横轴 ROI
-      const rois = Object.keys(data).filter(
-        (roiName) => roiName.toLowerCase() !== "overall" // 🚫 不画 overall
-      );
 
+      const ceilingVals = ceilingData.map((d) => d.raw).filter((v) => v != null);
+      if (ceilingVals.length > 0) {
+        ceilingData.push({
+          x: "global_score",
+          raw: d3.mean(ceilingVals),
+          norm: null,
+        });
+      }
+
+      xLabels = ["global_score", ...xLabels];
+    } else if (dataset) {
+      // case 2: 固定 Dataset
+      const rois = Object.keys(data).filter((roiName) => roiName.toLowerCase() !== "overall");
       models = [];
       let validRois = [];
 
       rois.forEach((roiName) => {
-        const modelNames = Object.keys(data[roiName] || {}).filter(
-          (m) => m !== "ceiling"
-        );
+        const modelNames = Object.keys(data[roiName] || {}).filter((m) => m !== "ceiling");
         models = Array.from(new Set([...models, ...modelNames]));
 
         let roiHasData = false;
 
-        // 模型数据
         modelNames.forEach((model) => {
           const vals = data[roiName]?.[model]?.[dataset];
-          const score = vals?.[1];
-          if (score != null) {
+          if (vals) {
             roiHasData = true;
-            cellData.push({ model, x: roiName, value: score });
+            cellData.push({ model, x: roiName, raw: vals[0], norm: vals[1] });
           }
         });
 
-        // ceiling 数据
-        const ceilingScore = data[roiName]?.ceiling?.[dataset]?.[1];
-        if (ceilingScore != null) {
+        const ceilingVals = data[roiName]?.ceiling?.[dataset];
+        if (ceilingVals) {
           roiHasData = true;
-          ceilingData.push({ x: roiName, value: ceilingScore });
+          ceilingData.push({
+            x: roiName,
+            raw: ceilingVals[0],
+            norm: ceilingVals[1],
+          });
         }
 
         if (roiHasData) {
-          validRois.push(roiName); // 只保留有数据的 ROI
+          validRois.push(roiName);
         }
       });
 
-      // 只保留有数据的 ROI 作为横轴
-      xLabels = validRois;
+      models.forEach((model) => {
+        const rawVals = cellData
+          .filter((d) => d.model === model && d.raw != null)
+          .map((d) => d.raw);
+        if (rawVals.length > 0) {
+          cellData.push({
+            model,
+            x: "global_score",
+            raw: d3.mean(rawVals),
+            norm: null,
+          });
+        }
+      });
+
+      const ceilingVals = ceilingData.map((d) => d.raw).filter((v) => v != null);
+      if (ceilingVals.length > 0) {
+        ceilingData.push({
+          x: "global_score",
+          raw: d3.mean(ceilingVals),
+          norm: null,
+        });
+      }
+
+      xLabels = ["global_score", ...validRois];
     } else {
-      return; // roi 和 dataset 都没传，不画
+      return;
+    }
+
+    // ========== 排序逻辑 ==========
+    // ========== 排序逻辑 ==========
+    if (rank && rank !== "") {
+      const modelGlobal = {};
+      cellData.forEach((d) => {
+        if (d.x === "global_score") {
+          modelGlobal[d.model] = d.raw ?? -Infinity;
+        }
+      });
+
+      // 统一用降序（大分数排前面）
+      models.sort((a, b) => (modelGlobal[b] || -Infinity) - (modelGlobal[a] || -Infinity));
     }
 
     // ======= dimensions =======
@@ -103,7 +152,7 @@ const HeatmapByROI = ({ data, roi, dataset }) => {
     const bodyHeight = models.length * (rowHeight + rowGap);
     const width = chartWidth + headerMargin.left + headerMargin.right;
 
-    // ======= Header (x labels + ceiling) =======
+    // ======= Header =======
     const headerHeight = headerMargin.top + rowHeight;
     const svgHeader = d3
       .select(headerRef.current)
@@ -111,13 +160,10 @@ const HeatmapByROI = ({ data, roi, dataset }) => {
       .attr("width", width)
       .attr("height", headerHeight);
 
-    // 顶部的 X 轴标签
+    // 顶部 X 轴
     svgHeader
       .append("g")
-      .attr(
-        "transform",
-        `translate(${columnWidth / 4},${headerMargin.top - 20})`
-      )
+      .attr("transform", `translate(${columnWidth / 4},${headerMargin.top - 40})`)
       .call(
         d3
           .axisTop(
@@ -142,69 +188,61 @@ const HeatmapByROI = ({ data, roi, dataset }) => {
       .attr("transform", "rotate(-30)")
       .style("text-anchor", "end");
 
-    // ceiling 行（固定在 header）
+    // ceiling row
     svgHeader
       .selectAll("rect.ceiling")
       .data(ceilingData)
       .enter()
       .append("rect")
       .attr("class", "ceiling")
-      .attr(
-        "x",
-        (d) =>
-          headerMargin.left +
-          xLabels.indexOf(d.x) * (columnWidth + columnGap)
-      )
+      .attr("x", (d) => headerMargin.left + xLabels.indexOf(d.x) * (columnWidth + columnGap))
       .attr("y", headerMargin.top)
       .attr("width", columnWidth)
       .attr("height", rowHeight)
-      .attr("fill", (d) =>
-        d.value != null ? colorScale(d.value) : "#f0f0f0"
-      );
+      .attr("fill", (d) => {
+        if (d.x === "global_score") return "rgba(158, 117, 214, 0.5)";
+        if (d.norm == null) return "#f0f0f0";
+        if (d.norm < 0) return colorScale(0);
+        if (d.norm > 1) return colorScale(1);
+        return colorScale(d.norm);
+      });
 
+    // ceiling label (raw)
     svgHeader
       .selectAll("text.ceiling-label")
-      .data(ceilingData.filter((d) => d.value != null))
+      .data(ceilingData.filter((d) => d.raw != null))
       .enter()
       .append("text")
       .attr("class", "ceiling-label")
-      .attr(
-        "x",
-        (d) =>
-          headerMargin.left +
-          xLabels.indexOf(d.x) * (columnWidth + columnGap) +
-          columnWidth / 2
+      .attr("x", (d) =>
+        headerMargin.left +
+        xLabels.indexOf(d.x) * (columnWidth + columnGap) +
+        columnWidth / 2
       )
       .attr("y", headerMargin.top + rowHeight / 2)
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "central")
       .style("fill", "black")
       .style("font-size", "14px")
-      .text((d) => d.value.toFixed(2));
+      .text((d) => d.raw.toFixed(2));
 
-    // Y 轴只有 "ceiling"
+    // ceiling Y 轴 label
     svgHeader
       .append("g")
       .attr("transform", `translate(${headerMargin.left - 10},0)`)
       .call(
         d3
           .axisLeft(
-            d3
-              .scalePoint()
-              .domain(["ceiling"])
-              .range([
-                headerMargin.top + rowHeight / 2,
-                headerMargin.top + rowHeight / 2,
-              ])
+            d3.scalePoint().domain(["ceiling"]).range([headerMargin.top + rowHeight / 2, headerMargin.top + rowHeight / 2])
           )
       )
       .call((g) => {
         g.select(".domain").remove();
-        g.selectAll("line").remove();
+        // g.selectAll("line").remove();
         g.selectAll("text").style("font-size", "14px").style("fill", "black");
       });
 
-    // ======= Body (models) =======
+    // ======= Body =======
     const svgBody = d3
       .select(bodyRef.current)
       .append("svg")
@@ -217,46 +255,39 @@ const HeatmapByROI = ({ data, roi, dataset }) => {
       .enter()
       .append("rect")
       .attr("class", "cell")
-      .attr(
-        "x",
-        (d) =>
-          bodyMargin.left +
-          xLabels.indexOf(d.x) * (columnWidth + columnGap)
-      )
-      .attr(
-        "y",
-        (d) => bodyMargin.top + models.indexOf(d.model) * (rowHeight + rowGap)
-      )
+      .attr("x", (d) => bodyMargin.left + xLabels.indexOf(d.x) * (columnWidth + columnGap))
+      .attr("y", (d) => bodyMargin.top + models.indexOf(d.model) * (rowHeight + rowGap))
       .attr("width", columnWidth)
       .attr("height", rowHeight)
-      .attr("fill", (d) =>
-        d.value != null ? (d.value < 0 ? "#D3D3D3" : colorScale(d.value)) : "#f0f0f0"
-      );
+      .attr("fill", (d) => {
+        if (d.x === "global_score") return "rgba(158, 117, 214, 0.5)";
+        if (d.norm == null) return "#f0f0f0";
+        if (d.norm < 0) return colorScale(0);
+        if (d.norm > 1) return colorScale(1);
+        return colorScale(d.norm);
+      });
 
+    // cell label (raw)
     svgBody
       .selectAll("text.cell-label")
-      .data(cellData.filter((d) => d.value != null))
+      .data(cellData.filter((d) => d.raw != null))
       .enter()
       .append("text")
-      .attr(
-        "x",
-        (d) =>
-          bodyMargin.left +
-          xLabels.indexOf(d.x) * (columnWidth + columnGap) +
-          columnWidth / 2
+      .attr("x", (d) =>
+        bodyMargin.left +
+        xLabels.indexOf(d.x) * (columnWidth + columnGap) +
+        columnWidth / 2
       )
-      .attr(
-        "y",
-        (d) =>
-          bodyMargin.top +
-          models.indexOf(d.model) * (rowHeight + rowGap) +
-          rowHeight / 2
+      .attr("y", (d) =>
+        bodyMargin.top +
+        models.indexOf(d.model) * (rowHeight + rowGap) +
+        rowHeight / 2
       )
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "central")
       .style("fill", "black")
       .style("font-size", "14px")
-      .text((d) => d.value.toFixed(2));
+      .text((d) => d.raw.toFixed(2));
 
     // Y 轴 (models)
     svgBody
@@ -265,16 +296,10 @@ const HeatmapByROI = ({ data, roi, dataset }) => {
       .call(
         d3
           .axisLeft(
-            d3
-              .scalePoint()
-              .domain(models)
-              .range([
-                bodyMargin.top + rowHeight / 2,
-                bodyMargin.top +
-                  models.length * (rowHeight + rowGap) -
-                  rowGap -
-                  rowHeight / 2,
-              ])
+            d3.scalePoint().domain(models).range([
+              bodyMargin.top + rowHeight / 2,
+              bodyMargin.top + models.length * (rowHeight + rowGap) - rowGap - rowHeight / 2,
+            ])
           )
       )
       .call((g) => {
@@ -316,34 +341,15 @@ const HeatmapByROI = ({ data, roi, dataset }) => {
       .append("g")
       .attr("transform", `translate(42,0)`)
       .call(d3.axisRight(legendScale).ticks(5));
-  }, [data, roi, dataset]);
+  }, [data, roi, dataset, rank]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-      }}
-    >
+    <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
       <div style={{ flex: 0, alignSelf: "flex-start" }}>
-        <div
-          ref={headerRef}
-          style={{ lineHeight: "0", alignSelf: "flex-start" }}
-        ></div>
-        <div
-          ref={bodyRef}
-          style={{
-            maxHeight: "400px",
-            overflowY: "scroll",
-            marginTop: "10px",
-          }}
-        ></div>
+        <div ref={headerRef} style={{ lineHeight: "0", alignSelf: "flex-start" }}></div>
+        <div ref={bodyRef} style={{ maxHeight: "400px", overflowY: "scroll", marginTop: "10px" }}></div>
       </div>
-      <div
-        ref={legendRef}
-        style={{ marginLeft: "0px", marginTop: "100px" }}
-      ></div>
+      <div ref={legendRef} style={{ marginLeft: "0px", marginTop: "100px" }}></div>
     </div>
   );
 };
