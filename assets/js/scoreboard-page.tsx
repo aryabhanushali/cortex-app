@@ -40,7 +40,27 @@ const ScoreboardPage: React.FC = () => {
 
 
   const [chartType, setChartType] = useState("uni");   
-  const [chartScope, setChartScope] = useState("all");
+  const [rank, setRank] = useState("");
+
+
+  const getEnable = (current: number, training: string, dataset: string, region: string) => {
+
+    if (current === 0) {
+   
+      return training !== "";
+    }
+    if (current === 1) {
+      // ROI 页：当 region 选中且 dataset 已经选定时才启用
+      return region !== "" && dataset !== "" && training !== "";
+    }
+    if (current === 2) {
+      // Dataset 页：当 dataset 已选择时才启用
+      return region !== "" && dataset !== "" && training !== "";
+    }
+    return false;
+  };
+
+
 
 
   // step 0 clear value logic
@@ -169,7 +189,7 @@ const ScoreboardPage: React.FC = () => {
             </div>
           )}
 
-          <ChartSelect chartType={chartType} setChartType={setChartType} chartScope={chartScope} setChartScope={setChartScope}/>
+          <ChartSelect chartType={chartType} setChartType={setChartType} rank={rank} setRank={setRank} enable={getEnable(current, training, dataset, region)}/>
 
         {/* scatter */}
         {!loadingNew && newData && training === "" && dataset === ""  && region === "" && (
@@ -274,7 +294,7 @@ const ScoreboardPage: React.FC = () => {
             </div>
           )}
 
-          <ChartSelect chartType={chartType} setChartType={setChartType} chartScope={chartScope} setChartScope={setChartScope}/>
+         <ChartSelect chartType={chartType} setChartType={setChartType} rank={rank} setRank={setRank} enable={getEnable(current, training, dataset, region)}/>
 
           {/* ScatterGapCeiling */}
           {!loadingNew && dataset === "" && training === ""  && region === "" && (
@@ -390,7 +410,7 @@ const ScoreboardPage: React.FC = () => {
             </div>
           )}
          
-          <ChartSelect chartType={chartType} setChartType={setChartType} chartScope={chartScope} setChartScope={setChartScope}/>
+          <ChartSelect chartType={chartType} setChartType={setChartType} rank={rank} setRank={setRank} enable={getEnable(current, training, dataset, region)}/>
           
   
 
@@ -496,16 +516,19 @@ const ScoreboardPage: React.FC = () => {
                     setDataset("");
                     setTraining("");
                     setChartType("uni")
+                    setRank("");
                 } else if (index === 1) {
                     setRegion("");
                     setDataset("");
                     setTraining("");
                     setChartType("uni");
+                    setRank("");
                 } else if(index == 2) {
                     setRegion("");
                     setDataset("");
                     setTraining("");
                     setChartType("uni");
+                    setRank("");
                 }
                 
                 

@@ -87,9 +87,8 @@ export const CHART_TYPE_OPTIONS = [
   { value: 'multi', label: 'Multivariate' },
 ];
 
-export const CHART_SCOPE_OPTIONS = [
-  { value: 'all', label: 'All Models' },
-  { value: 'top', label: 'Top 10 Models' },
+export const RANK = [
+  { value: 'rank', label: 'Rank' },
 ];
 
 
