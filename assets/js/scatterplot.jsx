@@ -128,6 +128,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
       .style("background", "white")
       .style("border", "1px solid #ccc")
       .style("padding", "5px")
+      .style("text-align", "left")
       .style("font-size", "14px");
 
     svg.selectAll("circle")
