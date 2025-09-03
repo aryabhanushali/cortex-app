@@ -86,8 +86,8 @@ export default function ScatterGapCeiling({ murtyData, nsdData, ceilingData, roi
     g.append("g").call(d3.axisLeft(y));
 
     // Labels
-    svg.append("text").attr("x", width / 2).attr("y", height - 10).attr("text-anchor", "middle").style("font-size", "16px").text("Ceiling Mean");
-    svg.append("text").attr("transform", "rotate(-90)").attr("x", -height / 2).attr("y", 15).attr("text-anchor", "middle").style("font-size", "16px").text("Normalized Gap");
+    svg.append("text").attr("x", width / 2).attr("y", height - 10).attr("text-anchor", "middle").style("font-size", "16px").text("Dataset Ceiling: Mean Subject Pairwise Correlations ± Variability");
+    svg.append("text").attr("transform", "rotate(-90)").attr("x", -height / 2).attr("y", 15).attr("text-anchor", "middle").style("font-size", "16px").text("Normalized Gap Between Model Performance and Dataset Ceiling");
     
 
     // Zero line
