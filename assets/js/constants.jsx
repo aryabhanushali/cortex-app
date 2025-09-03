@@ -1,6 +1,7 @@
 export const MODEL_OPTIONS = [
     { value: 'clip_rn50', label: 'CLIP-ResNet50', type: 'Vision Language Model', cardUrl: 'https://github.com/openai/clip/blob/main/model-card.md' },
     { value: 'dinov2', label: 'DINOv2', type: 'Self-Supervised Vision Transformer Model', cardUrl: 'https://github.com/facebookresearch/dinov2/blob/main/MODEL_CARD.md'},
+    { value: 'aimv2', label: 'AIMv2', type: 'Multimodel Transformer', cardUrl: 'https://github.com/apple/ml-aim'}
   ];
   
 export const DATASET_OPTIONS = [
@@ -12,11 +13,11 @@ export const REGION_OPTIONS = [
   { value: 'ffa', label: 'FFA' },
   { value: 'eba', label: 'EBA' },
   { value: 'ppa', label: 'PPA' },
-  { value: 'fba', label: 'FBA'},
-  { value: 'ofa', label: 'OFA'},
-  { value: 'opa', label: 'OPA'},
-  { value: 'rsc', label: 'RSC'},
-  { value: 'vwfa', label: 'VWFA'},
+  // { value: 'fba', label: 'FBA'},
+  // { value: 'ofa', label: 'OFA'},
+  // { value: 'opa', label: 'OPA'},
+  // { value: 'rsc', label: 'RSC'},
+  // { value: 'vwfa', label: 'VWFA'},
 ];
   
 export const VOXEL_OPTIONS = [
