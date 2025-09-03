@@ -173,7 +173,7 @@ const ScoreboardPage: React.FC = () => {
 
           {/* panel display logic */}
            <TrainingSelect training={training} setTraining={setTraining} dataset={dataset} mode = {1}/> 
-          {training !== "" && (<DatasetSelect dataset={dataset} setDataset={setDataset} training={training} allowToggle={true} mode = {1}/>)}
+          {training !== "" && (<DatasetSelect dataset={dataset} setDataset={setDataset} training={training} region = {region} allowToggle={true} mode = {1}/>)}
           {dataset !== "" && training !== "" && (<ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={1}/>)
          } 
           
@@ -261,7 +261,7 @@ const ScoreboardPage: React.FC = () => {
           {/* panel display logic */}
           <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={2}/>
           {region !== "" && ( <TrainingSelect training={training} setTraining={setTraining} dataset={dataset} mode = {2}/>)}
-          {region !== "" && training!== "" && ( <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} allowToggle={true} mode = {2}/>)}
+          {region !== "" && training!== "" && ( <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} region = {region} allowToggle={true} mode = {2}/>)}
 
 
           {/* title display logic */}
@@ -353,7 +353,7 @@ const ScoreboardPage: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
           {/* panel display logic */}
-          <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} allowToggle={true} mode ={3}/>
+          <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} region = {region} allowToggle={true} mode ={3}/>
           {dataset !== "" && (<TrainingSelect training={training} setTraining={setTraining} dataset={dataset} mode = {3}/>)}
           {dataset !== "" && training !== "" && (<ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={3}/>)}
 

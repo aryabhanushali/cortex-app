@@ -5,18 +5,32 @@ import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import { DATASET_OPTIONS_LEFT, DATASET_OPTIONS_RIGHT, MURTY185_DATASET, NSD_DATASET } from './constants-scoreboard';
 
-const DatasetSelect = ({ dataset, setDataset, training, allowToggle, mode}) => {
+const DatasetSelect = ({ dataset, setDataset, training, region, allowToggle, mode}) => {
   const isEnabled = (option) => {
-    if (mode === 1 || mode === 2) {
-      if (training === 'Murty185') {
-      return MURTY185_DATASET.includes(option.value);
-    } else if (training === 'NSD') {
-      return NSD_DATASET.includes(option.value);
+    let enabled = true;
+
+    // 训练集限制
+    if (training === 'Murty185' && !MURTY185_DATASET.includes(option.value)) {
+      enabled = false;
     }
+    if (training === 'NSD' && !NSD_DATASET.includes(option.value)) {
+      enabled = false;
     }
-    
-    return true; // 没选 training 时，全部禁用
-  };
+    if (training === "VS" && (option.value === "murty185" || option.value === "nsd_1000")) {
+      enabled = false;
+    }
+
+    // ROI 限制
+    if ((region === "ffa" || region === "eba") && (option.value === "bonner_2021" || option.value === "bold_5000")) {
+      enabled = false;
+    }
+    if (region === "eba" && (option.value === "kingbaker_2019" || option.value === "wardle_2020")) {
+      enabled = false;
+    }
+
+    return enabled;
+};
+
 
   return (
     <FormControl sx={{ minWidth: 120 }} fullWidth>

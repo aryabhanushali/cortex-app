@@ -9,14 +9,10 @@ import { TRAINING_OPTIONS, TRAINING_OPTIONS_VS } from './constants-scoreboard';
 
 const TrainingSelect = ({ training, setTraining, dataset, mode }) => {
   const isEnabled = (option) => {
-    if (mode === 3) {
-      if (dataset === 'murty185' && option.value.toLowerCase() === 'murty185') {
-        return false; // Murty185 dataset 禁止 Training 选 Murty185
-      }
-      if (dataset === 'nsd1000' && option.value.toLowerCase() === 'nsd') {
-        return false; // NSD dataset 禁止 Training 选 NSD
-      }
-    }
+    // === 互斥逻辑 ===
+    if (dataset === 'murty185' && option.value === 'Murty185') return false;
+    if (dataset === 'nsd_1000' && option.value === 'NSD') return false;
+    if ((dataset === 'murty185' || dataset ==="nsd_1000") && option.value === 'VS')return false;
     return true;
   };
 

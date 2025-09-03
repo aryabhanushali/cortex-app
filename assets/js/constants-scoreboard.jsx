@@ -2,7 +2,7 @@
 export const UNAVAILABILITY = {
   trainingToDataset: {
     Murty185: ['murty185'], 
-    NSD:['nsd1000' ],   //
+    NSD:['nsd1000' ],   
   },
 
   datasetToTraining: {
@@ -91,6 +91,7 @@ export const CHART_SCOPE_OPTIONS = [
   { value: 'all', label: 'All Models' },
   { value: 'top', label: 'Top 10 Models' },
 ];
+
 
 
 

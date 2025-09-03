@@ -9,11 +9,20 @@ import { ROI_OPTIONS, OVERALL_OPTION, REGION_OPTIONS } from './constants-scorebo
 
 const ROISelect = ({ region, setRegion, dataset, allowToggle, mode }) => {
  
+  const isEnabled = (option) => {
+    // === 互斥逻辑 ===
+    if((dataset === 'bold_5000'|| dataset ==='bonner_2021') && (option.value === "ffa" || option.value === "eba")) return false;
+    if((dataset === 'kingbaker_2019' || dataset === 'wardle_2020') && ( option.value === "eba")) return false;
+    
+    
+    return true;
+  };
   const renderButtons = (options) =>
     options.map((option) => (
       <Button
         key={option.value}
         onClick={() => {
+          if (!isEnabled(option)) return;
           if (allowToggle) {
             setRegion((prev) => (prev === option.value ? "" : option.value));
           } else {
@@ -21,6 +30,7 @@ const ROISelect = ({ region, setRegion, dataset, allowToggle, mode }) => {
           }
         }}
         variant={region === option.value ? "contained" : "outlined"}
+        disabled={!isEnabled(option)}
         sx={{
           "&.Mui-disabled": {
             backgroundColor: "#f3f3f3",
