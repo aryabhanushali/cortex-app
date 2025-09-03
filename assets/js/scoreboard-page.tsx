@@ -172,15 +172,15 @@ const ScoreboardPage: React.FC = () => {
           {!loadingNew && (
             <div className="chart-title">
               {training === "" && dataset === "" &&  region === ""
-                ? `Across-Regions Performence (Trained on Murty vs Trained on NSD1000) `
+                ? `Across-ROIs Performence (Trained on Murty vs Trained on NSD1000) `
                 : training === "Murty185" && dataset === "" && region === ""
-                ? "Across-Regions Performance (Trained on Murty185)"
+                ? "Across-ROIs Performance (Trained on Murty185)"
                 : training === "NSD" && dataset === ""  && region === ""
-                ? "Across-Regions Performance (Trained on NSD1000)"
+                ? "Across-ROIs Performance (Trained on NSD1000)"
                 : training === "Murty185" && dataset !== "" && region === ""
-                ? `Across-Regions Performance on ${dataset} (Trained on Murty185)`
+                ? `Across-ROIs Performance on ${dataset} (Trained on Murty185)`
                 : training === "NSD" && dataset !== "" && region !== "Overall"
-                ? `Across-Regions Performance on ${dataset} (Trained on NSD1000)`
+                ? `Across-ROIs Performance on ${dataset} (Trained on NSD1000)`
                 : training === "Murty185" && dataset !== "" && region !== "Overall"
                 ? `${region.toUpperCase()}  Performance on ${dataset} (Trained on Murty185)`
                 : training === "NSD" && dataset !== "" && region !== "Overall"
