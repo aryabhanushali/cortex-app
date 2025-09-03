@@ -97,7 +97,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
       .attr("y", height - 15)   // 放在 x 轴下方
       .attr("text-anchor", "middle")
       .style("font-size", "16px")
-      .text("Murty Prediction (mean across ROIs)");
+      .text("Model Performance (Mappings from Murty185)");
 
     // === y 轴 label ===
     svg.append("text")
@@ -106,7 +106,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
       .attr("y", 20)   // 调整与轴的距离
       .attr("text-anchor", "middle")
       .style("font-size", "16px")
-      .text("NSD Prediction (mean across ROIs)");
+      .text("Model Performance (Mappings from NSD1000)");
 
     // 散点
     svg.selectAll("circle")
