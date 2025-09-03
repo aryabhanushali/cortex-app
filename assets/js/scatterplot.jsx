@@ -134,7 +134,15 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
       .on("mouseover", (event, d) => {
         tooltip
           .style("visibility", "visible")
-          .html(`<b>${d.model}</b><br/>${d.dataset}<br/>Murty=${d.x.toFixed(3)}, NSD=${d.y.toFixed(3)}`)
+          .html(`
+              <div style="font-weight:600; margin-bottom:2px;">${d.model}</div>
+              <div style="color:#666; margin-bottom:6px;">
+                Evaluation Dataset: <span style="font-weight:500; color:#333;">${d.dataset}</span>
+              </div>
+              <div style="font-weight:600; margin-bottom:4px;">Performance Trained on</div>
+              <div>• Murty185 — ${d.x.toFixed(3)}</div>
+              <div>• NSD1000 — ${d.y.toFixed(3)}</div>
+            `)
           .style("top", `${event.pageY - 30}px`)
           .style("left", `${event.pageX + 10}px`);
       })
