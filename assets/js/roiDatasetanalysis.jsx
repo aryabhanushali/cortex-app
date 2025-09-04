@@ -16,6 +16,18 @@ const datasetShapes = {
   murty185: d3.symbolCircle,
 };
 
+ const datasetLabelMap = {
+  murty185: "Murty185",
+  nsd_1000: "NSD1000",
+  bold_5000: "BOLD5000v2",
+  bonner_2021: "Bonner2021",
+  bmd_2024: "BMD2024",
+  kingbaker_2019: "King2019",
+  wardle_2020: "Wardle2020",
+  nsd_syn: "NSD synthetic",
+  
+};
+
 const datasetTypeLabels = {
   circle: "Natural Dataset",
   triangle: "Video Dataset (BMD)",
@@ -177,7 +189,7 @@ export default function ScatterGapCeiling({
           .attr("y", cy)
           .attr("font-size", 9)
           .attr("fill", "black")
-          .text(`${Dataset}/${ROI}`);
+          .text(`${datasetLabelMap[Dataset]}/${ROI.toUpperCase()}:${row.normalized_gap.toFixed(2)}`);
       }
       mainDot
       .on("mouseover", () => {
@@ -221,7 +233,7 @@ export default function ScatterGapCeiling({
               .attr("font-size", 10)
               .attr("fill", "black")
               .attr("opacity", 0)
-              .text(`Trained on ${pt.Train}`)
+              .text(`Trained on ${pt.Train}: ${pt.normalized_gap.toFixed(2)}`)
               .transition()
               .duration(300)
               .attr("opacity", 1);

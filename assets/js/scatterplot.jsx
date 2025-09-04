@@ -26,6 +26,17 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
       "wardle_2020": "#e377c2",     // pink
       "nsd_syn": "#ffdd57"          // matte yellow
     };
+     const datasetLabelMap = {
+        murty185: "Murty185",
+        nsd_1000: "NSD1000",
+        bold_5000: "BOLD5000v2",
+        bonner_2021: "Bonner2021",
+        bmd_2024: "BMD2024",
+        kingbaker_2019: "King2019",
+        wardle_2020: "Wardle2020",
+        nsd_syn: "NSD synthetic",
+        
+      };
 
     const svg = d3
       .select(containerRef.current)
@@ -36,6 +47,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
     // 整理点：model 在不同 dataset 上的分数
     const points = [];
     Object.keys(murtyData[roi] || {}).forEach((model) => {
+      if (model === "ceiling") return; 
       const murtyVals = murtyData[roi][model]; // { dataset: [score, pval] }
       const nsdVals = nsdData[roi][model];
       if (!murtyVals || !nsdVals) return;
@@ -191,7 +203,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
       .append("text")
       .attr("x", 12)   // 在圆右边
       .attr("y", (d, i) => i * 20 + 4)
-      .text(d => d)
+      .text(d => datasetLabelMap[d] || d)
       .style("font-size", "14px")
       .attr("alignment-baseline", "middle");
 

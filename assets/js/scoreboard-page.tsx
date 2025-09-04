@@ -20,6 +20,9 @@ import ScatterGapCeiling from './roiDatasetanalysis.jsx';
 import ROICard from './roicard.jsx';
 import DatasetCard from './datasetcard.jsx';
 
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
+
 const ScoreboardPage: React.FC = () => {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
@@ -61,6 +64,30 @@ const ScoreboardPage: React.FC = () => {
   };
 
 
+
+    const handleDownloadZip = async () => {
+    if (!newData) {
+      message.error("No raw data available to download.");
+      return;
+    }
+
+    const zip = new JSZip();
+
+    // 遍历 newData 的 key，把每个 JSON 存进去
+    Object.entries(newData).forEach(([key, value]) => {
+      const jsonString = JSON.stringify(value, null, 2);
+      zip.file(`${key}.json`, jsonString);
+    });
+
+    try {
+      const blob = await zip.generateAsync({ type: "blob" });
+      saveAs(blob, "raw_data.zip");
+      message.success("Raw data downloaded as raw_data.zip!");
+    } catch (err) {
+      console.error("ZIP generation error:", err);
+      message.error("Failed to generate ZIP file.");
+    }
+  };
 
 
   // step 0 clear value logic
@@ -131,6 +158,7 @@ const ScoreboardPage: React.FC = () => {
   const ROI_DATASET_Murty = chartType === "uni" ? newData?.roi_dataset_Murty185_uni : newData?.roi_dataset_Murty185_multi;
   const ROI_DATASET_NSD = chartType === "uni" ? newData?.roi_dataset_NSD_uni : newData?.roi_dataset_NSD_multi;
   const Ceiling = chartType === "uni" ? newData?.ceiling_uni : newData?.ceiling_multi;
+  const yLabel = chartType === "uni" ? "Pearson Correlation" : "Spearman Correlation";
 
 
  
@@ -229,6 +257,7 @@ const ScoreboardPage: React.FC = () => {
               dataset={dataset}
               ceiling = {Ceiling}
               rank = {rank}
+              yLabel={yLabel}
             />
           )}
 
@@ -239,6 +268,7 @@ const ScoreboardPage: React.FC = () => {
               dataset={dataset}
               ceiling = {Ceiling}
               rank = {rank}
+              yLabel={yLabel}
             />
           )}
 
@@ -259,6 +289,15 @@ const ScoreboardPage: React.FC = () => {
             <ROICard region={region}/>
           )
           }
+          <div style={{ textAlign: "right" }}>
+            <Button
+              type="primary"
+              style={{ marginTop: 16, width: "150px" }}
+              onClick={handleDownloadZip}
+            >
+              Download Raw Data
+            </Button>
+        </div>
           
         </div>
       ),
@@ -341,7 +380,7 @@ const ScoreboardPage: React.FC = () => {
            
 
          {!loadingNew  && dataset != "" && training === "NSD" && 
-          (<RoiBarChart data={nsdData} roi ={region.toLowerCase()} dataset={dataset} ceiling = {Ceiling} rank = {rank}/>)
+          (<RoiBarChart data={nsdData} roi ={region.toLowerCase()} dataset={dataset} ceiling = {Ceiling} rank = {rank} yLabel ={yLabel}/>)
          }
 
           {!loadingNew  && dataset != "" && training === "Murty185" && (
@@ -351,6 +390,7 @@ const ScoreboardPage: React.FC = () => {
               dataset={dataset}
               ceiling = {Ceiling}
               rank = {rank}
+              yLabel={yLabel}
              
             />
 
@@ -376,6 +416,16 @@ const ScoreboardPage: React.FC = () => {
             <DatasetCard dataset={dataset}/>
           )
           }
+
+             <div style={{ textAlign: "right" }}>
+            <Button
+              type="primary"
+              style={{ marginTop: 16, width: "150px" }}
+              onClick={handleDownloadZip}
+            >
+              Download Raw Data
+            </Button>
+        </div>
          
 
           
@@ -460,7 +510,7 @@ const ScoreboardPage: React.FC = () => {
 
           
          {!loadingNew  && region !== "" && training === "NSD" && 
-          (<RoiBarChart data={nsdData} roi ={region.toLowerCase()} dataset={dataset} ceiling = {Ceiling} rank = {rank}/>)
+          (<RoiBarChart data={nsdData} roi ={region.toLowerCase()} dataset={dataset} ceiling = {Ceiling} rank = {rank} yLabel={yLabel}/>)
          }
 
           {!loadingNew  && region !== "" && training === "Murty185" && (
@@ -470,6 +520,7 @@ const ScoreboardPage: React.FC = () => {
               dataset={dataset}
               ceiling = {Ceiling}
               rank = {rank}
+              yLabel={yLabel}
             />
           )}
 
@@ -496,6 +547,15 @@ const ScoreboardPage: React.FC = () => {
             <ROICard region={region}/>
           )
           }
+            <div style={{ textAlign: "right" }}>
+            <Button
+              type="primary"
+              style={{ marginTop: 16, width: "150px" }}
+              onClick={handleDownloadZip}
+            >
+              Download Raw Data
+            </Button>
+        </div>
          
        
         </div>

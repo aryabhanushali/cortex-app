@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-const RoiBarChart = ({ data, roi, dataset, ceiling, rank }) => {
+const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel }) => {
   const ceilingRef = useRef();
   const barsRef = useRef();
   const [stats, setStats] = useState({ max: null, mean: null });
@@ -52,7 +52,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank }) => {
 
     ceilingSvg.attr("width", ceilingWidth).attr("height", height);
 
-    // 灰色虚线 (先画，保证在 bar 下方)
+    // 灰色虚线
     if (ceilingMax != null) {
       ceilingSvg
         .append("line")
@@ -67,7 +67,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank }) => {
 
     // ceiling bar
     if (ceilingMax != null) {
-      ceilingSvg
+      const rect = ceilingSvg
         .append("rect")
         .attr("x", margin.left + 15)
         .attr("y", Math.min(y(0), y(ceilingMax)))
@@ -75,6 +75,26 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank }) => {
         .attr("height", Math.abs(y(0) - y(ceilingMax)))
         .attr("fill", "#d3d3d3")
         .attr("stroke", "black");
+
+      // 👉 hover tooltip when roi !== "Overall"
+      if (roi !== "Overall") {
+        rect
+          .on("mouseover", (event) => {
+            d3.select("#roi-tooltip")
+              .style("opacity", 1)
+              .style("left", event.pageX + 10 + "px")
+              .style("top", event.pageY - 20 + "px")
+              .html("Pairwise Subjects Correlations");
+          })
+          .on("mousemove", (event) => {
+            d3.select("#roi-tooltip")
+              .style("left", event.pageX + 10 + "px")
+              .style("top", event.pageY - 20 + "px");
+          })
+          .on("mouseout", () => {
+            d3.select("#roi-tooltip").style("opacity", 0);
+          });
+      }
 
       // ceiling label 固定在 0.9
       ceilingSvg
@@ -131,7 +151,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank }) => {
         "transform",
         `translate(${margin.left - 45}, ${centerY}) rotate(-90)`
       )
-      .text("Pearson Correlation");
+      .text(yLabel);
 
     // x label for ceiling
     ceilingSvg
@@ -191,7 +211,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank }) => {
       .attr("fill", "#d3d3d3")
       .attr("stroke", "black");
 
-    // bar 数值 label (统一在 0.9)
+    // bar 数值 label
     barsSvg
       .append("g")
       .selectAll("text.value-label")
@@ -246,7 +266,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank }) => {
     drawLine(ceilingSvg, ceilingMean, "blue", ceilingWidth, margin.left);
     drawLine(barsSvg, ceilingMax, "red", width, 0);
     drawLine(barsSvg, ceilingMean, "blue", width, 0);
-  }, [data, roi, dataset, ceiling, rank]);
+  }, [data, roi, dataset, ceiling, rank, yLabel]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row", position: "relative" }}>
@@ -299,6 +319,21 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank }) => {
           )}
         </div>
       )}
+
+      {/* Tooltip 容器 */}
+      <div
+        id="roi-tooltip"
+        style={{
+          position: "fixed",
+          pointerEvents: "none",
+          background: "white",
+          border: "1px solid black",
+          padding: "4px 6px",
+          fontSize: "12px",
+          borderRadius: "4px",
+          opacity: 0,
+        }}
+      />
     </div>
   );
 };
