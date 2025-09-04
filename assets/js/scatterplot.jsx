@@ -357,15 +357,46 @@ datasets.forEach(dataset => {
 
 
 
-if (showOverlay) {
-      svg.append("image")
-        .attr("href", chartType === "uni" ?uniIcon: multiIcon) 
-        .attr("x", width - margin.right - 200)   // 距离右边界
-        .attr("y", height - margin.bottom - 170)  // 距离底部
-        .attr("width", 200)   // 图片宽度
-        .attr("height", 160)  // 图片高度
-        .attr("opacity", 0.7);  // 半透明可调
-    }
+  if (showOverlay) {
+  const overlay = svg.append("image")
+    .attr("href", chartType === "uni" ? uniIcon : multiIcon) 
+    .attr("x", width - margin.right - 200)   // 距离右边界
+    .attr("y", height - margin.bottom - 170) // 距离底部
+    .attr("width", 200)
+    .attr("height", 160)
+    .attr("opacity", 0.7)
+    .style("cursor", "pointer");
+
+  // tooltip 容器
+  const overlayTooltip = d3.select(containerRef.current)
+    .append("div")
+    .attr("class", "overlay-tooltip")
+    .style("position", "absolute")
+    .style("background", "white")
+    .style("border", "1px solid black")
+    .style("padding", "4px 6px")
+    .style("font-size", "12px")
+    .style("border-radius", "4px")
+    .style("opacity", 0);
+
+  overlay
+    .on("mouseover", (event) => {
+      overlayTooltip
+        .style("opacity", 1)
+        .style("left", `${event.pageX + 10}px`)
+        .style("top", `${event.pageY - 20}px`)
+        .html("need to implement");   // 先写死
+    })
+    .on("mousemove", (event) => {
+      overlayTooltip
+        .style("left", `${event.pageX + 10}px`)
+        .style("top", `${event.pageY - 20}px`);
+    })
+    .on("mouseout", () => {
+      overlayTooltip.style("opacity", 0);
+    });
+}
+
 
 
 
