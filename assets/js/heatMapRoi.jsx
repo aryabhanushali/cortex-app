@@ -1,11 +1,13 @@
 // components/HeatmapByROI.jsx
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-const HeatmapByROI = ({ data, roi, dataset, rank  }) => {
+const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
   const headerRef = useRef();
   const bodyRef = useRef();
   const legendRef = useRef();
+
+  const [selectedModel, setSelectedModel] = useState(null);
 
   const datasetLabelMap = {
   murty185: "Murty185",
@@ -307,17 +309,26 @@ const HeatmapByROI = ({ data, roi, dataset, rank  }) => {
       .append("g")
       .attr("transform", `translate(${bodyMargin.left - 10},0)`)
       .call(
-        d3
-          .axisLeft(
-            d3.scalePoint().domain(models).range([
-              bodyMargin.top + rowHeight / 2,
-              bodyMargin.top + models.length * (rowHeight + rowGap) - rowGap - rowHeight / 2,
-            ])
-          )
+        d3.axisLeft(
+          d3.scalePoint().domain(models).range([
+            bodyMargin.top + rowHeight / 2,
+            bodyMargin.top + models.length * (rowHeight + rowGap) - rowGap - rowHeight / 2,
+          ])
+        )
       )
       .call((g) => {
         g.select(".domain").remove();
-        g.selectAll("text").style("font-size", "14px").style("fill", "black");
+        g.selectAll("text")
+          .style("font-size", "14px")
+          .style("fill", "black")
+          .style("font-weight", (d) => (d === selectedModel ? "bold" : "normal"))
+          .style("cursor", "pointer")  // 鼠标 hover 时显示手型
+          .on("click", (event, d) => {
+            setSelectedModel(d); // ✅ 更新本地 state
+            if (onModelClick) {
+              onModelClick(d); // ✅ 仍然回调给父组件
+            }
+          });
       });
 
     // ======= Legend =======
@@ -354,7 +365,7 @@ const HeatmapByROI = ({ data, roi, dataset, rank  }) => {
       .append("g")
       .attr("transform", `translate(42,0)`)
       .call(d3.axisRight(legendScale).ticks(5));
-  }, [data, roi, dataset, rank]);
+  }, [data, roi, dataset, rank, onModelClick]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
@@ -365,6 +376,8 @@ const HeatmapByROI = ({ data, roi, dataset, rank  }) => {
       <div ref={legendRef} style={{ marginLeft: "0px", marginTop: "100px" }}></div>
     </div>
   );
+  
 };
+
 
 export default HeatmapByROI;

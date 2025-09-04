@@ -7,8 +7,7 @@ import TrainingSelect from './trainingselect.jsx';
 import DatasetSelect from './datasetselect.jsx';
 import useLoadData from './loaddata.jsx';
 import useLoadDataNew from './loadDataNew.jsx';
-import RoiHeatChart from './roiheartchart.jsx';
-import BarChartSpecific from './barchartspecific.jsx';
+
 
 //  new this time
 import ScatterMurtyVsNsd from './scatterplot.jsx';
@@ -19,6 +18,7 @@ import ChartSelect from './chartselect.jsx';
 import ScatterGapCeiling from './roiDatasetanalysis.jsx';
 import ROICard from './roicard.jsx';
 import DatasetCard from './datasetcard.jsx';
+import ModelCard from './modelcard.jsx';
 
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
@@ -44,6 +44,8 @@ const ScoreboardPage: React.FC = () => {
 
   const [chartType, setChartType] = useState("uni");   
   const [rank, setRank] = useState("");
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
+
 
 
   const getEnable = (current: number, training: string, dataset: string, region: string) => {
@@ -237,6 +239,7 @@ const ScoreboardPage: React.FC = () => {
               roi ={"Overall"}
               dataset = {dataset}
               rank = {rank}
+              onModelClick={(model: string) => setSelectedModel(model)} 
             />
           )}
 
@@ -246,6 +249,7 @@ const ScoreboardPage: React.FC = () => {
               roi ={"Overall"}
               dataset = {dataset}
               rank = {rank}
+              onModelClick={(model: string) => setSelectedModel(model)} 
             />
           )}
 
@@ -288,6 +292,11 @@ const ScoreboardPage: React.FC = () => {
           }
           {region !== "" && (
             <ROICard region={region}/>
+          )
+          }
+
+          {selectedModel !== "" && (
+             <ModelCard  region={"ppa"} dataset={"nsd_1000"} model={selectedModel}/>
           )
           }
           <div style={{ textAlign: "right" }}>
@@ -366,6 +375,7 @@ const ScoreboardPage: React.FC = () => {
               roi ={region}
               dataset={dataset}
               rank = {rank}
+              onModelClick={(model: string) => setSelectedModel(model)} 
             />
           )}
           {!loadingNew && dataset === "" && training === "NSD" &&(
@@ -374,6 +384,7 @@ const ScoreboardPage: React.FC = () => {
               roi ={region}
               dataset ={dataset}
               rank = {rank}
+              onModelClick={(model: string) => setSelectedModel(model)} 
             />
           )}
 
@@ -498,6 +509,7 @@ const ScoreboardPage: React.FC = () => {
               dataset ={dataset}
               roi = {region}
               rank = {rank}
+              onModelClick={(model: string) => setSelectedModel(model)} 
             />
           )}
           {!loadingNew && region === "" && training === "NSD" &&(
@@ -506,6 +518,7 @@ const ScoreboardPage: React.FC = () => {
               dataset ={dataset}
               roi = {region}
               rank = {rank}
+              onModelClick={(model: string) => setSelectedModel(model)} 
             />
           )}
 
