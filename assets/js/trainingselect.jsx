@@ -7,7 +7,7 @@ import FormLabel from '@mui/material/FormLabel';
 
 import { TRAINING_OPTIONS, TRAINING_OPTIONS_VS } from './constants-scoreboard';
 
-const TrainingSelect = ({ training, setTraining, dataset, mode }) => {
+const TrainingSelect = ({ training, setTraining, dataset, mode,allowToggle }) => {
   const isEnabled = (option) => {
     // === 互斥逻辑 ===
     if (dataset === 'murty185' && option.value === 'Murty185') return false;
@@ -22,7 +22,12 @@ const TrainingSelect = ({ training, setTraining, dataset, mode }) => {
         key={option.value}
         onClick={() => {
           if (!isEnabled(option)) return;
-          setTraining((prev) => (prev === option.value ? "" : option.value));
+          if(allowToggle) {
+             setTraining((prev) => (prev === option.value ? "" : option.value));
+          } else{
+             setTraining((prev) => ( option.value));
+          }
+         
         }}
         variant={training === option.value ? "contained" : "outlined"}
         disabled={!isEnabled(option)}

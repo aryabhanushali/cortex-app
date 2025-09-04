@@ -1,8 +1,9 @@
 // constants-scoreboard.js
 export const UNAVAILABILITY = {
   trainingToDataset: {
+     NSD:['nsd1000' ],   
     Murty185: ['murty185'], 
-    NSD:['nsd1000' ],   
+   
   },
 
   datasetToTraining: {
@@ -30,9 +31,10 @@ export const MODEL_OPTIONS = [
   ];
   
 export const TRAINING_OPTIONS = [
+   { value: 'NSD', label: 'NSD' },
   { value: 'Murty185', label: 'Murty185' },
   // { value: 'VS', label: 'Murty185 VS NSD1000'},
-  { value: 'NSD', label: 'NSD' },
+ 
 ];
 
 export const TRAINING_OPTIONS_VS= [
