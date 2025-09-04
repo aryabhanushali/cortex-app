@@ -226,6 +226,7 @@ const ScoreboardPage: React.FC = () => {
             nsdData={nsdData} 
             roi= {"Overall"}
             dataset = {dataset}
+            chartType={chartType} showOverlay={true}
           />
         )}
           
@@ -349,10 +350,10 @@ const ScoreboardPage: React.FC = () => {
 
           {/* murty vs nsd */}
            {!loadingNew && newData && dataset === "" && training === "VS"  && (
-            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {region} dataset = {dataset} />
+            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {region} dataset = {dataset} chartType={chartType} showOverlay={false}/>
           )} 
           {!loadingNew && newData && dataset !== "" && training === "VS"  && (
-            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {region} dataset = {dataset} />
+            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {region} dataset = {dataset} chartType={chartType} showOverlay={false} />
           )} 
 
 
@@ -483,10 +484,10 @@ const ScoreboardPage: React.FC = () => {
 
           {/* murty vs nsd */}
            {!loadingNew && newData && region === "" && training === "VS"  && (
-            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {'Overall'} dataset = {dataset} />
+            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {'Overall'} dataset = {dataset} chartType={chartType} showOverlay={false}/>
           )} 
           {!loadingNew && newData && region !== "" && training === "VS"  && (
-            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {region} dataset = {dataset} />
+            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {region} dataset = {dataset} chartType={chartType} showOverlay={false}/>
           )} 
 
 

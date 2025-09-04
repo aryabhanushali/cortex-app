@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
+import uniIcon from "../img/scatterplot/uni.webp";
+import multiIcon from "../img/scatterplot/multi.webp";
    
-const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
+const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset,  chartType, showOverlay}) => {
   const containerRef = useRef();
 
   useEffect(() => {
@@ -12,10 +14,10 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset}) => {
 
     const width = 910;
     const height = 930;
-    const margin = { top: 180, right: 160, bottom: 50, left: 50 };
+    const margin = { top: 220, right: 160, bottom: 50, left: 50 };
     const mainSize = 700; // 主散点区域大小
-    const histHeight = 150; // 直方图高度
-    const histWidth = 150;  // 直方图宽度
+    const histHeight = 140; // 直方图高度
+    const histWidth = 140;  // 直方图宽度
 
     const color_map = {
 
@@ -355,7 +357,15 @@ datasets.forEach(dataset => {
 
 
 
-
+if (showOverlay) {
+      svg.append("image")
+        .attr("href", chartType === "uni" ?uniIcon: multiIcon) 
+        .attr("x", width - margin.right - 200)   // 距离右边界
+        .attr("y", height - margin.bottom - 170)  // 距离底部
+        .attr("width", 200)   // 图片宽度
+        .attr("height", 160)  // 图片高度
+        .attr("opacity", 0.7);  // 半透明可调
+    }
 
 
 
