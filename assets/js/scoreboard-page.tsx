@@ -186,7 +186,7 @@ const ScoreboardPage: React.FC = () => {
 
   const steps = [
     {
-      title: 'Training Source',
+      title: 'Models',
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
@@ -576,6 +576,12 @@ const ScoreboardPage: React.FC = () => {
       ),
       icon: <SmileOutlined />,
     },
+    {
+      title: 'Training Sources',
+      icon: <SmileOutlined />,
+
+    }
+    
     
 
   ];
