@@ -14,7 +14,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset,  chartType, showO
 
     const width = 910;
     const height = 930;
-    const margin = { top: 220, right: 160, bottom: 50, left: 50 };
+    const margin = { top: 160, right: 160, bottom: 50, left: 50 };
     const mainSize = 700; // 主散点区域大小
     const histHeight = 140; // 直方图高度
     const histWidth = 140;  // 直方图宽度

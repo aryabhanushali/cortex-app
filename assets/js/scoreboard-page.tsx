@@ -528,6 +528,84 @@ const ScoreboardPage: React.FC = () => {
     },
     {
       title: 'Training Sources',
+
+      content: (
+
+        <div style={{ display: 'flex', flexDirection: 'column'}}>
+
+          {/* panel display logic */}
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={2} training={training}/>
+          <DatasetSelect dataset={dataset} setDataset={setDataset} training={setTraining} region = {region} allowToggle={true} mode ={3}/>
+         
+     
+          {/* title display logic */}
+          {!loadingNew && (
+            <div className="chart-title">
+              { region === "" && dataset === "" && newData
+                ? `Model Performance Gap to Ceiling vs Ceiling`
+                : ""}
+            </div>
+          )}
+         
+          <ChartSelect chartType={chartType} setChartType={setChartType} rank={rank} setRank={setRank} enable={getEnable(current, training, dataset, region)}/>
+          
+  
+
+          {/* Scatter */}
+          {!loadingNew && dataset === "" && region === ""   && (
+            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={"Overall"} dataset={dataset} chartType={chartType} showOverlay={true}/>
+          )}
+
+
+          {!loadingNew && dataset !== "" && region === ""   && (
+            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={"Overall"} dataset={dataset} chartType={chartType} showOverlay={true}/>
+          )}
+
+          {!loadingNew && dataset === "" && region !== ""   && (
+            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={true}/>
+          )}
+
+           {!loadingNew && dataset !== "" && region !== ""   && (
+            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={true}/>
+          )}
+
+      
+
+
+    
+
+           {dataset !== "" && (
+            <DatasetCard dataset={dataset}/>
+          )
+          }
+         
+          {emptyTraining === "Murty185" && (
+            <DatasetCard dataset={"murty185"}/>
+          )
+          }
+          {emptyTraining === "NSD" && (
+            <DatasetCard dataset={"nsd_1000"}/>
+          )
+          }
+          
+           {region !== "" && (
+            <ROICard region={region}/>
+          )
+          }
+            <div style={{ textAlign: "right" }}>
+            <Button
+              type="primary"
+              style={{ marginTop: 16, width: "150px" }}
+              onClick={handleDownloadZip}
+            >
+              Download Raw Data
+            </Button>
+        </div>
+         
+       
+        </div>
+
+      ),
       icon: <SmileOutlined />,
 
     }
@@ -563,6 +641,11 @@ const ScoreboardPage: React.FC = () => {
       
                     setDataset("");
                     setEmptyTraining("");
+                    setChartType("uni");
+                    setRank("rank");
+                } else if(index == 3) {
+                    setDataset("");
+                    setRegion("");
                     setChartType("uni");
                     setRank("rank");
                 }
