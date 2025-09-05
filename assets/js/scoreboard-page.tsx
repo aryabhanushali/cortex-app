@@ -451,29 +451,27 @@ const ScoreboardPage: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
           {/* panel display logic */}
-          <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} region = {region} allowToggle={true} mode ={3}/>
-          {dataset !== "" && (<TrainingSelect training={training} setTraining={setTraining} dataset={dataset} mode = {3} allowToggle={true}/>)}
-          {dataset !== "" && training !== "" && (<ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={3} training={training}/>)}
-
-
+          <DatasetSelect dataset={dataset} setDataset={setDataset} training={emptyTraining} region = {region} allowToggle={true} mode ={3}/>
+          <TrainingSelect training={emptyTraining} setTraining={setEmptyTraining} dataset={dataset} mode = {3} allowToggle={true}/>
+     
           {/* title display logic */}
           {!loadingNew && (
             <div className="chart-title">
-              { region === "" && training === "" && dataset === "" && newData
+              { region === "" && emptyTraining === "" && dataset === "" && newData
                 ? `Model Performance Gap to Ceiling vs Ceiling`
-                : training === "" && region === "" && dataset !== ""
+                : emptyTraining === "" && region === "" && dataset !== ""
                 ? `Model Performance Gap to Ceiling vs Ceiling`
-                : training === "VS" && region === "" 
+                : emptyTraining === "VS" && region === "" 
                 ? `Accross-Regions Performance on ${dataset}(Trained on Murty185 and Trained on NSD)`
-                : training === "Murty185" && dataset === ""
+                : emptyTraining === "Murty185" && dataset === ""
                 ? `Performance on ${dataset} (Trained on Murty185)`
-                : training === "NSD" && region === ""
+                : emptyTraining === "NSD" && region === ""
                 ? `Performance on ${dataset} (Trained on NSD)`
-                : training === "VS" && region !== "" 
+                : emptyTraining === "VS" && region !== "" 
                 ? `${region.toUpperCase()}Performance on ${dataset}(Trained on Murty185 and Trained on NSD)`
-                : training === "NSD" && dataset !== ""
+                : emptyTraining === "NSD" && dataset !== ""
                 ? `${region.toUpperCase()} Performance on ${dataset} (Trained on NSD)`
-                : training === "Murty185" && dataset !== ""
+                : emptyTraining === "Murty185" && dataset !== ""
                 ? `${region.toUpperCase()} Performance on ${dataset} (Trained on Murty185)`
                 : ""}
             </div>
@@ -484,79 +482,31 @@ const ScoreboardPage: React.FC = () => {
   
 
           {/* ScatterGapCeiling */}
-          {!loadingNew && dataset === "" && training === ""  && region === "" && (
+          {!loadingNew && dataset === "" && emptyTraining === ""   && (
             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset}/>
           )}
 
-          {!loadingNew && dataset !== "" && training === ""  && region === "" && (
+          {!loadingNew && dataset !== "" && emptyTraining === ""  && (
             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset}/>
           )}
 
 
-          {/* murty vs nsd */}
-           {!loadingNew && newData && region === "" && training === "VS"  && (
-            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {'Overall'} dataset = {dataset} chartType={chartType} showOverlay={false}/>
-          )} 
-          {!loadingNew && newData && region !== "" && training === "VS"  && (
-            <ScatterMurtyVsNsd murtyData={murtyData} nsdData={nsdData} roi= {region} dataset = {dataset} chartType={chartType} showOverlay={false}/>
-          )} 
-
-
-             {/* heatmap */}
-          {!loadingNew && region === "" && training === "Murty185" &&(
-            <HeatmapByROI
-              data={murtyData}
-              dataset ={dataset}
-              roi = {region}
-              rank = {rank}
-              onModelClick={(model: string) => setSelectedModel(model)} 
-            />
-          )}
-          {!loadingNew && region === "" && training === "NSD" &&(
-            <HeatmapByROI
-              data={nsdData}
-              dataset ={dataset}
-              roi = {region}
-              rank = {rank}
-              onModelClick={(model: string) => setSelectedModel(model)} 
-            />
-          )}
-
-          
-         {!loadingNew  && region !== "" && training === "NSD" && 
-          (<RoiBarChart data={nsdData} roi ={region.toLowerCase()} dataset={dataset} ceiling = {Ceiling} rank = {rank} yLabel={yLabel}/>)
-         }
-
-          {!loadingNew  && region !== "" && training === "Murty185" && (
-             <RoiBarChart
-              data={murtyData}
-              roi ={region}
-              dataset={dataset}
-              ceiling = {Ceiling}
-              rank = {rank}
-              yLabel={yLabel}
-            />
-          )}
-
+    
 
            {dataset !== "" && (
             <DatasetCard dataset={dataset}/>
           )
           }
          
-          {training === "Murty185" && (
+          {emptyTraining === "Murty185" && (
             <DatasetCard dataset={"murty185"}/>
           )
           }
-          {training === "NSD" && (
+          {emptyTraining === "NSD" && (
             <DatasetCard dataset={"nsd_1000"}/>
           )
           }
-          {training === "VS" && [
-            <DatasetCard key="murty" dataset="murty185" />,
-            <DatasetCard key="nsd" dataset="nsd_1000" />
-          ]}
-
+          
            {region !== "" && (
             <ROICard region={region}/>
           )
@@ -610,9 +560,9 @@ const ScoreboardPage: React.FC = () => {
                     setChartType("uni");
                     setRank("rank");
                 } else if(index == 2) {
-                    setRegion("");
+      
                     setDataset("");
-                    setTraining("");
+                    setEmptyTraining("");
                     setChartType("uni");
                     setRank("rank");
                 }
