@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { ROI_OPTIONS, OVERALL_OPTION, REGION_OPTIONS } from './constants-scoreboard';
 import { all } from 'axios';
 
-const ROISelect = ({ region, setRegion, dataset, allowToggle, mode,training }) => {
+const ROISelect = ({ region, setRegion, dataset,setDataset, allowToggle, mode,training }) => {
    const [effectiveToggle, setEffectiveToggle] = useState(allowToggle);
 
  
@@ -31,28 +31,53 @@ const ROISelect = ({ region, setRegion, dataset, allowToggle, mode,training }) =
     return true;
   };
 
-   useEffect(() => {
-    if (mode == 1) {
-        if (
-        training !== "" &&
-        (dataset === "bonner_2021" || dataset === "bold_5000")
-      ) {
+  // RegionSelector.jsx
+  useEffect(() => {
+    if (
+      mode === 1 &&
+      training !== "" &&
+      (dataset === "bonner_2021" || dataset === "bold_5000")
+    ) {
+      // ✅ 只有当 region 还没设置时，才自动绑定一次 PPA
+      if (region === "") {
         setRegion("ppa");
-        setEffectiveToggle(false); 
       }
+      setEffectiveToggle(true); // 允许 toggle
+    } else {
+      setEffectiveToggle(allowToggle);
     }
-    else{
-      setEffectiveToggle(allowToggle); // 其他情况恢复外部传入
-    }
-  }, [training, dataset, setRegion, allowToggle]);
+  }, [training, dataset, setRegion, allowToggle]); 
+
   const renderButtons = (options) =>
     options.map((option) => (
       <Button
         key={option.value}
+        // onClick={() => {
+        //   if (!isEnabled(option)) return;
+        //   if (effectiveToggle) {
+        //     setRegion((prev) => (prev === option.value ? "" : option.value));
+        //   } else {
+        //     setRegion(option.value);
+        //   }
+        // }}
         onClick={() => {
           if (!isEnabled(option)) return;
           if (effectiveToggle) {
-            setRegion((prev) => (prev === option.value ? "" : option.value));
+            if (region === option.value) {
+              // 🚀 只有在 mode == 1 且 dataset 是 bonner/bold 的时候，点掉 PPA → 清空 dataset
+              if (
+                mode === 1 &&
+                (dataset === "bonner_2021" || dataset === "bold_5000") &&
+                option.value === "ppa"
+              ) {
+                setRegion("");
+                setDataset(""); // ✅ 清掉 dataset
+              } else {
+                setRegion("");
+              }
+            } else {
+              setRegion(option.value);
+            }
           } else {
             setRegion(option.value);
           }

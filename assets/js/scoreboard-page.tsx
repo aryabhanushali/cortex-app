@@ -106,7 +106,7 @@ const ScoreboardPage: React.FC = () => {
 
   // step 0 clear value logic
   // useEffect(() => {
-  //   if (current === 0 && training === "") {
+  //   if (current === 0 && region) {
   //     setDataset("");
   //     setRegion("");
   //   } 
@@ -204,7 +204,7 @@ const ScoreboardPage: React.FC = () => {
 
           {/* panel display logic */}
           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset} mode = {1} allowToggle={false}/> 
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={1} training={training}/>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset} setDataset={setDataset} allowToggle={true} mode={1} training={training}/>
           <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} region = {region} allowToggle={true} mode = {1}/>
           
           
@@ -321,7 +321,7 @@ const ScoreboardPage: React.FC = () => {
               yLabel={yLabel}
             />
           )}
-          
+
           {selectedModel  && (
              <ModelCard  region={"ppa"} dataset={"nsd_1000"} model={selectedModel}/>
           )
@@ -366,7 +366,7 @@ const ScoreboardPage: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
           {/* panel display logic */}
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={2} training={training}/>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset} setDataset={setDataset} allowToggle={true} mode={2} training={training}/>
           <TrainingSelect training={emptyTraining} setTraining={setEmptyTraining} dataset={dataset} mode = {2} allowToggle={true}/> 
           
 
@@ -546,7 +546,7 @@ const ScoreboardPage: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
           {/* panel display logic */}
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={2} training={training}/>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset} setDataset={setDataset} allowToggle={true} mode={2} training={training}/>
           <DatasetSelect dataset={dataset} setDataset={setDataset} training={setTraining} region = {region} allowToggle={true} mode ={4}/>
          
      
