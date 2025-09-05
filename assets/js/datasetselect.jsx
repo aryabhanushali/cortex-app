@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-import { DATASET_OPTIONS_LEFT, DATASET_OPTIONS_RIGHT, MURTY185_DATASET, NSD_DATASET } from './constants-scoreboard';
+import { DATASET_OPTIONS, DATASET_OPTIONS_LESS, MURTY185_DATASET, NSD_DATASET } from './constants-scoreboard';
 
 const DatasetSelect = ({ dataset, setDataset, training, region, allowToggle, mode}) => {
   const isEnabled = (option) => {
@@ -44,7 +44,7 @@ const DatasetSelect = ({ dataset, setDataset, training, region, allowToggle, mod
       </div>
 
       <ButtonGroup aria-labelledby="region-buttons-group-label" fullWidth sx={{ margin: 0 }}>
-        {DATASET_OPTIONS_LEFT.map((option) => (
+        {(mode === 4 ? DATASET_OPTIONS_LESS : DATASET_OPTIONS).map((option) => (
           <Button
             key={option.value}
             onClick={() => {

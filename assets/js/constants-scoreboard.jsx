@@ -68,7 +68,7 @@ export const REGION_OPTIONS = [
 
 ];
 
-export const DATASET_OPTIONS_LEFT = [
+export const DATASET_OPTIONS = [
     { value: 'murty185', label: 'Murty185' },
     { value: 'nsd_1000', label: 'NSD1000' },
     { value: 'bold_5000', label: 'BOLD5000v2' },
@@ -79,9 +79,16 @@ export const DATASET_OPTIONS_LEFT = [
     { value: 'nsd_syn', label: 'NSD synthetic' },
   ];
 
-export const DATASET_OPTIONS_RIGHT = [
-    { value: 'DuplicatePaper', label: 'DuplicatePaper' }
+export const DATASET_OPTIONS_LESS = [
+
+    { value: 'bold_5000', label: 'BOLD5000v2' },
+    { value: 'bonner_2021', label: 'Bonner2021' },
+    { value: 'bmd_2024', label: 'BMD2024' },
+    { value: 'kingbaker_2019', label: 'King2019' },
+    { value: 'wardle_2020', label: 'Wardle2020' },
+    { value: 'nsd_syn', label: 'NSD synthetic' },
   ];
+
 
 
 export const CHART_TYPE_OPTIONS = [

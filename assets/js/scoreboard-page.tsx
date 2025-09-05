@@ -535,7 +535,7 @@ const ScoreboardPage: React.FC = () => {
 
           {/* panel display logic */}
           <ROISelect region={region} setRegion={setRegion} dataset={dataset} allowToggle={true} mode={2} training={training}/>
-          <DatasetSelect dataset={dataset} setDataset={setDataset} training={setTraining} region = {region} allowToggle={true} mode ={3}/>
+          <DatasetSelect dataset={dataset} setDataset={setDataset} training={setTraining} region = {region} allowToggle={true} mode ={4}/>
          
      
           {/* title display logic */}
@@ -568,11 +568,6 @@ const ScoreboardPage: React.FC = () => {
            {!loadingNew && dataset !== "" && region !== ""   && (
             <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={true}/>
           )}
-
-      
-
-
-    
 
            {dataset !== "" && (
             <DatasetCard dataset={dataset}/>
