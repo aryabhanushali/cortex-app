@@ -558,15 +558,15 @@ const ScoreboardPage: React.FC = () => {
 
 
           {!loadingNew && dataset !== "" && region === ""   && (
-            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={"Overall"} dataset={dataset} chartType={chartType} showOverlay={true}/>
+            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={"Overall"} dataset={dataset} chartType={chartType} showOverlay={false}/>
           )}
 
           {!loadingNew && dataset === "" && region !== ""   && (
-            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={true}/>
+            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={false}/>
           )}
 
            {!loadingNew && dataset !== "" && region !== ""   && (
-            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={true}/>
+            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={false}/>
           )}
 
            {dataset !== "" && (
