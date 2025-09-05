@@ -48,11 +48,12 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
     return barChartData;
   };
 
-  const getFileInfo = (filename: string) => {
+  const getFileInfo = (filename) => {
     const mapping = fileMappings?.find(m => m.file.name === filename);
     if (!mapping) return { blobURL: null, folder: null };
 
-    const relPath = (mapping.file as any).webkitRelativePath || "";
+    // webkitRelativePath is non-standard, so just access it directly
+    const relPath = mapping.file.webkitRelativePath || "";
     const folder =
       relPath && relPath.includes("/")
         ? relPath.split("/").slice(0, -1).join("/") // everything except the filename
