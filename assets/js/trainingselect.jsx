@@ -56,7 +56,7 @@ const TrainingSelect = ({ training, setTraining, dataset, mode,allowToggle }) =>
       </FormLabel>
       <ButtonGroup fullWidth>
         {mode === 1 && renderButtons(TRAINING_OPTIONS)}
-        {mode === 2 && renderButtons(TRAINING_OPTIONS_VS)}
+        {mode === 2 && renderButtons(TRAINING_OPTIONS)}
         {mode === 3 && renderButtons(TRAINING_OPTIONS_VS)}
       </ButtonGroup>
     </FormControl>
