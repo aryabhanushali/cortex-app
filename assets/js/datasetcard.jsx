@@ -29,11 +29,11 @@ const DatasetCard = ({ dataset }) => {
               {datasetName}
             </Link>
           </Typography>
-          <Typography sx={{ mb: 1.5 }} color="text.secondary">
+{/*           <Typography sx={{ mb: 1.5 }} color="text.secondary">
             Category: {category}  
-          </Typography>
+          </Typography> */}
           <Typography sx={{ mb: 1.5 }} color="text.secondary">
-            Stimuli Size: {size}, Subjects: {subjects}
+            Stimuli Num: {size} with {subjects} Subjects
           </Typography>
           <Typography variant="body2">
             {description || "No description available."}
