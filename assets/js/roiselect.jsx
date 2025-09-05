@@ -18,23 +18,28 @@ const ROISelect = ({ region, setRegion, dataset, allowToggle, mode,training }) =
     if((dataset === 'bold_5000'|| dataset ==='bonner_2021') && (option.value === "ffa" || option.value === "eba")) return false;
     if((dataset === 'kingbaker_2019' || dataset === 'wardle_2020') && ( option.value === "eba")) return false;
     
-    if (
-      training !== "" &&
-      (dataset === "bonner_2021" || dataset === "bold_5000")
-    ) {
-      return option.value === "ppa"; // 只允许 PPA
-    }
+    if (mode == 1) {
+       if (
+        training !== "" &&
+        (dataset === "bonner_2021" || dataset === "bold_5000")
+      ) {
+        return option.value === "ppa"; // 只允许 PPA
+      }
 
+    }
+   
     return true;
   };
 
    useEffect(() => {
-    if (
-      training !== "" &&
-      (dataset === "bonner_2021" || dataset === "bold_5000")
-    ) {
-      setRegion("ppa");
-      setEffectiveToggle(false); 
+    if (mode == 1) {
+        if (
+        training !== "" &&
+        (dataset === "bonner_2021" || dataset === "bold_5000")
+      ) {
+        setRegion("ppa");
+        setEffectiveToggle(false); 
+      }
     }
     else{
       setEffectiveToggle(allowToggle); // 其他情况恢复外部传入
