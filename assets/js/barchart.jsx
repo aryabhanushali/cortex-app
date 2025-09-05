@@ -43,8 +43,15 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       return [...barChartData].sort((a, b) => a.filename.localeCompare(b.filename));
     } else if (order === "ranking") {
       return [...barChartData].sort((a, b) => b.mean - a.mean);
+    } else if (order === "folder") {
+    // Sort by folder (A→Z), then by filename within the same folder
+      return [...barChartData].sort((a, b) => {
+        const fa = getFolderForFilename(a.filename);
+        const fb = getFolderForFilename(b.filename);
+        if (fa === fb) return a.filename.localeCompare(b.filename);
+        return fa.localeCompare(fb);
+      });
     }
-    
     return barChartData;
   };
 
@@ -60,6 +67,15 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
         : null;
 
     return { blobURL: mapping.blobURL, folder };
+  };
+
+  const getFolderForFilename = (filename) => {
+    const mapping = fileMappings?.find(m => m.file.name === filename);
+    if (!mapping) return "";
+    const relPath = mapping.file.webkitRelativePath || "";
+    return relPath && relPath.includes("/")
+      ? relPath.split("/").slice(0, -1).join("/")   // everything except filename
+      : "";
   };
 
   useEffect(() => {
@@ -259,6 +275,7 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       <label htmlFor="order">Order by: </label>
       <select id="order" value={order} onChange={e => setOrder(e.target.value)}>
         <option value="name">Image Name</option>
+        <option value="folder">Folder</option>
         <option value="ranking">Rank</option>
       </select>
     </div>
