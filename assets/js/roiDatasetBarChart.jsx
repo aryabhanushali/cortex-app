@@ -66,13 +66,13 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel }) => {
     }
 
     // ceiling bar
-    if (ceilingMax != null) {
+    if (ceilingMean != null) {
       const rect = ceilingSvg
         .append("rect")
         .attr("x", margin.left + 15)
-        .attr("y", Math.min(y(0), y(ceilingMax)))
+        .attr("y", Math.min(y(0), y(ceilingMean)))
         .attr("width", barWidth)
-        .attr("height", Math.abs(y(0) - y(ceilingMax)))
+        .attr("height", Math.abs(y(0) - y(ceilingMean)))
         .attr("fill", "#d3d3d3")
         .attr("stroke", "black");
 
