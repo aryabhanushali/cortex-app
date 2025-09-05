@@ -482,6 +482,9 @@ const ScoreboardPage: React.FC = () => {
           {!loadingNew && dataset === "" && emptyTraining === ""   && (
             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
           )}
+           {!loadingNew && dataset === "" && emptyTraining !== ""   && (
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
+          )}
 
           {!loadingNew && dataset !== "" && emptyTraining === ""  && (
             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
