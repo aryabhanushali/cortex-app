@@ -48,9 +48,17 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
     return barChartData;
   };
 
-  const getBlobURL = (filename) => {
-    const mapping = fileMappings?.find(mapping => mapping.file.name === filename);
-    return mapping ? mapping.blobURL : null;
+  const getFileInfo = (filename: string) => {
+    const mapping = fileMappings?.find(m => m.file.name === filename);
+    if (!mapping) return { blobURL: null, folder: null };
+
+    const relPath = (mapping.file as any).webkitRelativePath || "";
+    const folder =
+      relPath && relPath.includes("/")
+        ? relPath.split("/").slice(0, -1).join("/") // everything except the filename
+        : null;
+
+    return { blobURL: mapping.blobURL, folder };
   };
 
   useEffect(() => {
@@ -133,16 +141,19 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       .on("mouseover", (event, d) => {
         d3.select(event.currentTarget).attr("fill", d3.color(colorScale(d.mean)).darker(0.5));
 
-        const blobURL = getBlobURL(d.filename);
+        const { blobURL, folder } = getFileInfo(d.filename);
 
         tooltip
           .html(
             `<div>
               <p><strong>Filename:</strong> ${d.filename}</p>
+              <p><strong>Folder:</strong> ${folder ?? "(none)"}</p>
               <p><strong>Mean:</strong> ${d.mean.toFixed(4)}</p>
               <p><strong>SEM:</strong> ${d.sem.toFixed(4)}</p>
-              <img src="${blobURL}" alt="Thumbnail" 
-              style="width: 140px; height: 140px; object-fit: cover; margin-bottom: 5px; border: 1px solid #ccc;">
+              ${blobURL ? `
+                <img src="${blobURL}" alt="Thumbnail"
+                    style="width: 140px; height: 140px; object-fit: cover; margin-bottom: 5px; border: 1px solid #ccc;">
+              ` : ""}
             </div>`
           )
           .style("display", "block")
