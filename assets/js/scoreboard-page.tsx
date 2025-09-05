@@ -201,20 +201,27 @@ const ScoreboardPage: React.FC = () => {
           {/* title display logic */}
           {!loadingNew && (
             <div className="chart-title">
-              {training === "" && dataset === "" &&  region === ""
-                ? `Across-ROIs Performence (Trained on Murty185 vs Trained on NSD1000) `
-                : training === "Murty185" && dataset === "" && region === ""
+              {
+                
+                training === "Murty185" && dataset === "" && region === ""
                 ? "Across-ROIs Performance (Trained on Murty185)"
                 : training === "NSD" && dataset === ""  && region === ""
                 ? "Across-ROIs Performance (Trained on NSD1000)"
+
                 : training === "Murty185" && dataset !== "" && region === ""
-                ? `Across-ROIs Performance on ${dataset} (Trained on Murty185)`
-                : training === "NSD" && dataset !== "" && region !== "Overall"
-                ? `Across-ROIs Performance on ${dataset} (Trained on NSD1000)`
-                : training === "Murty185" && dataset !== "" && region !== "Overall"
-                ? `${region.toUpperCase()}  Performance on ${dataset} (Trained on Murty185)`
-                : training === "NSD" && dataset !== "" && region !== "Overall"
-                ? `${region.toUpperCase()}  Performance on ${dataset} (Trained on NSD1000)`
+                ? `Across-ROIs Performance on ${DATASET_LABEL_MAP[dataset]} (Trained on Murty185)`
+                : training === "NSD" && dataset !== "" && region === ""
+                ? `Across-ROIs Performance on ${DATASET_LABEL_MAP[dataset]} (Trained on NSD1000)`
+
+                : training === "Murty185" && dataset === "" && region !== ""
+                ? `${region.toUpperCase()}  Performance on (Trained on Murty185)`
+                : training === "NSD" && dataset === "" && region !== ""
+                ? `${region.toUpperCase()}  Performance on (Trained on NSD1000)`
+
+                : training === "Murty185" && dataset !== "" && region !== ""
+                ? `${region.toUpperCase()}  Performance on ${DATASET_LABEL_MAP[dataset]} (Trained on Murty185)`
+                : training === "NSD" && dataset !== "" && region !== ""
+                ? `${region.toUpperCase()}  Performance on ${DATASET_LABEL_MAP[dataset]} (Trained on NSD1000)`
                 : ""}
             </div>
           )}
