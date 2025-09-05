@@ -855,7 +855,7 @@ export const MURTY185_INCLUDED_REGIONS = ['ffa', 'eba', 'ppa'];
 
 //Modelcard info
 export const MODELCARD_INFO_LOOKUP = {
-  "murty185": {
+  "Murty185": {
     "ffa": {
       "adversarial_inceptionv3": {
         "bestLayer": "model.Mixed_7a.branch7x7x3_2.conv",
@@ -2375,7 +2375,7 @@ export const MODELCARD_INFO_LOOKUP = {
       }
     }
   },
-  "nsd_1000": {
+  "NSD": {
     "ffa": {
       "mobilenetv2": {
         "bestLayer": "model.layer.12.reduce_1x1.convolution",

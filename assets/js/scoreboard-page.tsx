@@ -18,7 +18,8 @@ import ChartSelect from './chartselect.jsx';
 import ScatterGapCeiling from './roiDatasetanalysis.jsx';
 import ROICard from './roicard.jsx';
 import DatasetCard from './datasetcard.jsx';
-import ModelCard from './modelcard.jsx';
+
+import ModelCardNew from './modelcard-scoreboard.jsx';
 
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
@@ -304,6 +305,7 @@ const ScoreboardPage: React.FC = () => {
               ceiling = {Ceiling}
               rank = {rank}
               yLabel={yLabel}
+              onModelClick={(model: string) => setSelectedModel(model)} 
             />
           )}
 
@@ -315,11 +317,12 @@ const ScoreboardPage: React.FC = () => {
               ceiling = {Ceiling}
               rank = {rank}
               yLabel={yLabel}
+              onModelClick={(model: string) => setSelectedModel(model)} 
             />
           )}
 
           {selectedModel  && (
-             <ModelCard  region={"ppa"} dataset={"nsd_1000"} model={selectedModel}/>
+             <ModelCardNew  region={region} dataset={training} model={selectedModel} evalDataset={dataset}/>
           )
           }
 
@@ -567,21 +570,35 @@ const ScoreboardPage: React.FC = () => {
 
           {/* Scatter */}
           {!loadingNew && dataset === "" && region === ""   && (
-            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={"Overall"} dataset={dataset} chartType={chartType} showOverlay={true}/>
+            <ScatterMurtyVsNsd 
+              nsdData={nsdData} 
+              murtyData={murtyData} 
+              roi={"Overall"} 
+              dataset={dataset} 
+              chartType={chartType} 
+              showOverlay={true}
+               onModelClick={(model: string) => setSelectedModel(model)} />
+              
+
           )}
 
 
           {!loadingNew && dataset !== "" && region === ""   && (
-            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={"Overall"} dataset={dataset} chartType={chartType} showOverlay={false}/>
+            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={"Overall"} dataset={dataset} chartType={chartType} showOverlay={false}  onModelClick={(model: string) => setSelectedModel(model)} />
           )}
 
           {!loadingNew && dataset === "" && region !== ""   && (
-            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={false}/>
+            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={false}  onModelClick={(model: string) => setSelectedModel(model)} />
           )}
 
            {!loadingNew && dataset !== "" && region !== ""   && (
-            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={false}/>
+            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={false}  onModelClick={(model: string) => setSelectedModel(model)} />
           )}
+
+          {/* {
+            selectedModel && 
+            <ModelCard region={region} dataset={training} model={selectedModel}/>
+          } */}
 
            {dataset !== "" && (
             <DatasetCard dataset={dataset}/>

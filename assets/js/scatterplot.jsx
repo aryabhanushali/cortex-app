@@ -1,11 +1,17 @@
 // ScatterMurtyVsNsd.jsx
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef,useState } from "react";
 import * as d3 from "d3";
 import uniIcon from "../img/scatterplot/uni.webp";
 import multiIcon from "../img/scatterplot/multi.webp";
 
-const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOverlay }) => {
+const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOverlay, onModelClick }) => {
   const containerRef = useRef();
+  const [selectedModel, setSelectedModel] = useState(null);
+
+  useEffect(() => {
+    setSelectedModel(null);
+    if (onModelClick) onModelClick(null); 
+  }, [murtyData, nsdData, roi, dataset]);
 
   useEffect(() => {
     if (!murtyData || !nsdData) return;
@@ -104,6 +110,25 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
       .attr("stroke-dasharray", "4 2")
       .attr("opacity", 0.5);
 
+
+    // === x 轴 label ===
+    svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", height - 15)   // 放在 x 轴下方
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .text("Model Performance (Mappings from Murty185)");
+
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -height / 2)
+      .attr("y", 20)   // 调整与轴的距离
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .text("Model Performance (Mappings from NSD1000)");
+
+    
+
     // ===== 散点 =====
     svg.selectAll("circle")
       .data(points)
@@ -114,7 +139,19 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
       .attr("r", 5)
       .attr("fill", (d) => color_map[d.dataset])
       .attr("opacity", 0.4)
-      .attr("stroke", "black");
+      .attr("stroke", "black")
+
+      .style("cursor", "pointer")  // 鼠标 hover 时显示手型
+      .on("click", (event, d) => {
+          const newSelection = (selectedModel === d.model ? null : d.model);  // 🚀 再点一次取消
+          setSelectedModel(newSelection);
+          if (onModelClick) {
+            onModelClick(newSelection); // ✅ 父组件也知道
+          }
+      });
+      
+      
+
 
     // ===== Tooltip（保持不变） =====
     const tooltip = d3.select(containerRef.current)
@@ -253,7 +290,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
 
     // ===== overlay =====
     if (showOverlay) {
-      svg.append("image")
+      const overlayGroup = svg.append("image")
         .attr("href", chartType === "uni" ? uniIcon : multiIcon)
         .attr("x", width - margin.right - 200)
         .attr("y", height - margin.bottom - 170)
@@ -261,9 +298,37 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
         .attr("height", 160)
         .attr("opacity", 0.7)
         .style("cursor", "pointer");
+
+        // overlay tooltip
+  const overlayTooltip = d3.select(containerRef.current)
+    .append("div")
+    .attr("class", "overlay-tooltip")
+    .style("position", "absolute")
+    .style("visibility", "hidden")
+    .style("background", "white")
+    .style("border", "1px solid #ccc")
+    .style("padding", "5px")
+    .style("font-size", "13px");
+
+  overlayGroup.on("mouseover", (event) => {
+    overlayTooltip
+      .style("visibility", "visible")
+      .html(chartType === "uni"
+        ? "Unimodal mapping view"
+        : "Multimodal mapping view"
+      )
+      .style("top", `${event.pageY - 30}px`)
+      .style("left", `${event.pageX + 10}px`);
+  })
+  .on("mousemove", (event) => {
+    overlayTooltip
+      .style("top", `${event.pageY - 30}px`)
+      .style("left", `${event.pageX + 10}px`);
+  })
+  .on("mouseout", () => overlayTooltip.style("visibility", "hidden"));
     }
 
-  }, [murtyData, nsdData, roi, dataset]);
+  }, [murtyData, nsdData, roi, dataset,onModelClick]);
 
   return <div style={{ justifyContent: "center" }} ref={containerRef}></div>;
 };

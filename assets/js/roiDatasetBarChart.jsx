@@ -1,11 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel }) => {
+const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }) => {
   const ceilingRef = useRef();
   const barsRef = useRef();
+  const [selectedModel, setSelectedModel] = useState(null);
   const [stats, setStats] = useState({ max: null, mean: null });
   const [scaleY, setScaleY] = useState(null);
+
+   useEffect(() => {
+      setSelectedModel(null);
+      if (onModelClick) onModelClick(null); 
+    }, [data, roi, dataset]);
 
   useEffect(() => {
     console.log("🔍 RoiBarChart props:", { roi, dataset, ceiling, data });
@@ -244,7 +250,16 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel }) => {
             height - margin.bottom
           })`
       )
-      .text((d) => d.model);
+   
+      .text((d) => d.model)
+      .style("cursor", "pointer") // ✅ 可以链式写
+      .on("click", (event, d) => {
+        const newSelection = selectedModel === d.model ? null : d.model; // 🚀 再点一次取消
+        setSelectedModel(newSelection);
+        if (onModelClick) {
+          onModelClick(newSelection); // ✅ 父组件也知道
+        }
+      });
 
     function drawLine(svg, value, color, svgWidth, offsetX = 0) {
       if (value == null) return;
@@ -266,7 +281,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel }) => {
     drawLine(ceilingSvg, ceilingMean, "blue", ceilingWidth, margin.left);
     drawLine(barsSvg, ceilingMax, "red", width, 0);
     drawLine(barsSvg, ceilingMean, "blue", width, 0);
-  }, [data, roi, dataset, ceiling, rank, yLabel]);
+  }, [data, roi, dataset, ceiling, rank, yLabel, onModelClick]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row", position: "relative" }}>

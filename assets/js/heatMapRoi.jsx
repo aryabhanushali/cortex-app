@@ -18,7 +18,7 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
   kingbaker_2019: "King2019",
   wardle_2020: "Wardle2020",
   nsd_syn: "NSD synthetic",
-  global_score: "Global Score" // 特殊列
+  global_score: "Global Score" // special
 };
   useEffect(() => {
     setSelectedModel(null);
