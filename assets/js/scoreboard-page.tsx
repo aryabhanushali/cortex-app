@@ -127,18 +127,7 @@ const ScoreboardPage: React.FC = () => {
   // }, [current, region,training]);
   
 
-  useEffect(() => {
-    if (current === 2 && dataset === "") {
-      setTraining("");
-      setRegion("");
-    } 
-    if (current === 2 && training === "") {
-      setRegion("");
-    }
-    if(current === 2 && training === "VS" && (dataset === "bonner_2021" || dataset === "bold_5000")){
-      setRegion("ppa");
-    }
-  }, [current, dataset,training]);
+
 
   
 
@@ -366,7 +355,7 @@ const ScoreboardPage: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
           {/* panel display logic */}
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} setDataset={setDataset} allowToggle={true} mode={2} training={training}/>
+          <ROISelect region={region} setRegion={setRegion} dataset={dataset} setDataset={setDataset} allowToggle={true} mode={2} training={emptyTraining}/>
           <TrainingSelect training={emptyTraining} setTraining={setEmptyTraining} dataset={dataset} mode = {2} allowToggle={true}/> 
           
 
@@ -646,23 +635,27 @@ const ScoreboardPage: React.FC = () => {
                 if (index === 0) {
                     setRegion("");
                     setDataset("");
-                    setTraining("Murty185");
+                    setTraining("NSD");
                     setChartType("uni")
                     setRank("rank");
                 } else if (index === 1) {
                     setRegion("");
                     setEmptyTraining("");
+                    setDataset("");
                     setChartType("uni");
                     setRank("rank");
                 } else if(index == 2) {
       
                     setDataset("");
                     setEmptyTraining("");
+                    setRegion("");
                     setChartType("uni");
                     setRank("rank");
                 } else if(index == 3) {
                     setDataset("");
                     setRegion("");
+                    setTraining("");
+                    setEmptyTraining("");
                     setChartType("uni");
                     setRank("rank");
                 }
