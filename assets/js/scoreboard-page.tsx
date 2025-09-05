@@ -321,6 +321,11 @@ const ScoreboardPage: React.FC = () => {
               yLabel={yLabel}
             />
           )}
+          
+          {selectedModel  && (
+             <ModelCard  region={"ppa"} dataset={"nsd_1000"} model={selectedModel}/>
+          )
+          }
 
           {training === "Murty185" && (
             <DatasetCard dataset={"murty185"}/>
@@ -340,10 +345,7 @@ const ScoreboardPage: React.FC = () => {
           )
           }
 
-          {selectedModel !== "" && (
-             <ModelCard  region={"ppa"} dataset={"nsd_1000"} model={selectedModel}/>
-          )
-          }
+          
           <div style={{ textAlign: "right" }}>
             <Button
               type="primary"

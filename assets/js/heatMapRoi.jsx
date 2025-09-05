@@ -20,9 +20,14 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
   nsd_syn: "NSD synthetic",
   global_score: "Global Score" // 特殊列
 };
+  useEffect(() => {
+    setSelectedModel(null);
+    if (onModelClick) onModelClick(null); 
+  }, [data, roi, dataset]);
 
   useEffect(() => {
     if (!data) return;
+
 
     d3.select(headerRef.current).select("svg").remove();
     d3.select(bodyRef.current).select("svg").remove();
@@ -51,6 +56,7 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
       models.forEach((model) => {
         let rawVals = [];
         xLabels.forEach((ds) => {
+          if (["murty185", "nsd_1000"].includes(ds)) return; 
           const vals = data[roi][model]?.[ds];
           if (vals) {
             const raw = vals[0];
@@ -69,10 +75,12 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
         }
       });
 
-      ceilingData = xLabels.map((ds) => {
-        const vals = data[roi]?.ceiling?.[ds];
-        return vals ? { x: ds, raw: vals[0], norm: vals[1] } : {};
-      });
+      ceilingData = xLabels
+        .filter(ds => !["murty185", "nsd_1000"].includes(ds)) 
+        .map((ds) => {
+          const vals = data[roi]?.ceiling?.[ds];
+          return vals ? { x: ds, raw: vals[0], norm: vals[1] } : {};
+        });
 
       const ceilingVals = ceilingData.map((d) => d.raw).filter((v) => v != null);
       if (ceilingVals.length > 0) {
@@ -83,7 +91,7 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
         });
       }
 
-      xLabels = ["global_score", ...xLabels];
+      xLabels = ["global_score", ...xLabels.filter(ds => !["murty185", "nsd_1000"].includes(ds))];
     } else if (dataset) {
       // case 2: 固定 Dataset
       const rois = Object.keys(data).filter((roiName) => roiName.toLowerCase() !== "overall");
@@ -324,10 +332,11 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
           .style("font-weight", (d) => (d === selectedModel ? "bold" : "normal"))
           .style("cursor", "pointer")  // 鼠标 hover 时显示手型
           .on("click", (event, d) => {
-            setSelectedModel(d); // ✅ 更新本地 state
-            if (onModelClick) {
-              onModelClick(d); // ✅ 仍然回调给父组件
-            }
+              const newSelection = (selectedModel === d ? null : d);  // 🚀 再点一次取消
+              setSelectedModel(newSelection);
+              if (onModelClick) {
+                onModelClick(newSelection); // ✅ 父组件也知道
+              }
           });
       });
 
