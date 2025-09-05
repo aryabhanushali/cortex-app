@@ -48,6 +48,16 @@ const ScoreboardPage: React.FC = () => {
   const [rank, setRank] = useState("rank");
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
 
+  const DATASET_LABEL_MAP: Record<string, string> = {
+    murty185: "Murty185",
+    nsd_1000: "NSD1000",
+    bold_5000: "BOLD5000v2",
+    bonner_2021: "Bonner2021",
+    bmd_2024: "BMD2024",
+    kingbaker_2019: "King2019",
+    wardle_2020: "Wardle2020",
+    nsd_syn: "NSD synthetic",
+};
 
 
   const getEnable = (current: number, training: string, dataset: string, region: string) => {
@@ -58,11 +68,11 @@ const ScoreboardPage: React.FC = () => {
     }
     if (current === 1) {
       // ROI 页：当 region 选中且 dataset 已经选定时才启用
-      return region !== ""  && (training === "Murty185" ||training === "NSD")  ;
+      return false
     }
     if (current === 2) {
       // Dataset 页：当 dataset 已选择时才启用
-      return dataset !== "" && training !== "";
+      return false
     }
     return false;
   };
@@ -543,7 +553,17 @@ const ScoreboardPage: React.FC = () => {
             <div className="chart-title">
               { region === "" && dataset === "" && newData
                 ? `Model Performance Gap to Ceiling vs Ceiling`
+                :region !== "" && dataset === "" && newData
+                ? `${region.toUpperCase()}: Model Performance Gap to Ceiling vs Ceiling`
+                :region === "" && dataset !== "" && newData
+                ? `${DATASET_LABEL_MAP[dataset]}: Model Performance Gap to Ceiling vs Ceiling`
+
+                :region !== "" && dataset !== "" && newData
+                ? `${region.toUpperCase()}/${DATASET_LABEL_MAP[dataset]}: Model Performance Gap to Ceiling vs Ceiling`
+
+
                 : ""}
+
             </div>
           )}
          
