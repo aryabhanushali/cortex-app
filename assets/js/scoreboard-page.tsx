@@ -369,22 +369,24 @@ const ScoreboardPage: React.FC = () => {
           {/* title display logic */}
           {!loadingNew && (
             <div className="chart-title">
-              { region === "" && emptyTraining === "" && dataset === "" && newData
+              { region === "" && emptyTraining === "" && newData
                 ? `Model Performance Gap to Ceiling vs Ceiling`
-                : emptyTraining === "" && dataset === ""
+                : emptyTraining === "" && region !== ""
                 ? `${region.toUpperCase()} : Model Performance Gap to Ceiling vs Ceiling`
-                : emptyTraining === "VS" && dataset === ""
-                ? `${region.toUpperCase()} Performance (Trained on Murty185 and Trained on NSD)`
-                : emptyTraining === "Murty185" && dataset === ""
-                ? `${region.toUpperCase()} Performance (Trained on Murty185)`
-                : emptyTraining === "NSD" && dataset === ""
-                ? `${region.toUpperCase()} Performance (Trained on NSD)`
-                : emptyTraining === "VS" && dataset !== ""
-                ? `${region.toUpperCase()} Performance on ${dataset}(Trained on Murty185 and Trained on NSD)`
-                : emptyTraining === "NSD" && dataset !== ""
-                ? `${region.toUpperCase()} Performance on ${dataset} (Trained on NSD)`
-                : emptyTraining === "Murty185" && dataset !== ""
-                ? `${region.toUpperCase()} Performance on ${dataset} (Trained on Murty185)`
+
+                : emptyTraining === "Murty185" && region === ""
+                ? `Model Performance Gap to Ceiling vs Ceiling (Trained on Murty185)`
+
+                : emptyTraining === "NSD" && region === ""
+                ? `Model Performance Gap to Ceiling vs Ceiling (Trained on NSD1000)`
+
+                : emptyTraining === "NSD" && region !== ""
+                ? `${region.toUpperCase()} : Model Performance Gap to Ceiling vs Ceiling (Trained on NSD1000)`
+
+                 : emptyTraining === "Murty185" && region !== ""
+                ? `${region.toUpperCase()} : Model Performance Gap to Ceiling vs Ceiling (Trained on Murty185)`
+             
+                
                 : ""}
             </div>
           )}
@@ -393,35 +395,20 @@ const ScoreboardPage: React.FC = () => {
 
           {/* ScatterGapCeiling */}
           {!loadingNew && emptyTraining === ""  && region === "" && (
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset}/>
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
           )}
           {!loadingNew && emptyTraining === ""  && region !== "" &&(
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset}/>
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
           )}
 
-          
-
-         
-
-          {/* barchart */}
-           
-
-         {!loadingNew  && dataset != "" && training === "NSD" && 
-          (<RoiBarChart data={nsdData} roi ={region.toLowerCase()} dataset={dataset} ceiling = {Ceiling} rank = {rank} yLabel ={yLabel}/>)
-         }
-
-          {!loadingNew  && dataset != "" && training === "Murty185" && (
-             <RoiBarChart
-              data={murtyData}
-              roi ={region}
-              dataset={dataset}
-              ceiling = {Ceiling}
-              rank = {rank}
-              yLabel={yLabel}
-             
-            />
-
+           {!loadingNew && emptyTraining !== ""  && region === "" &&(
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
           )}
+
+           {!loadingNew && emptyTraining !== ""  && region !== "" &&(
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
+          )}
+
 
            {region !== "" && (
             <ROICard region={region}/>
@@ -462,25 +449,27 @@ const ScoreboardPage: React.FC = () => {
           <DatasetSelect dataset={dataset} setDataset={setDataset} training={emptyTraining} region = {region} allowToggle={true} mode ={3}/>
           <TrainingSelect training={emptyTraining} setTraining={setEmptyTraining} dataset={dataset} mode = {3} allowToggle={true}/>
      
-          {/* title display logic */}
+                    {/* title display logic */}
           {!loadingNew && (
             <div className="chart-title">
-              { region === "" && emptyTraining === "" && dataset === "" && newData
+              { dataset === "" && emptyTraining === "" && newData
                 ? `Model Performance Gap to Ceiling vs Ceiling`
-                : emptyTraining === "" && region === "" && dataset !== ""
-                ? `Model Performance Gap to Ceiling vs Ceiling`
-                : emptyTraining === "VS" && region === "" 
-                ? `Accross-Regions Performance on ${dataset}(Trained on Murty185 and Trained on NSD)`
+                : emptyTraining === "" && dataset !== ""
+                ? `${DATASET_LABEL_MAP[dataset]} : Model Performance Gap to Ceiling vs Ceiling`
+
                 : emptyTraining === "Murty185" && dataset === ""
-                ? `Performance on ${dataset} (Trained on Murty185)`
-                : emptyTraining === "NSD" && region === ""
-                ? `Performance on ${dataset} (Trained on NSD)`
-                : emptyTraining === "VS" && region !== "" 
-                ? `${region.toUpperCase()}Performance on ${dataset}(Trained on Murty185 and Trained on NSD)`
+                ? `Model Performance Gap to Ceiling vs Ceiling (Trained on Murty185)`
+
+                : emptyTraining === "NSD" && dataset === ""
+                ? `Model Performance Gap to Ceiling vs Ceiling (Trained on NSD1000)`
+
                 : emptyTraining === "NSD" && dataset !== ""
-                ? `${region.toUpperCase()} Performance on ${dataset} (Trained on NSD)`
-                : emptyTraining === "Murty185" && dataset !== ""
-                ? `${region.toUpperCase()} Performance on ${dataset} (Trained on Murty185)`
+                ? `${DATASET_LABEL_MAP[dataset]} : Model Performance Gap to Ceiling vs Ceiling (Trained on NSD1000)`
+
+                 : emptyTraining === "Murty185" && dataset !== ""
+                ? `${DATASET_LABEL_MAP[dataset]} : Model Performance Gap to Ceiling vs Ceiling (Trained on Murty185)`
+             
+                
                 : ""}
             </div>
           )}
@@ -491,11 +480,15 @@ const ScoreboardPage: React.FC = () => {
 
           {/* ScatterGapCeiling */}
           {!loadingNew && dataset === "" && emptyTraining === ""   && (
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset}/>
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
           )}
 
           {!loadingNew && dataset !== "" && emptyTraining === ""  && (
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset}/>
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
+          )}
+
+           {!loadingNew && dataset !== "" && emptyTraining !== ""  && (
+            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
           )}
 
 

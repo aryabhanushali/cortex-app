@@ -40,37 +40,58 @@ export default function ScatterGapCeiling({
   ceilingData,
   roi,
   dataset,
+  training,   // 👉 新增的 props
 }) {
   const svgRef = useRef();
 
   useEffect(() => {
     if (!murtyData && !nsdData) return;
 
-    const entries = [
-      ...Object.entries(murtyData || {}).map(([key, value]) => {
-        const [ds, roiName] = key.split("/");
-        return { Dataset: ds, ROI: roiName, Train: "Murty185", ...value };
-      }),
-      ...Object.entries(nsdData || {}).map(([key, value]) => {
-        const [ds, roiName] = key.split("/");
-        return { Dataset: ds, ROI: roiName, Train: "NSD1000", ...value };
-      }),
-    ];
+    // ===== 根据 training 筛选数据源 =====
+    let entries = [];
+    if (training === "Murty185") {
+      entries = [
+        ...Object.entries(murtyData || {}).map(([key, value]) => {
+          const [ds, roiName] = key.split("/");
+          return { Dataset: ds, ROI: roiName, Train: "Murty185", ...value };
+        }),
+      ];
+    } else if (training === "NSD") {
+      entries = [
+        ...Object.entries(nsdData || {}).map(([key, value]) => {
+          const [ds, roiName] = key.split("/");
+          return { Dataset: ds, ROI: roiName, Train: "NSD1000", ...value };
+        }),
+      ];
+    } else {
+      // 默认：两边都 merge
+      entries = [
+        ...Object.entries(murtyData || {}).map(([key, value]) => {
+          const [ds, roiName] = key.split("/");
+          return { Dataset: ds, ROI: roiName, Train: "Murty185", ...value };
+        }),
+        ...Object.entries(nsdData || {}).map(([key, value]) => {
+          const [ds, roiName] = key.split("/");
+          return { Dataset: ds, ROI: roiName, Train: "NSD1000", ...value };
+        }),
+      ];
+    }
+
 
     let filtered;
-    if (dataset === "murty185" || dataset === "nsd_1000") {
-      filtered = entries.filter(
-        (d) =>
-          d.Train.toLowerCase() === dataset.toLowerCase() &&
-          (roi === "" || d.ROI === roi)
-      );
-    } else {
+    // if (dataset === "murty185" || dataset === "nsd_1000") {
+    //   filtered = entries.filter(
+    //     (d) =>
+    //       d.Train.toLowerCase() === dataset.toLowerCase() &&
+    //       (roi === "" || d.ROI === roi)
+    //   );
+    // } else {
       filtered = entries.filter(
         (d) =>
           (roi === "" || d.ROI === roi) &&
           (dataset === "" || d.Dataset === dataset)
       );
-    }
+    // }
 
     const grouped = d3.rollups(
       filtered,
@@ -289,7 +310,7 @@ export default function ScatterGapCeiling({
         .attr("font-size", 20)
         .text(label);
     });
-  }, [murtyData, nsdData, ceilingData, roi, dataset]);
+  }, [murtyData, nsdData, ceilingData, roi, dataset,training]);
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
