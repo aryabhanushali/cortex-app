@@ -292,7 +292,13 @@ export const MODELCARD_INFO_LOOKUP = {
 
 export const DATASETCARD_OPTIONS = [
   { value: "nsd_1000", label: "Natural Scenes Dataset (NSD1000)" },
-  { value: "murty185", label: "Murty185" }
+  { value: "murty185", label: "Murty185" },
+  { value: 'bold_5000', label: 'BOLD5000v2' },
+  { value: 'bonner_2021', label: 'Bonner2021' },
+  { value: 'bmd_2024', label: 'BMD2024' },
+  { value: 'kingbaker_2019', label: 'King2019' },
+  { value: 'wardle_2020', label: 'Wardle2020' },
+  { value: 'nsd_syn', label: 'NSD synthetic' },
   // add more datasets...
 ];
 
@@ -311,6 +317,48 @@ export const DATASETCARD_INFO_LOOKUP = {
     description: "An fMRI dataset of four participants responses in functionally-defined regions of interest (fROIs) to a diverse set of 185 naturalistic stimuli. Each of the 185 images was presented at least 20 times to each participant (Murty et al., 2021).",
     cardUrl: "https://www.nature.com/articles/s41467-021-25409-6"
   },
+  bold_5000: {
+    category: "Faces & Objects",
+    size: "4,803 images",
+    subjects: 4,
+    description: "A Large-scale, slow event-related fMRI dataset collected on 4 subjects, each observing 5,254 images over 15 scanning sessions.",
+    cardUrl: "https://bold5000-dataset.github.io/website/"
+  },
+  bonner_2021: {
+    category: "Objects",
+    size: "810 images",
+    subjects: 4,
+    description: "fMRI responses while participants viewed 810 isolated objects (81 categories × 10 exemplars) on textured backgrounds; tests object co-occurrence representations (Bonner & Epstein, 2021).",
+    cardUrl: "https://www.nature.com/articles/s41467-021-24368-2"
+  },
+  bmd_2024: {
+    category: "Naturalistic Videos",
+    size: "1,102 short videos",
+    subjects: 10,
+    description: "Whole-brain fMRI while participants watched 3-second naturalistic clips with rich annotations (objects, scenes, actions, sentences, memorability) (Lahner et al., 2024).",
+    cardUrl: "https://www.nature.com/articles/s41467-024-50310-3"
+  },
+  kingbaker_2019: {
+    category: "Multi-Domain Tasks",
+    size: "26 tasks / 47 conditions",
+    subjects: 24,
+    description: "MDTB: four fMRI sessions per participant across diverse cognitive, motor, and affective tasks; used to derive functional parcellations of cerebellum/cortex (King & Hernandez-Castillo et al., 2019).",
+    cardUrl: "https://pmc.ncbi.nlm.nih.gov/articles/PMC6591952/"
+  },
+  wardle_2020: {
+    category: "Faces",
+    size: "96 images",
+    subjects: 16,
+    description: "fMRI (plus MEG) responses to 32 illusory faces, 32 matched objects, and 32 human faces; characterizes pareidolia in face-selective cortex (Wardle et al., 2020).",
+    cardUrl: "https://www.nature.com/articles/s41467-020-18325-8"
+  },
+  nsd_syn: {
+    category: "Natural Scenes (Synthetic/OOD)",
+    size: "284 synthetic images",
+    subjects: 8,
+    description: "NSD-synthetic: 7T fMRI from the eight NSD subjects to carefully controlled synthetic images for out-of-distribution model testing (Gifford et al., 2025).",
+    cardUrl: "https://arxiv.org/abs/2503.06286"
+  }
 };
 
 // =====================
