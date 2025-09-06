@@ -6,7 +6,7 @@
 }
 
 /* Global Colors - The following color variables are used throughout the website. Updating them here will change the color scheme of the entire website */
-:root { 
+:root {
   --background-color: #ffffff; /* Background color for the entire website, including individual sections */
   --default-color: #444444; /* Default color used for the majority of the text content across the entire website */
   --heading-color: #012970; /* Color for headings, subheadings and title throughout the website */
@@ -2796,12 +2796,12 @@ section,
 --------------------------------------------------------------*/
 
 .chart-title {
-  font-size: 20px;            
-  font-weight: 600;          
-  color: #000000;             
-  text-align: center;        
-  margin: 30px 0 12px 0;     
-  line-height: 1.4;           
+  font-size: 20px;
+  font-weight: 600;
+  color: #000000;
+  text-align: center;
+  margin: 30px 0 12px 0;
+  line-height: 1.4;
 }
 
 
@@ -2810,9 +2810,9 @@ section,
   display: flex;
   align-items: flex-start;
   margin-left: 35%;
-  gap: 5px; 
+  gap: 5px;
   margin-top: 10px;
-  
+
 }
 .header-title {
   position: absolute;
@@ -2823,15 +2823,15 @@ section,
 }
 
 .header-title h1 {
-  font-size: 35px;  
-  font-weight: 700; 
-  color: var(--heading-color); 
+  font-size: 35px;
+  font-weight: 700;
+  color: var(--heading-color);
   margin-top: 0;
   text-align: center;
 }
 
 .overallchart {
-  
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2839,7 +2839,7 @@ section,
 
 .loading-overlay {
   position: absolute;
-  
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2857,15 +2857,15 @@ section,
 
 /* first page button */
 .scoreboard-page .custom-btn {
-  font-size: 30px; 
-  padding: 20px 30px; 
-  border-radius: 12px; 
-  width: 100%; 
-  height: 200px; 
+  font-size: 30px;
+  padding: 20px 30px;
+  border-radius: 12px;
+  width: 100%;
+  height: 200px;
 }
 
 
-  
+
 
 
 
@@ -2883,9 +2883,9 @@ section,
 }
 
 .cross-region-performance-page .header-title h1 {
-  font-size: 35px;  
-  font-weight: 700; 
-  color: var(--heading-color); 
+  font-size: 35px;
+  font-weight: 700;
+  color: var(--heading-color);
   margin-top: 0;
   text-align: center;
 }
@@ -2903,9 +2903,34 @@ section,
 }
 
 .roi-performance-page .header-title h1 {
-  font-size: 35px;  
-  font-weight: 700; 
-  color: var(--heading-color); 
+  font-size: 35px;
+  font-weight: 700;
+  color: var(--heading-color);
   margin-top: 0;
   text-align: center;
 }
+
+/*--------------------------------------------------------------
+# walkthrough
+--------------------------------------------------------------*/
+
+
+.walkthrough-btn-row {
+  text-align: right;
+  margin: 4px 2rem 0 0;
+}
+
+.walkthrough-btn-row .btn {
+  font-size: 0.80rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.walkthrough-img {
+  display: block;
+  max-width: 100%;   /* don’t go beyond page width */
+  height: auto;      /* keep aspect ratio */
+  margin: 0 auto;    /* center image */
+  padding: 1rem 0;   /* space around it */
+}
+

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>The Lab - Virtual Visual Cortex</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="assets/img/logo.svg" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Nunito:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+</head>
+
+<body class="lab-page">
+
+
+ <!-- Navbar -->
+ <header id="header" class="header d-flex align-items-center sticky-top">
+   <div class="container-fluid container-xl position-relative d-flex align-items-center">
+     <a href="index.html" class="logo d-flex align-items-center me-auto">
+       <img src="assets/img/logo.svg" alt="">
+       <h1 class="sitename">Cortex</h1>
+     </a>
+     <nav id="navmenu" class="navmenu">
+       <ul>
+         <li><a href="index.html">Home</a></li>
+         <li><a href="lab-page.html">The Lab</a></li>
+         <li><a href="scoreboard-landing.html">The Scoreboard</a></li>
+
+       </ul>
+       <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+     </nav>
+   </div>
+ </header>
+
+</div>
+
+ <!-- Walkthrough Content -->
+ <div class="walkthrough-container">
+   <img id="walkthroughImage" src="assets/img/walkthrough-img1.png" alt="Walkthrough Step" class="walkthrough-img">
+ </div>
+
+
+ <div class="controls">
+  <a href="scoreboard-page-new.html" class="btn btn-outline-primary">
+    <i class="bi bi-arrow-left-circle"></i> Back to Scoreboard
+  </a>
+  <button id="backBtn" class="btn btn-secondary">
+    <i class="bi bi-arrow-left"></i> Back
+  </button>
+  <button id="nextBtn" class="btn btn-primary">
+    Next <i class="bi bi-arrow-right"></i>
+  </button>
+</div>
+
+
+
+ <!-- Bootstrap JS -->
+ <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+
+ <script>
+   // Array of walkthrough screenshots
+   const images = [
+     "assets/img/walkthrough-img1.png",
+     "assets/img/walkthrough-img2.png",
+     "assets/img/walkthrough-img3.png",
+     "assets/img/walkthrough-img4.png",
+     "assets/img/walkthrough-img5.png",
+     "assets/img/walkthrough-img6.png",
+     "assets/img/walkthrough-img7.png",
+     "assets/img/walkthrough-img8.png",
+     "assets/img/walkthrough-img9.png",
+     "assets/img/walkthrough-img10.png",
+     "assets/img/walkthrough-img11.png",
+     "assets/img/walkthrough-img12.png"
+   ];
+
+
+   let currentStep = 0;
+   const imgElement = document.getElementById("walkthroughImage");
+   const nextBtn = document.getElementById("nextBtn");
+   const backBtn = document.getElementById("backBtn");
+
+
+   nextBtn.addEventListener("click", () => {
+     currentStep++;
+     if (currentStep < images.length) {
+       imgElement.src = images[currentStep];
+       window.scrollTo({ top: 0, behavior: "smooth" });
+     } else {
+       // If last image, go back to scoreboard
+       window.location.href = "scoreboard-page-new.html";
+     }
+   });
+
+
+ </script>
+</body>
+</html>
+<style>
+ .controls {
+  display: flex;
+  justify-content: center;  /* center all buttons */
+  gap: 1rem;                /* spacing between buttons */
+  margin-top: 1rem;
+}
+
+.controls .btn {
+  font-size: 0.9rem;
+  padding: 6px 14px;
+}
+
+</style>
+

@@ -30,6 +30,7 @@ export default defineConfig({
         specificDataset: 'specify-dataset-page.html',
         crossRegion: 'cross-region-performance-page.html',
         roiPerformance: 'roi-performance-page.html',
+        walkthrough: 'walkthrough.html'
 
 
 
