@@ -118,17 +118,25 @@
 </body>
 </html>
 <style>
- .controls {
+.controls {
+  position: fixed;
+  bottom: 0;               /* stick to bottom */
+  left: 0;
+  width: 100%;             /* stretch across screen */
   display: flex;
-  justify-content: center;  /* center all buttons */
-  gap: 1rem;                /* spacing between buttons */
-  margin-top: 1rem;
+  justify-content: center; /* center all buttons */
+  gap: 1rem;               /* spacing between buttons */
+  padding: 0.75rem;
+  background: #fff;        /* white background so it doesn’t overlap invisibly */
+  border-top: 1px solid #ddd; /* subtle divider */
+  z-index: 1000;           /* stay above other content */
 }
 
 .controls .btn {
   font-size: 0.9rem;
   padding: 6px 14px;
 }
+
 
 </style>
 
