@@ -999,6 +999,8 @@ section,
 @media (min-width: 992px) {
   .brain-viewport { height: 520px; }
 }
+
+
 /*--------------------------------------------------------------
 # About Section
 --------------------------------------------------------------*/
@@ -3009,9 +3011,36 @@ section,
 
 .walkthrough-img {
   display: block;
-  max-width: 100%;   
-  height: auto;     
-  margin: 0 auto;    
-  padding: 1rem 0;   
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  padding: 1rem 0;
 }
 
+/* Neural Pulse Glow Animation */
+.pulse-glow {
+  font-size: 75px;
+  font-weight: 700;
+  line-height: 70px;
+  color: #012970;
+  text-align: left;
+  animation: neuralPulse 4s infinite ease-in-out;
+}
+
+@keyframes neuralPulse {
+  0% {
+    text-shadow: 0 0 4px rgba(65, 84, 241, 0.15),
+                 0 0 10px rgba(65, 84, 241, 0.2);
+    color: #012970;
+  }
+  50% {
+    text-shadow: 0 0 8px rgba(65, 84, 241, 0.25),
+                 0 0 20px rgba(65, 84, 241, 0.3);
+    color: #2a3fbf; /* softer mid-blue instead of neon */
+  }
+  100% {
+    text-shadow: 0 0 4px rgba(65, 84, 241, 0.15),
+                 0 0 10px rgba(65, 84, 241, 0.2);
+    color: #012970;
+  }
+}
