@@ -60,7 +60,7 @@ material.onBeforeCompile = (shader) => {
 };
       const mesh = new THREE.Mesh(geometry, material);
 
-        geometry.computeVertexNormals();  
+        geometry.computeVertexNormals();  // 确保有法线
         geometry.center();    
 
       geometry.computeBoundingBox();
@@ -193,6 +193,5 @@ function initNeuralNetwork() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  initBrainViewer('assets/brainModel/brain.stl'); 
-  initNeuralNetwork();
+  initBrainViewer('assets/brainModel/brain.stl'); // <- 这里用你实际文件路径
 });
