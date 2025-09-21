@@ -41,7 +41,7 @@ function initBrainViewer(url = 'assets/brainModel/brain.stl') {
         roughness: 0.1,      
         clearcoat: 0.5,        
         clearcoatRoughness: 0.1,
-        reflectivity: 0.6,    
+        reflectivity: 0.6,     
         transparent: true,   
         opacity: 0.9    
   
@@ -61,7 +61,7 @@ material.onBeforeCompile = (shader) => {
       const mesh = new THREE.Mesh(geometry, material);
 
         geometry.computeVertexNormals();  // 确保有法线
-        geometry.center();    
+        geometry.center();
 
       geometry.computeBoundingBox();
       const box = geometry.boundingBox;
@@ -194,4 +194,5 @@ function initNeuralNetwork() {
 
 window.addEventListener('DOMContentLoaded', () => {
   initBrainViewer('assets/brainModel/brain.stl'); // <- 这里用你实际文件路径
+  initNeuralNetwork();
 });
