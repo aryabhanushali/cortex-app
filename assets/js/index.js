@@ -43,8 +43,8 @@ function initBrainViewer(url = 'assets/brainModel/brain.stl') {
         clearcoatRoughness: 0.1,
         reflectivity: 0.6,     // 让它多反射环境光
         transparent: true,   // 必须加
-        opacity: 0.9    
-  
+        opacity: 0.9
+
     });
     // 加入 y 方向渐变 (白 -> 浅蓝)
 material.onBeforeCompile = (shader) => {
@@ -61,7 +61,7 @@ material.onBeforeCompile = (shader) => {
       const mesh = new THREE.Mesh(geometry, material);
 
         geometry.computeVertexNormals();  // 确保有法线
-        geometry.center();    
+        geometry.center();
 
       geometry.computeBoundingBox();
       const box = geometry.boundingBox;
@@ -121,6 +121,78 @@ material.onBeforeCompile = (shader) => {
   window.addEventListener('orientationchange', resize);
 }
 
+// ===== Neural Network Background Animation =====
+function initNeuralNetwork() {
+  const neuralCanvas = document.getElementById('neuralCanvas');
+  if (!neuralCanvas) return;
+
+  const ctx = neuralCanvas.getContext('2d');
+
+  function resizeCanvas() {
+    neuralCanvas.width = neuralCanvas.offsetWidth;
+    neuralCanvas.height = neuralCanvas.offsetHeight;
+  }
+
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  const nodes = [];
+  const nodeCount = 40;
+
+  // Create nodes
+  for (let i = 0; i < nodeCount; i++) {
+    nodes.push({
+      x: Math.random() * neuralCanvas.width,
+      y: Math.random() * neuralCanvas.height,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5
+    });
+  }
+
+  function animateNetwork() {
+    ctx.clearRect(0, 0, neuralCanvas.width, neuralCanvas.height);
+
+    // Draw connections
+    for (let i = 0; i < nodeCount; i++) {
+      for (let j = i + 1; j < nodeCount; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 150) {
+          ctx.strokeStyle = 'rgba(70, 85, 221, 0.3)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw nodes and update positions
+    nodes.forEach(node => {
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#4655dd';
+      ctx.fill();
+
+      // Update position
+      node.x += node.vx;
+      node.y += node.vy;
+
+      // Bounce off edges
+      if (node.x < 0 || node.x > neuralCanvas.width) node.vx *= -1;
+      if (node.y < 0 || node.y > neuralCanvas.height) node.vy *= -1;
+    });
+
+    requestAnimationFrame(animateNetwork);
+  }
+
+  animateNetwork();
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   initBrainViewer('assets/brainModel/brain.stl'); // <- 这里用你实际文件路径
+  initNeuralNetwork();
 });
