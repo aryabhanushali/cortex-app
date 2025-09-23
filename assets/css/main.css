@@ -833,11 +833,37 @@ section,
   background-size: cover;
 }
 
+#neuralCanvasGlobal {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
 .hero h1 {
   margin: 0;
   font-size: 75px; /* 64px */
   font-weight: 700;
   line-height: 70px;
+}
+
+/* Stats section neural background canvas */
+#neuralCanvasStats {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0; /* behind stats cards */
+  opacity: 0.18; /* subtle */
+  pointer-events: none;
+}
+
+#stats .container {
+  position: relative; /* create stacking context above the canvas */
+  z-index: 1;
 }
 
 .hero p {
