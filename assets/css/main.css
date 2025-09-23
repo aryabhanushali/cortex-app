@@ -843,6 +843,16 @@ section,
   pointer-events: none;
 }
 
+#neuralCanvasGlobal {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
 .hero h1 {
   margin: 0;
   font-size: 75px; /* 64px */
