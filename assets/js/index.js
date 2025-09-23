@@ -192,7 +192,142 @@ function initNeuralNetwork() {
   animateNetwork();
 }
 
+// Global neural background
+function initGlobalNeuralBackground() {
+  const canvas = document.getElementById('neuralCanvasGlobal');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const nodes = [];
+  const nodeCount = 70; // a bit more nodes for full page
+
+  for (let i = 0; i < nodeCount; i++) {
+    nodes.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4
+    });
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < nodeCount; i++) {
+      for (let j = i + 1; j < nodeCount; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 160) {
+          ctx.strokeStyle = 'rgba(70, 85, 221, 0.35)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    nodes.forEach(n => {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#4655dd';
+      ctx.fill();
+
+      n.x += n.vx;
+      n.y += n.vy;
+      if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+      if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+    });
+
+    requestAnimationFrame(tick);
+  }
+
+  tick();
+}
+
+// Stats-only subtle background
+function initStatsNeuralBackground() {
+  const canvas = document.getElementById('neuralCanvasStats');
+  const section = document.getElementById('stats');
+  if (!canvas || !section) return;
+
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    // Match canvas to visible size of stats section
+    const rect = section.getBoundingClientRect();
+    canvas.width = section.clientWidth;
+    canvas.height = section.clientHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const nodes = [];
+  const nodeCount = 30; // fewer nodes for less distraction
+
+  function seedNodes() {
+    nodes.length = 0;
+    for (let i = 0; i < nodeCount; i++) {
+      nodes.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3
+      });
+    }
+  }
+  seedNodes();
+
+  function tick() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.strokeStyle = 'rgba(70, 85, 221, 0.18)'; // very light
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    nodes.forEach(n => {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(70, 85, 221, 0.3)';
+      ctx.fill();
+
+      n.x += n.vx;
+      n.y += n.vy;
+      if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+      if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+    });
+
+    requestAnimationFrame(tick);
+  }
+
+  tick();
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   initBrainViewer('assets/brainModel/brain.stl'); // <- 这里用你实际文件路径
   initNeuralNetwork();
+  initGlobalNeuralBackground();
+  initStatsNeuralBackground();
 });
