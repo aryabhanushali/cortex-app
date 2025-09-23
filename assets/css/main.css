@@ -1052,8 +1052,13 @@ section,
 --------------------------------------------------------------*/
 .stats .stats-item {
   background-color: var(--surface-color);
-  box-shadow: 0px 0 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 0 20px rgba(0, 0, 0, 0.06);
   padding: 30px;
+  position: relative;
+  border-radius: 12px;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  overflow: hidden;
+  z-index: 1;
 }
 
 .stats .stats-item i {
@@ -1061,6 +1066,7 @@ section,
   font-size: 42px;
   line-height: 0;
   margin-right: 20px;
+  transition: color 0.6s ease, text-shadow 0.6s ease;
 }
 
 .stats .stats-item span {
@@ -1077,6 +1083,43 @@ section,
   font-size: 16px;
 }
 
+.stats .stats-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 25px rgba(70, 85, 221, 0.18),
+              0 0 45px rgba(70, 85, 221, 0.13);
+}
+
+
+.stats .stats-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(120deg, #4655dd, #15be56, #bb0852);
+  background-size: 200% 200%;
+  animation: slow-shift 16s ease infinite;
+  opacity: 0.15;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: -1;
+}
+
+@keyframes slow-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+.stats .stats-item:hover i {
+  color: var(--accent-color);
+  text-shadow: 0 0 10px rgba(70, 85, 221, 0.5),
+               0 0 20px rgba(70, 85, 221, 0.25);
+}
 /*--------------------------------------------------------------
 # Features Section
 --------------------------------------------------------------*/
