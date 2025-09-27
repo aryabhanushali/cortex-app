@@ -41,7 +41,7 @@ export default function useLoadData() {
       }
     }
 
-    d3.json('assets/data/data_scoreboard_test/trained_on_Murty185.json').then(data => {
+    d3.json('/assets/data/data_scoreboard_test/trained_on_Murty185.json').then(data => {
       if (!data || data.length === 0) {
         console.error('❌ Murty185 data is empty');
         return;
@@ -56,7 +56,7 @@ export default function useLoadData() {
       maybeFinish();
     });
 
-    d3.json('assets/data/data_scoreboard_test/trained_on_NSD.json').then(data => {
+    d3.json('/assets/data/data_scoreboard_test/trained_on_NSD.json').then(data => {
       if (!data || data.length === 0) {
         console.error('❌ NSD data is empty');
         return;

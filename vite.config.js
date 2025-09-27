@@ -20,20 +20,11 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: 'index.html',
-        admin: 'lab-page.html',
-        scoreboard: 'scoreboard-page.html',
-        scoreboardNew: 'scoreboard-page-new.html',
-        scoreboardLanding: 'scoreboard-landing.html',
-        labLanding: 'lab-landing.html',
-        overallPerformance: 'overall-performance-accross-all-regions.html',
-        specificROI: 'specify-roi-page.html',
-        specificDataset: 'specify-dataset-page.html',
-        crossRegion: 'cross-region-performance-page.html',
-        roiPerformance: 'roi-performance-page.html',
-        walkthrough: 'walkthrough.html'
-
-
-
+        lab: 'lab/index.html',
+        scoreboard: 'scoreboard/index.html',
+        scoreboardLanding: 'scoreboardLanding/index.html',
+        labLanding: 'labLanding/index.html',
+        walkthrough: 'walkthrough/index.html'
       },
     },
   },
