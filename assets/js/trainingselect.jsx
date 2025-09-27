@@ -9,7 +9,7 @@ import { TRAINING_OPTIONS, TRAINING_OPTIONS_VS } from './constants-scoreboard';
 
 const TrainingSelect = ({ training, setTraining, dataset, mode,allowToggle }) => {
   const isEnabled = (option) => {
-    // === 互斥逻辑 ===
+// button logic
     if (dataset === 'murty185' && option.value === 'Murty185') return false;
     if (dataset === 'nsd_1000' && option.value === 'NSD') return false;
     if ((dataset === 'murty185' || dataset ==="nsd_1000") && option.value === 'VS')return false;

@@ -29,7 +29,7 @@ function addOverall(content) {
     });
   });
 
-  // 平均
+  // average
   Object.keys(overall).forEach(model => {
     Object.keys(overall[model]).forEach(dataset => {
       const [sumScore, sumPval, count] = overall[model][dataset];
@@ -76,12 +76,12 @@ export default function useLoadDataNew() {
     Promise.all(
       Object.entries(files).map(([key, path]) =>
         d3.json(path).then(content => {
-          // ceiling 文件不需要 addOverall
+          // ceiling doesnot need addOverall
           if (key === "ceiling_uni" || key === "ceiling_multi") {
             console.log("📂 Loaded ceiling file:", key, content);
             return { key, content }; 
           }
-          // 其它结果文件需要 addOverall
+ 
           return { key, content: addOverall(content) };
         })
       )

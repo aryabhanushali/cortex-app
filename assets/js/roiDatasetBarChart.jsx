@@ -21,7 +21,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }
 
     const roiData = data[roi];
 
-    // ==== 数据处理 ====
+    // ==== data preprocessing ====
     const models = Object.keys(roiData).filter((m) => m !== "ceiling");
     let results = models
       .map((model) => {
@@ -39,7 +39,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }
 
     setStats({ max: ceilingMax, mean: ceilingMean });
 
-    // ==== 尺寸 ====
+    // ====scale ====
     const barWidth = 30;
     const margin = { top: 40, right: 20, bottom: 180, left: 60 };
     const height = 400;
@@ -51,14 +51,14 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }
 
     setScaleY(() => y);
 
-    // ================= 左边 ceiling SVG =================
+    // ================= left ceiling SVG =================
     const ceilingSvg = d3.select(ceilingRef.current);
     ceilingSvg.selectAll("*").remove();
     const ceilingWidth = margin.left + 50;
 
     ceilingSvg.attr("width", ceilingWidth).attr("height", height);
 
-    // 灰色虚线
+    // dot lines
     if (ceilingMax != null) {
       ceilingSvg
         .append("line")
@@ -102,7 +102,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }
           });
       }
 
-      // ceiling label 固定在 0.9
+      // ceiling label fixed at 0.95
       ceilingSvg
         .append("text")
         .attr("x", margin.left + 15 + barWidth / 2)
@@ -135,7 +135,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }
       }
     }
 
-    // y 轴
+    // y axis
     ceilingSvg
       .append("g")
       .attr("transform", `translate(${margin.left},0)`)
@@ -146,7 +146,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }
         g.selectAll("text").attr("fill", "black");
       });
 
-    // y 轴 label
+    // y  label
     const centerY = (height - margin.bottom) / 2;
     ceilingSvg
       .append("text")
@@ -175,7 +175,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }
       )
       .text("Ceiling");
 
-    // ================= 右边 bars SVG =================
+    // ================= right bars SVG =================
     const barsSvg = d3.select(barsRef.current);
     barsSvg.selectAll("*").remove();
 
@@ -188,7 +188,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }
       .range([10, width - margin.right])
       .padding(0.2);
 
-    // 灰色虚线 (在 bar 下层)
+    // dot line
     barsSvg
       .append("g")
       .selectAll("line.value-dash")
@@ -217,7 +217,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }
       .attr("fill", "#d3d3d3")
       .attr("stroke", "black");
 
-    // bar 数值 label
+    // bar label
     barsSvg
       .append("g")
       .selectAll("text.value-label")
@@ -250,14 +250,14 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }
             height - margin.bottom
           })`
       )
-   
+      //model cards
       .text((d) => d.model)
-      .style("cursor", "pointer") // ✅ 可以链式写
+      .style("cursor", "pointer") 
       .on("click", (event, d) => {
-        const newSelection = selectedModel === d.model ? null : d.model; // 🚀 再点一次取消
+        const newSelection = selectedModel === d.model ? null : d.model; 
         setSelectedModel(newSelection);
         if (onModelClick) {
-          onModelClick(newSelection); // ✅ 父组件也知道
+          onModelClick(newSelection);
         }
       });
 
@@ -276,7 +276,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }
         .attr("stroke-width", 1);
     }
 
-    // 画 ceiling mean/max
+    // ceiling mean/max
     drawLine(ceilingSvg, ceilingMax, "red", ceilingWidth, margin.left);
     drawLine(ceilingSvg, ceilingMean, "blue", ceilingWidth, margin.left);
     drawLine(barsSvg, ceilingMax, "red", width, 0);
@@ -285,17 +285,17 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }
 
   return (
     <div style={{ display: "flex", flexDirection: "row", position: "relative" }}>
-      {/* 左边 ceiling + y 轴 */}
+      {/* left ceiling + y axis */}
       <div>
         <svg ref={ceilingRef}></svg>
       </div>
 
-      {/* 右边模型 bars */}
+      {/* right bars */}
       <div style={{ overflowX: "auto" }}>
         <svg ref={barsRef}></svg>
       </div>
 
-      {/* 固定在右边的 label */}
+      {/* fixed mean/max label */}
       {scaleY && (
         <div
           style={{
@@ -335,7 +335,7 @@ const RoiBarChart = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }
         </div>
       )}
 
-      {/* Tooltip 容器 */}
+      {/* Tooltip */}
       <div
         id="roi-tooltip"
         style={{

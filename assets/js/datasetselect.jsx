@@ -9,7 +9,7 @@ const DatasetSelect = ({ dataset, setDataset, training, region, allowToggle, mod
   const isEnabled = (option) => {
     let enabled = true;
 
-    // 训练集限制
+    // traingsouces restrictions
     if (training === 'Murty185' && !MURTY185_DATASET.includes(option.value)) {
       enabled = false;
     }
@@ -20,7 +20,7 @@ const DatasetSelect = ({ dataset, setDataset, training, region, allowToggle, mod
       enabled = false;
     }
 
-    // ROI 限制
+    // ROI restrictions
     if ((region === "ffa" || region === "eba") && (option.value === "bonner_2021" || option.value === "bold_5000")) {
       enabled = false;
     }
@@ -48,7 +48,7 @@ const DatasetSelect = ({ dataset, setDataset, training, region, allowToggle, mod
           <Button
             key={option.value}
             onClick={() => {
-              if (!isEnabled(option)) return; // 禁用时不触发
+              if (!isEnabled(option)) return; 
               if (allowToggle) {
                 setDataset((prev) => (prev === option.value ? '' : option.value));
               } else {
@@ -56,7 +56,7 @@ const DatasetSelect = ({ dataset, setDataset, training, region, allowToggle, mod
               }
             }}
             variant={dataset === option.value ? 'contained' : 'outlined'}
-            disabled={!isEnabled(option)} // ✅ 不能选的直接禁用
+            disabled={!isEnabled(option)} 
           >
             {option.label}
           </Button>

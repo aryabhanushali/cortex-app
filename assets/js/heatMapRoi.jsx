@@ -40,7 +40,7 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
     const columnWidth = 100;
     const columnGap = 5;
 
-    // 颜色比例尺
+    // color legend
     const colorScale = d3.scaleLinear().domain([0, 1]).range(["#D3D3D3", "#9CC9FF"]);
 
     let xLabels = [];
@@ -49,7 +49,7 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
     let ceilingData = [];
 
     if (roi) {
-      // case 1: 固定 ROI
+      // case 1: fixed ROI
       models = Object.keys(data[roi] || {}).filter((m) => m !== "ceiling");
       xLabels = Array.from(new Set(models.flatMap((m) => Object.keys(data[roi][m] || {}))));
 
@@ -93,7 +93,7 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
 
       xLabels = ["global_score", ...xLabels.filter(ds => !["murty185", "nsd_1000"].includes(ds))];
     } else if (dataset) {
-      // case 2: 固定 Dataset
+      // case 2: fixed Dataset
       const rois = Object.keys(data).filter((roiName) => roiName.toLowerCase() !== "overall");
       models = [];
       let validRois = [];
@@ -155,8 +155,7 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
       return;
     }
 
-    // ========== 排序逻辑 ==========
-    // ========== 排序逻辑 ==========
+    //ranking logic
     if (rank && rank !== "") {
       const modelGlobal = {};
       cellData.forEach((d) => {
@@ -165,7 +164,6 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
         }
       });
 
-      // 统一用降序（大分数排前面）
       models.sort((a, b) => (modelGlobal[b] || -Infinity) - (modelGlobal[a] || -Infinity));
     }
 
@@ -182,7 +180,7 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
       .attr("width", width)
       .attr("height", headerHeight);
 
-    // 顶部 X 轴
+    // top x axis
     svgHeader
       .append("g")
       .attr("transform", `translate(${columnWidth / 2},${headerMargin.top - 40})`)
@@ -249,7 +247,7 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
       .style("font-size", "14px")
       .text((d) => d.raw.toFixed(2));
 
-    // ceiling Y 轴 label
+    // ceiling Y axis label
     svgHeader
       .append("g")
       .attr("transform", `translate(${headerMargin.left - 10},0)`)
@@ -312,7 +310,7 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
       .style("font-size", "14px")
       .text((d) => d.raw.toFixed(2));
 
-    // Y 轴 (models)
+    // Y  (models)
     svgBody
       .append("g")
       .attr("transform", `translate(${bodyMargin.left - 10},0)`)
@@ -330,12 +328,12 @@ const HeatmapByROI = ({ data, roi, dataset, rank, onModelClick  }) => {
           .style("font-size", "14px")
           .style("fill", "black")
           .style("font-weight", (d) => (d === selectedModel ? "bold" : "normal"))
-          .style("cursor", "pointer")  // 鼠标 hover 时显示手型
+          .style("cursor", "pointer")  
           .on("click", (event, d) => {
-              const newSelection = (selectedModel === d ? null : d);  // 🚀 再点一次取消
+              const newSelection = (selectedModel === d ? null : d);  
               setSelectedModel(newSelection);
               if (onModelClick) {
-                onModelClick(newSelection); // ✅ 父组件也知道
+                onModelClick(newSelection); 
               }
           });
       });

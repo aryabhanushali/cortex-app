@@ -62,8 +62,8 @@ const RoiHeatChart = ({ dataset, title }) => {
       .attr('class', 'axis-label clickable')
       .style('cursor', 'pointer')
       .style('font-size', `${baseFontSize * 1.2}px`)
-      .style('fill', '#000')  // 黑色
-      .style('font-weight', 'bold') // 加粗
+      .style('fill', '#000')  
+      .style('font-weight', 'bold') 
 
     
 
@@ -79,8 +79,8 @@ const RoiHeatChart = ({ dataset, title }) => {
       .attr('class', 'axis-label clickable')
       .style('cursor', 'pointer')
       .style('font-size', `${baseFontSize * 1.2}px`)
-      .style('fill', '#000')  // 黑色
-      .style('font-weight', 'bold') // 加粗
+      .style('fill', '#000') 
+      .style('font-weight', 'bold')
 
     const cells = svg.selectAll('.heatmap-cell')
       .data(dataset)

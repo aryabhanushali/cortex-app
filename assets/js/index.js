@@ -36,17 +36,17 @@ function initBrainViewer(url = 'assets/brainModel/brain.stl') {
     url,
     (geometry) => {
     const material = new THREE.MeshPhysicalMaterial({
-        // color: 0xf3f5fb,       // 浅蓝白
-        metalness: 0.1,       // 几乎不带金属
-        roughness: 0.1,       // 更光滑
-        clearcoat: 0.5,        // 清漆层，增加光泽
+        // color: 0xf3f5fb,      
+        metalness: 0.1,       
+        roughness: 0.1,      
+        clearcoat: 0.5,        
         clearcoatRoughness: 0.1,
-        reflectivity: 0.6,     // 让它多反射环境光
-        transparent: true,   // 必须加
+        reflectivity: 0.6,    
+        transparent: true,   
         opacity: 0.9    
   
     });
-    // 加入 y 方向渐变 (白 -> 浅蓝)
+
 material.onBeforeCompile = (shader) => {
   shader.fragmentShader = shader.fragmentShader.replace(
     '#include <dithering_fragment>',
@@ -60,7 +60,7 @@ material.onBeforeCompile = (shader) => {
 };
       const mesh = new THREE.Mesh(geometry, material);
 
-        geometry.computeVertexNormals();  // 确保有法线
+        geometry.computeVertexNormals();  
         geometry.center();    
 
       geometry.computeBoundingBox();
@@ -82,11 +82,11 @@ material.onBeforeCompile = (shader) => {
       requestAnimationFrame(tick);
       if (autoRotate) mesh.rotation.z += 0.001;
 
-        // 变色逻辑：用时间算颜色
-        const t = (Math.sin(time * 0.001) + 1) / 2; // 0~1 循环
-        const r = 0.75;                // 红色高 → 偏白蓝
-        const g = 0.9;                // 绿色高 → 去掉灰感
-        const b = 0.85 + 0.3 * t; ;       // 蓝色 0.9 ~ 1.0 微变化
+
+        const t = (Math.sin(time * 0.001) + 1) / 2; 
+        const r = 0.75;               
+        const g = 0.9;                
+        const b = 0.85 + 0.3 * t; ;       
         mesh.material.color.setRGB(r, g, b);
 
         controls.update();
@@ -95,18 +95,18 @@ material.onBeforeCompile = (shader) => {
         tick();
 
       controls.addEventListener('start', () => {
-        autoRotate = false; // 拖动中关闭自转
+        autoRotate = false; 
         });
 
         controls.addEventListener('end', () => {
-        autoRotate = true;  // 拖动结束恢复自转
+        autoRotate = true; 
         });
     },
     undefined,
     (err) => {
-      console.error('STL 加载失败：', err);
-      container.innerHTML =
-        '<div style="padding:12px;border-radius:12px;background:#f8d7da;color:#842029;font-size:14px;">⚠️ 模型加载失败，请检查路径和文件体积。</div>';
+      console.error('STL load faied：', err);
+      // container.innerHTML =
+      //   '<div style="padding:12px;border-radius:12px;background:#f8d7da;color:#842029;font-size:14px;">⚠️ 模型加载失败，请检查路径和文件体积。</div>';
     }
   );
 
@@ -122,5 +122,5 @@ material.onBeforeCompile = (shader) => {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  initBrainViewer('assets/brainModel/brain.stl'); // <- 这里用你实际文件路径
+  initBrainViewer('assets/brainModel/brain.stl'); 
 });

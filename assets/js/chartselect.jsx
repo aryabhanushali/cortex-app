@@ -7,7 +7,7 @@ import { CHART_TYPE_OPTIONS, RANK } from './constants-scoreboard';
 const ChartSelect = ({ chartType, setChartType, rank, setRank, enable }) => {
   return (
     <div style={{ display: "flex", justifyContent: "center",gap: 10 }}>
-      {/* 第一组：Uni vs Multi */}
+      {/*：Uni vs Multi */}
       <ButtonGroup>
         {CHART_TYPE_OPTIONS.map((option) => (
           <Button
@@ -20,7 +20,7 @@ const ChartSelect = ({ chartType, setChartType, rank, setRank, enable }) => {
         ))}
       </ButtonGroup>
 
-      {/* 第二组：All vs Top10 */}
+      {/*：All vs Top10 */}
       {enable &&(
         <ButtonGroup>
         {RANK.map((option) => (

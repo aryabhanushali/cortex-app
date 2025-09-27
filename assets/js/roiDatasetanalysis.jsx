@@ -40,14 +40,14 @@ export default function ScatterGapCeiling({
   ceilingData,
   roi,
   dataset,
-  training,   // 👉 新增的 props
+  training,   
 }) {
   const svgRef = useRef();
 
   useEffect(() => {
     if (!murtyData && !nsdData) return;
 
-    // ===== 根据 training 筛选数据源 =====
+    // =====  training filter =====
     let entries = [];
     if (training === "Murty185") {
       entries = [
@@ -64,7 +64,6 @@ export default function ScatterGapCeiling({
         }),
       ];
     } else {
-      // 默认：两边都 merge
       entries = [
         ...Object.entries(murtyData || {}).map(([key, value]) => {
           const [ds, roiName] = key.split("/");
@@ -215,10 +214,10 @@ export default function ScatterGapCeiling({
       mainDot
       .on("mouseover", () => {
         g.selectAll(".agg-item").attr("display", "none");
-        // 保留 hover 的 aggregated 元素 (label + ceiling range)
+
         g.selectAll(`.agg-item[data-id='${id}']`).attr("display", null);
 
-        // 主点变浅 + 动画
+
         mainDot.transition().duration(200).attr("opacity", 0.3);
 
         hoverLayer.selectAll("*").remove();
@@ -233,7 +232,7 @@ export default function ScatterGapCeiling({
             const py = y(pt.normalized_gap);
             const subShape = d3.symbol().type(shapeFn).size(80)();
 
-            // 裂变子点带淡入动画
+            // animation
             hoverLayer
               .append("path")
               .attr("d", subShape)
@@ -262,7 +261,7 @@ export default function ScatterGapCeiling({
         }
       })
       .on("mouseout", () => {
-        // 主点恢复不透明
+        
         mainDot.transition().duration(200).attr("opacity", 1);
         g.selectAll(".agg-item").attr("display", null);
         hoverLayer.selectAll("*").remove();
