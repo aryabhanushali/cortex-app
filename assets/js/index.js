@@ -106,7 +106,7 @@ material.onBeforeCompile = (shader) => {
     (err) => {
       console.error('STL load faied：', err);
       // container.innerHTML =
-      //   '<div style="padding:12px;border-radius:12px;background:#f8d7da;color:#842029;font-size:14px;">⚠️ 模型加载失败，请检查路径和文件体积。</div>';
+      //   '<div style="padding:12px;border-radius:12px;background:#f8d7da;color:#842029;font-size:14px;">⚠️。</div>';
     }
   );
 
@@ -193,6 +193,6 @@ function initNeuralNetwork() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  initBrainViewer('assets/brainModel/brain.stl'); // <- 这里用你实际文件路径
+  initBrainViewer('assets/brainModel/brain.stl'); 
   initNeuralNetwork();
 });
