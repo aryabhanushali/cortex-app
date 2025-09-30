@@ -17,71 +17,38 @@ const ROISelect = ({ region, setRegion, dataset,setDataset, allowToggle, mode,tr
    
     if((dataset === 'bold_5000'|| dataset ==='bonner_2021') && (option.value === "ffa" || option.value === "eba")) return false;
     if((dataset === 'kingbaker_2019' || dataset === 'wardle_2020') && ( option.value === "eba")) return false;
+    // if((dataset === "bonner_2021" ||dataset === "bold_5000" )) &&(option.value ===)
     
-    if (mode == 1) {
-       if (
-        training !== "" &&
-        (dataset === "bonner_2021" || dataset === "bold_5000")
-      ) {
-        return option.value === "ppa"; 
-      }
-
-    }
+  
    
     return true;
   };
 
   // RegionSelector.jsx
   useEffect(() => {
-    if (
-      mode === 1 &&
-      training !== "" &&
-      (dataset === "bonner_2021" || dataset === "bold_5000")
-    ) {
-
-      if (region === "") {
-        setRegion("ppa");
-      }
-      setEffectiveToggle(true); 
-    } else {
+    
       setEffectiveToggle(allowToggle);
-    }
-  }, [training, dataset, setRegion, allowToggle]); 
+  }, [allowToggle]); 
 
   const renderButtons = (options) =>
     options.map((option) => (
       <Button
         key={option.value}
-        // onClick={() => {
-        //   if (!isEnabled(option)) return;
-        //   if (effectiveToggle) {
-        //     setRegion((prev) => (prev === option.value ? "" : option.value));
-        //   } else {
-        //     setRegion(option.value);
-        //   }
-        // }}
         onClick={() => {
           if (!isEnabled(option)) return;
           if (effectiveToggle) {
-            if (region === option.value) {
-              
-              if (
-                mode === 1 &&
-                (dataset === "bonner_2021" || dataset === "bold_5000") &&
-                option.value === "ppa"
-              ) {
-                setRegion("");
-                setDataset(""); 
-              } else {
-                setRegion("");
-              }
-            } else {
-              setRegion(option.value);
-            }
+            setRegion((prev) => (prev === option.value ? "" : option.value));
           } else {
             setRegion(option.value);
           }
         }}
+        // onClick={() => {
+        //   if (!isEnabled(option)) return;
+        //   if (effectiveToggle) {
+          
+        //     setRegion(option.value);
+        //   }
+        // }}
         variant={region === option.value ? "contained" : "outlined"}
         disabled={!isEnabled(option)}
         sx={{
