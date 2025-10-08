@@ -10,7 +10,7 @@ export default function Home() {
   // Initialize typewriter effect on client side
   useEffect(() => {
     const typewriteElements = document.querySelectorAll('.typewrite');
-    
+
     function typeWriter(element: Element) {
       const dataType = element.getAttribute('data-type');
       const dataPeriod = element.getAttribute('data-period');
@@ -21,21 +21,21 @@ export default function Home() {
         let isDeleting = false;
         const period = parseInt(dataPeriod || '2000');
         const wrap = element.querySelector('.wrap');
-        
+
         function tick() {
           const fullText = texts[textIndex];
-          let updatedText = isDeleting 
-            ? fullText.substring(0, charIndex - 1) 
+          let updatedText = isDeleting
+            ? fullText.substring(0, charIndex - 1)
             : fullText.substring(0, charIndex + 1);
-          
+
           if (wrap) wrap.textContent = updatedText;
-          
+
           if (isDeleting) {
             charIndex--;
           } else {
             charIndex++;
           }
-          
+
           if (!isDeleting && charIndex === fullText.length) {
             isDeleting = true;
             setTimeout(() => tick(), 1000);
@@ -47,11 +47,11 @@ export default function Home() {
             setTimeout(() => tick(), isDeleting ? 50 : 100);
           }
         }
-        
+
         tick();
       }
     }
-    
+
     typewriteElements.forEach(element => {
       typeWriter(element);
     });
@@ -67,7 +67,7 @@ export default function Home() {
             <div className="row gy-5 align-items-center">
               <div className="col-lg-8 order-2 order-lg-1 d-flex flex-column justify-content-center">
                 <h1 className="display-4 fw-bold mb-4" data-aos="fade-up">Virtual Visual Cortex</h1>
-                
+
                 <div className="typewriter-container" data-aos="fade-up" data-aos-delay="100">
                   <p className="typewrite lead fs-4 mb-5" data-period="2000" data-type='["Predict responses in the brain", "Simulate your own experiments", "Learn more about human brain areas", "Upload images and map them to neural patterns"]'>
                     <span className="wrap"></span>
@@ -82,7 +82,7 @@ export default function Home() {
                     View Model Performance <i className="bi bi-graph-up ms-2"></i>
                   </Link>
                 </div>
-                
+
                 <div className="mt-5 d-none d-md-block" data-aos="fade-up" data-aos-delay="300">
                   <div className="d-flex align-items-center gap-3">
                     <div className="badge bg-light text-dark px-3 py-2 rounded-pill">
@@ -99,10 +99,10 @@ export default function Home() {
               </div>
               <div className="col-lg-4 order-1 order-lg-2 hero-img" data-aos="zoom-out">
                 <div className="position-relative d-flex justify-content-center align-items-center">
-                  <img 
-                    src="assets/img/logo.svg" 
-                    className="img-fluid animated" 
-                    alt="Cortex Logo" 
+                  <img
+                    src="assets/img/logo.svg"
+                    className="img-fluid animated"
+                    alt="Cortex Logo"
                     style={{
                       filter: "drop-shadow(0 10px 15px rgba(0,0,0,0.1))",
                       maxHeight: "400px"
@@ -113,7 +113,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          
+
           {/* Background decoration */}
           <div className="position-absolute top-0 end-0 d-none d-lg-block" style={{ zIndex: -1, opacity: 0.1 }}>
             <svg width="600" height="600" viewBox="0 0 600 600">
@@ -122,7 +122,7 @@ export default function Home() {
               </g>
             </svg>
           </div>
-          
+
           <div className="position-absolute bottom-0 start-0 d-none d-lg-block" style={{ zIndex: -1, opacity: 0.1 }}>
             <svg width="500" height="500" viewBox="0 0 600 600">
               <g transform="translate(300,300)">
@@ -154,7 +154,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="col-md-4" data-aos="fade-up" data-aos-delay="200">
                 <div className="card h-100 border-0 shadow-sm">
                   <div className="card-body text-center p-4">
@@ -166,7 +166,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="col-md-4" data-aos="fade-up" data-aos-delay="300">
                 <div className="card h-100 border-0 shadow-sm">
                   <div className="card-body text-center p-4">
@@ -199,7 +199,7 @@ export default function Home() {
                         Why work with Cortex?
                       </button>
                     </h2>
-                    <div id="faq1" className="accordion-collapse collapse show" data-bs-parent="#faqAccordion1">
+                    <div id="faq1" className="accordion-collapse collapse rounded" data-bs-parent="#faqAccordion1">
                       <div className="accordion-body">
                         <p>Cortex provides a unique platform for researchers, educators, and AI enthusiasts to explore the intersection of computer vision models and human brain activity. Our tools allow you to simulate fMRI experiments without the need for expensive equipment or specialized knowledge.</p>
                       </div>
@@ -292,25 +292,25 @@ export default function Home() {
           align-items: center;
           justify-content: center;
         }
-        
+
         .bg-gradient-circle {
           background: radial-gradient(circle, rgba(78,115,223,0.1) 0%, rgba(255,255,255,0) 70%);
         }
-        
+
         .typewriter-container {
           min-height: 60px;
         }
-        
+
         .typewrite .wrap {
           border-right: 0.08em solid #4e73df;
           padding-right: 5px;
         }
-        
+
         @media (max-width: 768px) {
           .hero h1 {
             font-size: 2rem;
           }
-          
+
           .typewrite {
             font-size: 1.2rem;
           }
