@@ -11,6 +11,10 @@ export default defineConfig({
         {
           src: 'assets',
           dest: '.'
+        },
+        {
+          src: 'cortex-web-app/model-pages',
+          dest: '.'
         }
       ]
     })
