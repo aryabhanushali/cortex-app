@@ -11,7 +11,7 @@ const ModelCard = ({ region, dataset, model }) => {
   const modelMeta = MODEL_OPTIONS.find(option => option.value === model);
   const modelName = modelMeta?.label || model;
   const modelType = modelMeta?.type || 'Unknown Model Type';
-  const cardUrl = modelMeta?.cardUrl || '#';
+  const cardUrl = `model-pages/${model}.html`;
 
   const { bestLayer, corrScore } = getInfo(dataset, region, model);
 
@@ -27,14 +27,14 @@ const ModelCard = ({ region, dataset, model }) => {
           </div>
           <div>
             <h4 className="card-title mb-1">
-              <a href={cardUrl} target="_blank" rel="noopener noreferrer" className="text-decoration-none text-primary">
+              <a href={cardUrl} className="text-decoration-none text-primary">
                 {modelName} <i className="bi bi-box-arrow-up-right fs-6"></i>
               </a>
             </h4>
             <span className="badge bg-light text-dark">{modelType}</span>
           </div>
         </div>
-        
+
         <div className="row mt-4">
           <div className="col-md-4 mb-3">
             <div className="info-box p-3 bg-light rounded">
@@ -55,7 +55,7 @@ const ModelCard = ({ region, dataset, model }) => {
             </div>
           </div>
         </div>
-        
+
         <div className="mt-3 pt-3 border-top">
           <p className="text-muted mb-0">
             <i className="bi bi-info-circle me-2"></i>

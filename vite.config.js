@@ -11,6 +11,10 @@ export default defineConfig({
         {
           src: 'assets',
           dest: '.'
+        },
+        {
+          src: 'model-pages',
+          dest: '.'
         }
       ]
     })

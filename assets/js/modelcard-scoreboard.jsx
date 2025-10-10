@@ -18,7 +18,7 @@ const ModelCardNew = ({ region, dataset, model, evalDataset }) => {
   const modelMeta = MODEL_OPTIONS.find(option => option.value === model);
   const modelName = modelMeta?.label || model;
   const modelType = modelMeta?.type || 'Unknown Model Type';
-  const cardUrl = modelMeta?.cardUrl || '#';
+  const cardUrl = `model-pages/${model}.html`;
 
   const { bestLayer, corrScore } = getInfo(dataset, region, model);
 
@@ -30,7 +30,7 @@ const ModelCardNew = ({ region, dataset, model, evalDataset }) => {
             Model Card
           </Typography>
           <Typography variant="h5" component="div">
-            <Link href={cardUrl} target="_blank" rel="noopener noreferrer" underline="hover">
+            <Link href={cardUrl} underline="hover">
               {modelName}
             </Link>
           </Typography>
@@ -40,13 +40,13 @@ const ModelCardNew = ({ region, dataset, model, evalDataset }) => {
           {evalDataset === "" && (
               <Typography variant="body2">
             The optimal model layer for the selected ROI({region.toUpperCase()}):{' '}
-            <strong>{bestLayer}</strong>, 
-            with highest correlation raw score: <strong>{corrScore.toFixed(2)}</strong>, 
+            <strong>{bestLayer}</strong>,
+            with highest correlation raw score: <strong>{corrScore.toFixed(2)}</strong>,
             evaluated on the selected fMRI dataset: <strong>{dataset}</strong>
           </Typography>
           )}
-          
-          
+
+
         </CardContent>
       </Card>
     </Box>
