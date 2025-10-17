@@ -10,7 +10,7 @@ const SelectedFiltersBar = ({ training, region, dataset, clearSingle }) => {
 
   if (Array.isArray(dataset) && dataset.length > 0) {
     dataset.forEach((r) => {
-      selected.push({ key: `region-${r}`, label: r.toUpperCase(), color: '#9bbfc4ff' });
+      selected.push({ key: `dataset-${r}`, label: r.toUpperCase(), color: '#9bbfc4ff' });
     });
   }
   // ✅ region 是数组，展开
@@ -42,9 +42,9 @@ const SelectedFiltersBar = ({ training, region, dataset, clearSingle }) => {
               const r = item.key.replace('region-', '');
               clearSingle('region', r);
             } 
-            if (item.key.startsWith('dataset-')) {
+            else if (item.key.startsWith('dataset-')) {
               const r = item.key.replace('dataset-', '');
-              clearSingle('datset', r);
+              clearSingle('dataset', r);
             } else {
               clearSingle(item.key);
             }

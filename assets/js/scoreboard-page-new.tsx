@@ -28,7 +28,9 @@ const ScoreboardPageNew: React.FC = (
 
   const clearSingle = (key: String, value: String) => {
   if (key === 'training') setTraining('');
-  if (key === 'dataset') setDataset([]);
+  if (key === 'dataset') {
+    setDataset((prev) => prev.filter((r) => r !== value));
+  }
   if (key === 'region') {
     setRegion((prev) => prev.filter((r) => r !== value));
   }
@@ -43,7 +45,6 @@ const ScoreboardPageNew: React.FC = (
         alignItems: 'start',
       }}
     >
-    
       <div
         style={{
           gridColumn: '1 / -1',
@@ -61,12 +62,16 @@ const ScoreboardPageNew: React.FC = (
       {/* 左侧 Filters */}
       <div
         style={{
+          height: 'calc(100vh - 160px)',  // ✅ 减去顶部 header 高度
+          overflowY: 'auto',
           minHeight: '40vh',
           display: 'flex',
           flexDirection: 'column',
           background: 'transparent',
           padding: '4px 0px',
+          scrollbarWidth: 'thin',
         }}
+
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Title level={4} style={{ marginBottom: 0 }}>
