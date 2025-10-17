@@ -41,7 +41,7 @@ const ScoreboardPageNew: React.FC = (
         display: 'grid',
         gridTemplateColumns: '1.5fr 3fr 4fr',
         gap: 16,
-        padding: 24,
+        padding: 0,
         alignItems: 'start',
       }}
     >
