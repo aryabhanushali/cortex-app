@@ -1,0 +1,89 @@
+import React from 'react';
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
+  Checkbox,
+  FormControl,
+  FormGroup,
+  FormControlLabel,
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {
+  DATASET_OPTIONS,
+  DATASET_OPTIONS_LESS,
+  MURTY185_DATASET,
+  NSD_DATASET,
+} from './constants-scoreboard';
+
+const DatasetSelectNew = ({ dataset, setDataset, training, region, allowToggle, mode }) => {
+  const options = mode === 4 ? DATASET_OPTIONS_LESS : DATASET_OPTIONS;
+
+  const isEnabled = (option) => {
+    if (training === 'Murty185' && !MURTY185_DATASET.includes(option.value)) return false;
+    if (training === 'NSD' && !NSD_DATASET.includes(option.value)) return false;
+    if (training === 'VS' && (option.value === 'murty185' || option.value === 'nsd_1000')) return false;
+    if (
+      Array.isArray(region) &&
+      (region.includes('ffa') || region.includes('eba')) &&
+      (option.value === 'bonner_2021' || option.value === 'bold_5000')
+    )
+      return false;
+    if (Array.isArray(region) && region.includes('eba') && (option.value === 'kingbaker_2019' || option.value === 'wardle_2020'))
+      return false;
+    return true;
+  };
+
+  const handleChange = (value) => {
+    if (!isEnabled({ value })) return;
+    setDataset((prev) =>
+      prev.includes(value)
+        ? prev.filter((d) => d !== value)
+        : [...prev, value]
+    );
+  };
+
+  return (
+    <Accordion defaultExpanded disableGutters sx={{ bgcolor: 'transparent' }}>
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
+        sx={{
+          bgcolor: '#f5f5f5',
+          borderRadius: 1,
+          '&.Mui-expanded': { bgcolor: '#eaeaea' },
+          minHeight: 40,
+          px: 1.5,
+        }}
+      >
+        <Typography sx={{ fontWeight: 'bold', color: 'black' }}>Evaluation Dataset</Typography>
+      </AccordionSummary>
+
+      <AccordionDetails sx={{ pl: 2 }}>
+        <FormControl component="fieldset" variant="standard" sx={{ width: '100%' }}>
+          <FormGroup>
+            {options.map((option) => (
+              <FormControlLabel
+                key={option.value}
+                control={
+                  <Checkbox
+                    checked={Array.isArray(dataset) && dataset.includes(option.value)}
+                    onChange={() => handleChange(option.value)}
+                    disabled={!isEnabled(option)}
+                    sx={{
+                      '&.Mui-checked': { color: '#55d6cdff' },
+                      '&.Mui-disabled': { color: '#b0b0b0' },
+                    }}
+                  />
+                }
+                label={option.label}
+              />
+            ))}
+          </FormGroup>
+        </FormControl>
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+export default DatasetSelectNew;

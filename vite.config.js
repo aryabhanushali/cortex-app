@@ -29,7 +29,8 @@ export default defineConfig({
         scoredboardQuality: 'scoreboardQualitative/index.html',
         scoreboardLanding: 'scoreboardLanding/index.html',
         labLanding: 'labLanding/index.html',
-        walkthrough: 'walkthrough/index.html'
+        walkthrough: 'walkthrough/index.html',
+        scoreboardQuantitativeNew: 'scoreboardQuantitativeNew/index.html'
       },
     },
   },
