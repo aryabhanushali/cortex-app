@@ -4,53 +4,101 @@ import { Typography, Button } from 'antd';
 import TrainingSelectNew from './trainingselectnew.jsx';
 import ROISelectNew from './roiselectnew.jsx';
 import DatasetSelectNew from './datasetselectnew.jsx';
-import SelectedFiltersBar from './selectFiltersBar.jsx'; 
+import SelectedFiltersBar from './selectFiltersBar.jsx';
+import ChartSelect from './chartselect.jsx'; 
+import HeatmapOverview from './heatmapOverview.jsx';
+import HeatmapByROI from './heatMapRoi.jsx';
+
+
+
+import useLoadDataNew from './loadDataNew.jsx';
 
 const { Title } = Typography;
 
-const ScoreboardPageNew: React.FC = (
-) => {
-  const [training, setTraining] = useState('');
+const ScoreboardPageNew: React.FC = () => {
+  const [training, setTraining] = useState('NSD');
   const [region, setRegion] = useState([]);
-  const [dataset, setDataset] =  useState([]);
+  const [dataset, setDataset] = useState([]);
 
- const hasFilters =
-  (training && training !== '') ||
-  (Array.isArray(dataset) && dataset.length > 0) ||
-  (Array.isArray(region) && region.length > 0);
+  const [chartType, setChartType] = useState('uni'); 
+  const [rank, setRank] = useState(''); 
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
 
+
+
+  type newData = {
+    //group by ppa
+    murty_uni?: Record<string, any>;
+    nsd_uni?: Record<string, any>;
+    murty_multi?: Record<string, any>;
+    nsd_multi?: Record<string, any>;
+  
+    // 
+    ceiling_uni?: Record<string, any>;
+    ceiling_multi?: Record<string, any>;
+  
+      
+    roi_dataset_Murty185_uni?: Record<string, any>;
+    roi_dataset_Murty185_multi?: Record<string, any>;
+    roi_dataset_NSD_uni?: Record<string, any>;
+    roi_dataset_NSD_multi?: Record<string, any>;
+  };
+  
+    const { data: newData, loading: loadingNew } = useLoadDataNew() as {
+      data: newData;
+      loading: boolean;
+    };
+  
+  
+    const murtyData = chartType === "uni" ? newData?.murty_uni : newData?.murty_multi;
+    const nsdData   = chartType === "uni" ? newData?.nsd_uni   : newData?.nsd_multi;
+    const ROI_DATASET_Murty = chartType === "uni" ? newData?.roi_dataset_Murty185_uni : newData?.roi_dataset_Murty185_multi;
+    const ROI_DATASET_NSD = chartType === "uni" ? newData?.roi_dataset_NSD_uni : newData?.roi_dataset_NSD_multi;
+    const Ceiling = chartType === "uni" ? newData?.ceiling_uni : newData?.ceiling_multi;
+    const yLabel = chartType === "uni" ? "Pearson Correlation" : "Spearman Correlation";
+  
+  
+
+
+  const hasFilters =
+    (training && training !== '') ||
+    (Array.isArray(dataset) && dataset.length > 0) ||
+    (Array.isArray(region) && region.length > 0);
 
   const clearFilters = () => {
     setTraining('');
-    setRegion([]); 
+    setRegion([]);
     setDataset([]);
   };
 
-  const clearSingle = (key: String, value: String) => {
-  if (key === 'training') setTraining('');
-  if (key === 'dataset') {
-    setDataset((prev) => prev.filter((r) => r !== value));
-  }
-  if (key === 'region') {
-    setRegion((prev) => prev.filter((r) => r !== value));
+  const clearSingle = (key: string, value: string) => {
+    if (key === 'training') setTraining('');
+    if (key === 'dataset') setDataset((prev) => prev.filter((r) => r !== value));
+    if (key === 'region') setRegion((prev) => prev.filter((r) => r !== value));
+  };
+
+  const getDataByTraining = (training: string) => {
+  if (training === "NSD") {
+    return  nsdData;
+  } else if (training === "Murty185") {
+    return murtyData;
+  } else {
+    return {}; 
   }
 };
+
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '1.5fr 3fr 4fr',
+        gridTemplateColumns: '1.5fr 7fr', // 左侧 filters + 右侧整体
         gap: 16,
         padding: 0,
         alignItems: 'start',
       }}
     >
-      <div
-        style={{
-          gridColumn: '1 / -1',
-          marginBottom: 8,
-        }}
-      >
+      {/* 顶部过滤标签栏 */}
+      <div style={{ gridColumn: '1 / -1', marginBottom: 8 }}>
         <SelectedFiltersBar
           training={training}
           region={region}
@@ -62,16 +110,14 @@ const ScoreboardPageNew: React.FC = (
       {/* 左侧 Filters */}
       <div
         style={{
-          height: 'calc(100vh - 160px)',  // ✅ 减去顶部 header 高度
+          height: 'calc(100vh - 200px)',
           overflowY: 'auto',
-          minHeight: '40vh',
           display: 'flex',
           flexDirection: 'column',
           background: 'transparent',
           padding: '4px 0px',
           scrollbarWidth: 'thin',
         }}
-
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Title level={4} style={{ marginBottom: 0 }}>
@@ -114,28 +160,74 @@ const ScoreboardPageNew: React.FC = (
         </div>
       </div>
 
-      {/* 中间区域 */}
+      {/* 右侧整体（中 + 右） */}
       <div
         style={{
-          minHeight: '80vh',
-          background: '#fafafa',
-          borderRadius: 8,
-          padding: 16,
+          display: 'flex',
+          flexDirection: 'column',
+          height: 'calc(100vh - 200px)',
+          gap: 16,
         }}
       >
-        <Title level={4}>Center Section</Title>
-      </div>
+        {/* ✅ 顶部 ChartSelect 组件 */}
+        <div
+          style={{
+            background: '#f5f5f5',
+            borderRadius: 8,
+            padding: '0px 0px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <ChartSelect
+            chartType={chartType}
+            setChartType={setChartType}
+            rank={rank}
+            setRank={setRank}
+            enable={true} 
+          />
+        </div>
 
-      {/* 右侧区域 */}
-      <div
-        style={{
-          minHeight: '80vh',
-          background: '#fafafa',
-          borderRadius: 8,
-          padding: 16,
-        }}
-      >
-        <Title level={4}>Controls</Title>
+    
+        <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 5.2fr', gap: 16, flex: 1 }}>
+          <div
+            style={{
+              background: '#fafafa',
+              borderRadius: 8,
+              padding: 16,
+              overflow: 'hidden',
+            }}
+
+            
+          >
+             <HeatmapOverview
+              data={getDataByTraining(training)} 
+              roi={'Overall'}
+              dataset={dataset[0] || ''}
+              rank={rank}
+              onModelClick={(m: string) => setSelectedModel(m)}
+            />
+          </div>
+
+          <div
+            style={{
+              background: '#fafafa',
+              borderRadius: 8,
+              padding: 16,
+              overflowY: 'auto',
+            }}
+          >
+              <HeatmapByROI
+              data={getDataByTraining(training)} 
+              roi={'Overall'}
+              dataset={dataset[0] || ''}
+              rank={rank}
+              onModelClick={(m: string) => setSelectedModel(m)}
+            />
+            
+          </div>
+        </div>
       </div>
     </div>
   );
