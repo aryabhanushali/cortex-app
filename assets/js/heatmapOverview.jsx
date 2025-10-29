@@ -1,9 +1,10 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
 const HeatmapOverview = ({ data, roi, dataset, rank, onModelClick }) => {
   const chartRef = useRef();
-  const [availableHeight, setAvailableHeight] = useState(window.innerHeight - 200);
+  const [availableHeight, setAvailableHeight] = useState(window.innerHeight - 180);
   const [selectedModel, setSelectedModel] = useState(null);
 
 
@@ -30,7 +31,7 @@ const HeatmapOverview = ({ data, roi, dataset, rank, onModelClick }) => {
 
     // --- ROI 模式 ---
     if (roi && data[roi]) {
-      models = Object.keys(data[roi]);
+      models = Object.keys(data[roi]).filter((m) => m !== "ceiling");
       xLabels = Array.from(new Set(models.flatMap((m) => Object.keys(data[roi][m] || {}))));
       models.forEach((model) => {
         xLabels.forEach((x) => {
@@ -44,7 +45,7 @@ const HeatmapOverview = ({ data, roi, dataset, rank, onModelClick }) => {
       const rois = Object.keys(data).filter((r) => r !== "overall");
       const seen = new Set();
       rois.forEach((r) => {
-        const modelNames = Object.keys(data[r] || {});
+        const modelNames = Object.keys(data[r] || {}).filter((m) => m !== "ceiling");
         modelNames.forEach((model) => {
           const vals = data[r][model]?.[dataset];
           if (vals) cellData.push({ model, x: r, raw: vals[0], norm: vals[1] });
@@ -68,22 +69,10 @@ const HeatmapOverview = ({ data, roi, dataset, rank, onModelClick }) => {
     }
 
     // --- 自动计算尺寸 ---
-    // const totalWidth = chartRef.current.clientWidth;
+    const totalWidth = chartRef.current.clientWidth;
     const totalHeight = availableHeight;
     const rowHeight = totalHeight / models.length;
-    // const colWidth = totalWidth / xLabels.length;
-
-    // const totalHeight = availableHeight;
-    const colWidth = 30; 
-    const totalWidth = colWidth * xLabels.length;
-    // const rowHeight = totalHeight / models.length;
-
-    const containerWidth = chartRef.current.clientWidth;
-    const offsetX = Math.max(0, (containerWidth - totalWidth) / 2);
-
-
-    const svgWidth = Math.max(containerWidth, totalWidth + offsetX * 2);
-
+    const colWidth = totalWidth / xLabels.length;
 
     const colorScale = d3
       .scaleLinear()
@@ -93,14 +82,11 @@ const HeatmapOverview = ({ data, roi, dataset, rank, onModelClick }) => {
     // --- 创建 SVG ---
     const svg = container
       .append("svg")
-      // .attr("width", "100%")
-      // .attr("height", availableHeight)
+      .attr("width", "100%")
+      .attr("height", "100%")
+      .attr("height", availableHeight)
       // .attr("viewBox", `0 0 ${totalWidth} ${totalHeight}`)
-      .attr("width", svgWidth)
-      .attr("height", totalHeight)
-      .style("background", "transparent");
-
-      
+      .style("background", "white");
 
     // --- 绘制方格 ---
     const rects = svg
@@ -108,7 +94,7 @@ const HeatmapOverview = ({ data, roi, dataset, rank, onModelClick }) => {
       .data(cellData)
       .enter()
       .append("rect")
-      .attr("x", (d) => offsetX + xLabels.indexOf(d.x) * colWidth)
+      .attr("x", (d) => xLabels.indexOf(d.x) * colWidth)
       .attr("y", (d) => models.indexOf(d.model) * rowHeight)
       .attr("width", colWidth)
       .attr("height", rowHeight)
@@ -140,10 +126,10 @@ const HeatmapOverview = ({ data, roi, dataset, rank, onModelClick }) => {
         width: "100%",
         height: `${availableHeight}px`,
         overflow: "hidden",
-        background: "transparent",
+        background: "white",
       }}
     />
   );
 };
 
-export default HeatmapOverview;
+export default HeatmapOverview; 

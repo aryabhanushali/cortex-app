@@ -7,7 +7,7 @@ import DatasetSelectNew from './datasetselectnew.jsx';
 import SelectedFiltersBar from './selectFiltersBar.jsx';
 import ChartSelect from './chartselect.jsx'; 
 import HeatmapOverview from './heatmapOverview.jsx';
-import HeatmapByROI from './heatMapRoi.jsx';
+import HeatmapDetail from './heatmapDetail.jsx';
 
 
 
@@ -190,12 +190,12 @@ const ScoreboardPageNew: React.FC = () => {
         </div>
 
     
-        <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 5.2fr', gap: 16, flex: 1 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 5.5fr', gap: 16, flex: 1 }}>
           <div
             style={{
               background: '#fafafa',
               borderRadius: 8,
-              padding: 16,
+              padding: 8,
               overflow: 'hidden',
             }}
 
@@ -210,23 +210,53 @@ const ScoreboardPageNew: React.FC = () => {
             />
           </div>
 
-          <div
+         <div
+          style={{
+            background: '#fafafa',
+            borderRadius: 8,
+            padding: 16,
+            
+                 // ✅ 内容居中
+          }}
+        >
+          {/* === Title === */}
+          <h3
             style={{
-              background: '#fafafa',
-              borderRadius: 8,
-              padding: 16,
-              overflowY: 'auto',
+              marginBottom: 8,
+              fontSize: '18px',
+              fontWeight: 600,
+              color: '#333',
+               textAlign: 'center', 
             }}
           >
-              <HeatmapByROI
+            {`Across-ROIs Performance (Trained on ${
+              training === 'NSD' ? 'NSD1000' : 'Murty185'
+            })`}
+          </h3>
+
+          {/* === Heatmap === */}
+          
+           <div
+            style={{
+              background: "#fafafa",
+              borderRadius: 8,
+              overflowX: "auto", // ✅ 可以水平滚动
+              justifyContent: "flex-start", // ✅ 改成左对齐
+              alignItems: "flex-start",
+              // marginLeft: "auto",
+              // marginRight: "auto",  
+            }}
+          >
+            <HeatmapDetail
               data={getDataByTraining(training)} 
               roi={'Overall'}
               dataset={dataset[0] || ''}
               rank={rank}
               onModelClick={(m: string) => setSelectedModel(m)}
             />
-            
           </div>
+        </div>
+
         </div>
       </div>
     </div>
