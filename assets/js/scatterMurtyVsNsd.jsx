@@ -1,0 +1,332 @@
+// ScatterMurtyVsNsd.jsx
+import React, { useEffect, useRef, useState } from "react";
+import * as d3 from "d3";
+import uniIcon from "../img/scatterplot/uni.webp";
+import multiIcon from "../img/scatterplot/multi.webp";
+
+const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOverlay, onModelClick }) => {
+  const containerRef = useRef();
+  const [selectedModel, setSelectedModel] = useState(null);
+
+  // 确保 dataset 始终是一个数组，防止报错
+  const datasetArray = Array.isArray(dataset) ? dataset : (dataset ? [dataset] : []);
+
+  useEffect(() => {
+    setSelectedModel(null);
+    if (onModelClick) onModelClick(null);
+  }, [murtyData, nsdData, roi, dataset]);
+
+  useEffect(() => {
+    if (!murtyData || !nsdData) return;
+
+    d3.select(containerRef.current).select("svg").remove();
+    d3.select(containerRef.current).select(".scatter-tooltip").remove();
+
+    const width = 910;
+    const height = 930;
+    const margin = { top: 190, right: 160, bottom: 50, left: 50 };
+    const mainSize = 700;
+    const histHeight = 160;
+    const histWidth = 160;
+
+    const color_map = {
+      bold_5000: "#1f78b4",
+      bonner_2021: "#4dd0e1",
+      bmd_2024: "#60bd68",
+      kingbaker_2019: "#9e75d6",
+      wardle_2020: "#e377c2",
+      nsd_syn: "#ffdd57",
+    };
+
+    const datasetLabelMap = {
+      murty185: "Murty185",
+      nsd_1000: "NSD1000",
+      bold_5000: "BOLD5000v2",
+      bonner_2021: "Bonner2021",
+      bmd_2024: "BMD2024",
+      kingbaker_2019: "King2019",
+      wardle_2020: "Wardle2020",
+      nsd_syn: "NSD synthetic",
+    };
+
+    const svg = d3
+      .select(containerRef.current)
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    // ===== 整理点（核心修改：支持数组 filter） =====
+    const points = [];
+    Object.keys(murtyData[roi] || {}).forEach((model) => {
+      if (model === "ceiling") return;
+      const murtyVals = murtyData[roi][model];
+      const nsdVals = nsdData[roi][model];
+      if (!murtyVals || !nsdVals) return;
+
+      Object.keys(murtyVals).forEach((ds) => {
+        // 如果数组不为空，且当前数据集不在数组中，则过滤掉
+        if (datasetArray.length > 0 && !datasetArray.includes(ds)) return;
+        
+        if (["murty185", "nsd_1000", "ceiling"].includes(ds)) return;
+        const x = murtyVals[ds]?.[0];
+        const y = nsdVals[ds]?.[0];
+        if (x != null && y != null) points.push({ model, dataset: ds, x, y });
+      });
+    });
+
+    // ===== 全局 scale（为了保证坐标轴稳定，依然使用全局数据计算范围） =====
+    let allVals = [];
+    let allXValsGlobal = [];
+    let allYValsGlobal = [];
+    Object.keys(murtyData || {}).forEach((roiKey) => {
+      Object.keys(murtyData[roiKey] || {}).forEach((model) => {
+        if (model === "ceiling") return;
+        const murtyVals = murtyData[roiKey][model];
+        const nsdVals = nsdData[roiKey][model];
+        if (!murtyVals || !nsdVals) return;
+        Object.keys(murtyVals).forEach((ds) => {
+          if (["murty185", "nsd_1000", "ceiling"].includes(ds)) return;
+          const x = murtyVals[ds]?.[0];
+          const y = nsdVals[ds]?.[0];
+          if (x != null && y != null) {
+            allVals.push(x, y);
+            allXValsGlobal.push(x);
+            allYValsGlobal.push(y);
+          }
+        });
+      });
+    });
+
+    const minVal = (d3.min(allVals) || 0) - 0.05;
+    const maxVal = (d3.max(allVals) || 1) + 0.05;
+    const xScale = d3.scaleLinear().domain([minVal, maxVal]).range([margin.left, width - margin.right]);
+    const yScale = d3.scaleLinear().domain([minVal, maxVal]).range([height - margin.bottom, margin.top]);
+
+    // 坐标轴
+    svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(d3.axisBottom(xScale));
+    svg.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(yScale));
+
+    // y=x 参考线
+    svg.append("line")
+      .attr("x1", xScale(minVal))
+      .attr("y1", yScale(minVal))
+      .attr("x2", xScale(maxVal + 0.2))
+      .attr("y2", yScale(maxVal + 0.2))
+      .attr("stroke", "black")
+      .attr("stroke-dasharray", "4 2")
+      .attr("opacity", 0.5);
+
+    // x/y 轴 label
+    svg.append("text")
+      .attr("x", (width - margin.right + margin.left) / 2)
+      .attr("y", height - 10)
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .text("Model Performance (Mappings from Murty185)");
+
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -(height - margin.bottom + margin.top) / 2)
+      .attr("y", 15)
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .text("Model Performance (Mappings from NSD1000)");
+
+    // ===== 散点绘制 =====
+    svg.selectAll("circle.dot")
+      .data(points)
+      .enter()
+      .append("circle")
+      .attr("class", "dot")
+      .attr("cx", (d) => xScale(d.x))
+      .attr("cy", (d) => yScale(d.y))
+      .attr("r", 5)
+      .attr("fill", (d) => color_map[d.dataset])
+      .attr("opacity", 0.5)
+      .attr("stroke", "black")
+      .style("cursor", "pointer")
+      .on("click", (event, d) => {
+          const newSelection = (selectedModel === d.model ? null : d.model);
+          setSelectedModel(newSelection);
+          if (onModelClick) onModelClick(newSelection);
+      });
+
+    // ===== Tooltip =====
+    const tooltip = d3.select(containerRef.current)
+      .append("div")
+      .attr("class", "scatter-tooltip")
+      .style("position", "absolute")
+      .style("visibility", "hidden")
+      .style("background", "white")
+      .style("border", "1px solid #ccc")
+      .style("padding", "5px")
+      .style("z-index", "10")
+      .style("pointer-events", "none")
+      .style("font-size", "14px");
+
+    svg.selectAll("circle.dot")
+      .on("mouseover", (event, d) => {
+        tooltip
+          .style("visibility", "visible")
+          .html(`
+            <div style="color:#666; margin-bottom:6px;">
+              Model: <span style="font-weight:500; color:#333;">${d.model}</span>
+            </div>
+            <div style="color:#666; margin-bottom:6px;">
+              Evaluation Dataset: <span style="font-weight:500; color:#333;">${datasetLabelMap[d.dataset]}</span>
+            </div>
+            <div style="font-weight:600; margin-bottom:4px;">Performance Trained on</div>
+            <div>• Murty185 — ${d.x.toFixed(3)}</div>
+            <div>• NSD1000 — ${d.y.toFixed(3)}</div>
+          `);
+      })
+      .on("mousemove", (event) => {
+        tooltip
+          .style("top", `${event.pageY - 30}px`)
+          .style("left", `${event.pageX + 10}px`);
+      })
+      .on("mouseout", () => tooltip.style("visibility", "hidden"));
+
+    // ===== Legend (基于当前显示的 points 生成) =====
+    const legendData = Array.from(new Set(points.map((d) => d.dataset)));
+    const legend = svg.append("g").attr("class", "legend")
+      .attr("transform", `translate(${margin.left + 20}, ${margin.top + 20})`);
+    
+    legend.selectAll("circle")
+      .data(legendData).enter().append("circle")
+      .attr("cx", 0).attr("cy", (d, i) => i * 20).attr("r", 6)
+      .style("fill", (d) => color_map[d]).style("opacity", 0.6).style("stroke", "black");
+
+    legend.selectAll("text")
+      .data(legendData).enter().append("text")
+      .attr("x", 12).attr("y", (d, i) => i * 20 + 4)
+      .text((d) => datasetLabelMap[d] || d)
+      .style("font-size", "14px").attr("alignment-baseline", "middle");
+
+    // ===== 上方直方图 (根据选中的数据集分层显示) =====
+    const globalXHist = d3.histogram().domain(xScale.domain()).thresholds(xScale.ticks(20))(allXValsGlobal);
+    const globalXMax = d3.max(globalXHist, (d) => d.length) || 1;
+    const yHistScale = d3.scaleLinear().domain([0, globalXMax]).range([histHeight, -150]);
+
+    legendData.forEach((ds) => {
+      const xVals = points.filter((d) => d.dataset === ds).map((d) => d.x);
+      const xHist = d3.histogram().domain(xScale.domain()).thresholds(xScale.ticks(20))(xVals);
+      svg.append("g")
+        .attr("transform", `translate(0, -10)`)
+        .selectAll(`rect.${ds}`)
+        .data(xHist).enter().append("rect")
+        .attr("x", (d) => xScale(d.x0))
+        .attr("y", (d) => yHistScale(d.length))
+        .attr("width", (d) => Math.max(0, xScale(d.x1) - xScale(d.x0) - 1))
+        .attr("height", (d) => histHeight - yHistScale(d.length))
+        .attr("fill", color_map[ds]).attr("opacity", 0.5).attr("stroke", "none");
+    });
+
+    // ===== 右侧直方图 =====
+    const globalYHist = d3.histogram().domain(yScale.domain()).thresholds(yScale.ticks(20))(allYValsGlobal);
+    const globalYMax = d3.max(globalYHist, (d) => d.length) || 1;
+    const xHistScale = d3.scaleLinear().domain([0, globalYMax]).range([0, histWidth + 150]);
+
+    legendData.forEach((ds) => {
+      const yVals = points.filter((d) => d.dataset === ds).map((d) => d.y);
+      const yHist = d3.histogram().domain(yScale.domain()).thresholds(yScale.ticks(20))(yVals);
+      svg.append("g")
+        .attr("transform", `translate(${mainSize + margin.left + 10}, 0)`)
+        .selectAll(`rect.${ds}`)
+        .data(yHist).enter().append("rect")
+        .attr("x", 0)
+        .attr("y", (d) => yScale(d.x1))
+        .attr("width", (d) => xHistScale(d.length))
+        .attr("height", (d) => Math.max(0, yScale(d.x0) - yScale(d.x1) - 1))
+        .attr("fill", color_map[ds]).attr("opacity", 0.5).attr("stroke", "none");
+    });
+
+    // ===== KDE 曲线 =====
+    const dVec = [1 / Math.sqrt(2), 1 / Math.sqrt(2)];
+    const d_orth = [1 / Math.sqrt(2), -1 / Math.sqrt(2)];
+    const center = [300, -300];
+
+    function kernelDensityEstimator(xGrid, sample, bandwidth) {
+      const kernel = (v) => Math.exp(-0.5 * v * v) / Math.sqrt(2 * Math.PI);
+      return xGrid.map((x) => [x, d3.mean(sample, (v) => kernel((x - v) / bandwidth)) / bandwidth]);
+    }
+
+    let allProj = [];
+    legendData.forEach((ds) => {
+      const pts = points.filter((p) => p.dataset === ds);
+      const proj = pts.map((p) => xScale(p.x) * dVec[0] + yScale(p.y) * dVec[1]);
+      allProj = allProj.concat(proj);
+    });
+
+    if (allProj.length > 0) {
+      const uMinAll = d3.min(allProj);
+      const uMaxAll = d3.max(allProj);
+      const uGridAll = d3.range(uMinAll, uMaxAll, (uMaxAll - uMinAll) / 100);
+      const kdeValsAll = kernelDensityEstimator(uGridAll, allProj, 30);
+      const globalMaxDens = d3.max(kdeValsAll, (d) => d[1]) || 1;
+
+      legendData.forEach((ds) => {
+        const pts = points.filter((p) => p.dataset === ds);
+        if (!pts.length) return;
+        const proj = pts.map((p) => xScale(p.x) * dVec[0] + yScale(p.y) * dVec[1]);
+        const uMin = d3.min(proj);
+        const uMax = d3.max(proj);
+        const uGrid = d3.range(uMin, uMax, (uMax - uMin) / 100);
+        const kdeVals = kernelDensityEstimator(uGrid, proj, 30);
+        const scale = 100;
+        const linePts = kdeVals.map(([u, dens]) => {
+          const base = [u * dVec[0], u * dVec[1]];
+          const offset = [(dens / globalMaxDens) * scale * d_orth[0], (dens / globalMaxDens) * scale * d_orth[1]];
+          return [center[0] + base[0] + offset[0], center[1] + base[1] + offset[1]];
+        });
+        svg.append("path")
+          .datum(linePts)
+          .attr("d", d3.line().curve(d3.curveBasis))
+          .attr("fill", "none")
+          .attr("stroke", color_map[ds])
+          .attr("stroke-width", 2)
+          .attr("opacity", 0.8);
+      });
+    }
+
+    // ===== overlay (Icon) =====
+    if (showOverlay) {
+      const overlayGroup = svg.append("image")
+        .attr("href", chartType === "uni" ? uniIcon : multiIcon)
+        .attr("x", width - margin.right - 200)
+        .attr("y", height - margin.bottom - 170)
+        .attr("width", 200)
+        .attr("height", 160)
+        .attr("opacity", 0.7)
+        .style("cursor", "pointer");
+
+      const overlayTooltip = d3.select(containerRef.current)
+        .append("div")
+        .attr("class", "overlay-tooltip")
+        .style("position", "absolute")
+        .style("visibility", "hidden")
+        .style("background", "white")
+        .style("border", "1px solid #ccc")
+        .style("padding", "5px")
+        .style("font-size", "13px")
+        .style("z-index", "10");
+
+      overlayGroup.on("mouseover", (event) => {
+        overlayTooltip
+          .style("visibility", "visible")
+          .html(chartType === "uni" ? "Unimodal mapping view" : "Multimodal mapping view");
+      })
+      .on("mousemove", (event) => {
+        overlayTooltip
+          .style("top", `${event.pageY - 30}px`)
+          .style("left", `${event.pageX + 10}px`);
+      })
+      .on("mouseout", () => overlayTooltip.style("visibility", "hidden"));
+    }
+
+  }, [murtyData, nsdData, roi, dataset, onModelClick, selectedModel, chartType, showOverlay]);
+
+  return <div style={{ display: "flex", justifyContent: "center", position: "relative" }} ref={containerRef}></div>;
+};
+
+export default ScatterMurtyVsNsd;

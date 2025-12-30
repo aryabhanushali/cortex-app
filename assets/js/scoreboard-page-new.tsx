@@ -8,6 +8,7 @@ import SelectedFiltersBar from './selectFiltersBar.jsx';
 import ChartSelect from './chartselect.jsx'; 
 import HeatmapOverview from './heatmapOverview.jsx';
 import HeatmapDetail from './heatmapDetail.jsx';
+import ScatterMurtyVsNsd from './scatterMurtyVsNsd.jsx';
 
 
 
@@ -99,14 +100,14 @@ return (
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden', // 防止溢出
-        padding: '16px',    // 统一给个外边距
+        overflow: 'hidden', 
+        padding: '16px',    
         boxSizing: 'border-box',
-        background: '#fff' // 或者是你的背景色
+        background: '#fff' 
       }}
     >
-      {/* 2. 顶部 SelectedFiltersBar */}
-      {/* flex: 0 0 auto 让它根据内容自然撑开，不压缩也不拉伸 */}
+      {/* 2. SelectedFiltersBar */}
+      {/* flex: 0 0 auto  */}
       <div style={{ flex: '0 0 auto', marginBottom: 16 }}>
         <SelectedFiltersBar
           training={training}
@@ -116,27 +117,27 @@ return (
         />
       </div>
 
-      {/* 3. 下方主体区域（左侧 Filter + 右侧 Charts） */}
-      {/* flex: 1 让它占据剩余的所有空间 */}
-      {/* minHeight: 0 是 Flex 布局嵌套滚动的关键，防止子元素撑破容器 */}
+      {/* 3. body part（left: Filter + right: Charts） */}
+      {/* flex: 1 fit all space */}
+     
       <div
         style={{
           flex: 1,
           minHeight: 0, 
           display: 'grid',
-          gridTemplateColumns: '1.5fr 7fr', // 左右比例
+          gridTemplateColumns: '1.5fr 7fr', // ratio for overview and detail
           gap: 16,
         }}
       >
         
-        {/* --- 左侧 Filters --- */}
+        {/* --- left Filters --- */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
-            height: '100%',     // 填满父容器分配的高度
-            overflowY: 'auto',  // 内容过多时，只有左侧内部滚动
-            paddingRight: 4,    // 给滚动条留点位置
+            height: '100%',     // fill height
+            overflowY: 'auto',  // 
+            paddingRight: 4,    // 
             scrollbarWidth: 'thin',
           }}
         >
@@ -146,7 +147,7 @@ return (
               type="default"
               disabled={!hasFilters}
               onClick={clearFilters}
-              size="small" // 稍微改小一点可能更好看
+              size="small" 
               style={{
                 borderRadius: 6,
                 fontWeight: 500,
@@ -180,17 +181,17 @@ return (
           </div>
         </div>
 
-        {/* --- 右侧整体（ChartSelect + 两个图表） --- */}
+        {/* --- right（ChartSelect + overview + details） --- */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
-            height: '100%', // 填满高度
+            height: '100%', // fill height
             gap: 16,
-            minHeight: 0, // 同样重要
+            minHeight: 0, // 
           }}
         >
-          {/* ChartSelect 顶部栏 */}
+          {/* ChartSelect button group*/}
           <div
             style={{
               flex: '0 0 auto', // 自然高度
@@ -210,10 +211,10 @@ return (
             />
           </div>
 
-          {/* 下方图表区域：横向排列 */}
+          {/* chart: horizontal*/}
           <div 
             style={{ 
-              flex: 1, // 占据剩余空间
+              flex: 1, // fill space
               minHeight: 0, 
               display: 'grid', 
               gridTemplateColumns: '1fr 6fr', 
@@ -221,20 +222,18 @@ return (
             }}
           >
             
-            {/* 图表 1: Overview */}
+            {/* chart 1: Overview */}
             <div
               style={{
                 background: '#fafafa',
                 borderRadius: 8,
                 padding: 8,
                 overflow: 'hidden', 
-                display: 'flex',       // 加上 flex
-                flexDirection: 'column' // 让内部组件能撑满
+                display: 'flex',       // 
+                flexDirection: 'column' // 
               }}
             >
-               {/* 注意：HeatmapOverview 内部现在使用了 ResizeObserver。
-                  因为这里是 grid item, 它有明确的高度，ResizeObserver 会正确工作。
-               */}
+            
                {(region?.[0] === 'Across Regions') && (<div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
                  <HeatmapOverview
                     data={getDataByTraining(training)} 
@@ -261,7 +260,8 @@ return (
               }
             </div>
 
-            {/* 图表 2: Detail */}
+            {/* chart 2: Detail */}
+           
             <div
               style={{
                 background: '#fafafa',
@@ -269,7 +269,7 @@ return (
                 padding: 16,
                 display: 'flex',
                 flexDirection: 'column',
-                minWidth: 0, // 防止 flex item 被内容撑破
+                minWidth: 0, 
                 overflow: 'hidden'
               }}
             >
@@ -283,41 +283,62 @@ return (
                   textAlign: 'center', 
                 }}
               >
-                {`${region[0].toUpperCase()} Performance (Trained on ${
-                  training === 'NSD' ? 'NSD1000' : 'Murty185'
-                })`}
+                {/* title logic*/}
+                {training === 'Murty185 VS NSD1000' 
+                  ? 'Murty185 vs NSD1000 Performance Comparison' 
+                  : `${region[0].toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`
+                }
               </h3>
 
-              {/* 包裹 HeatmapDetail 的容器 */}
+              {/* content */}
               <div
                 style={{
-                  flex: 1,         // 占满剩余高度
-                  overflowX: "auto", // 允许横向滚动
+                  flex: 1,
+                  overflowX: "auto",
                   overflowY: "hidden", 
-                  position: 'relative'
+                  position: 'relative',
+                  display: training === 'Murty185 VS NSD1000' ? 'flex' : 'block', // scatterplot display setting
+                  justifyContent: 'center'
                 }}
               >
-                {/* 如果 HeatmapDetail 内部没有自动高度适应，
-                   你可能需要给它传一个 style={{ height: '100%' }} 
-                */}
-                {(region?.[0] === 'Across Regions') && (<HeatmapDetail
-                  data={getDataByTraining(training)} 
-                  roi={'Overall'}
-                  dataset={dataset[0] || ''}
-                  rank={rank}
-                  selectedModel={selectedModel}
-                  onModelClick={(m: string) => setSelectedModel(m)}
-                  onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
-                />)}
-                  {(region?.[0] !== 'Across Regions') && (<HeatmapDetail
-                  data={getDataByTraining(training)} 
-                  roi={region[0]}
-                  dataset={dataset[0] || ''}
-                  rank={rank}
-                  selectedModel={selectedModel}
-                  onModelClick={(m: string) => setSelectedModel(m)}
-                  onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
-                />)}
+                {/* scatter plot */}
+                {(training === 'Murty185 VS NSD1000') && (
+                  <ScatterMurtyVsNsd
+                    murtyData={murtyData}
+                    nsdData={nsdData}
+                    roi={region[0] === 'Across Regions' ? 'Overall' : region[0]}
+                    dataset={dataset} // dataset list filter
+                    chartType={chartType}
+                    showOverlay={true}
+                    onModelClick={(m: string) => setSelectedModel(m)}
+                  />
+                )}
+
+                {/* 2.  Across Regions heatmap detail */}
+                {(training !== 'Murty185 VS NSD1000' && region?.[0] === 'Across Regions') && (
+                  <HeatmapDetail
+                    data={getDataByTraining(training)} 
+                    roi={'Overall'}
+                    dataset={dataset[0] || ''}
+                    rank={rank}
+                    selectedModel={selectedModel}
+                    onModelClick={(m: string) => setSelectedModel(m)}
+                    onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
+                  />
+                )}
+
+                {/* 3. region heatmap detail */}
+                {(training !== 'Murty185 VS NSD1000' && region?.[0] !== 'Across Regions') && (
+                  <HeatmapDetail
+                    data={getDataByTraining(training)} 
+                    roi={region[0]}
+                    dataset={dataset[0] || ''}
+                    rank={rank}
+                    selectedModel={selectedModel}
+                    onModelClick={(m: string) => setSelectedModel(m)}
+                    onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
+                  />
+                )}
               </div>
             </div>
           </div>
