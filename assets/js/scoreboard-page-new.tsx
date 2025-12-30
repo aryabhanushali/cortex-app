@@ -235,7 +235,7 @@ return (
                {/* 注意：HeatmapOverview 内部现在使用了 ResizeObserver。
                   因为这里是 grid item, 它有明确的高度，ResizeObserver 会正确工作。
                */}
-               <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
+               {(region?.[0] === 'Across Regions') && (<div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
                  <HeatmapOverview
                     data={getDataByTraining(training)} 
                     roi={'Overall'}
@@ -245,7 +245,20 @@ return (
                     onModelClick={(m: string) => setSelectedModel(m)}
                     visibleRange={visibleRange}
                   />
-               </div>
+               </div>)
+              }
+                {(region?.[0] !== 'Across Regions') && (<div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
+                 <HeatmapOverview
+                    data={getDataByTraining(training)} 
+                    roi={region[0]}
+                    dataset={dataset[0] || ''}
+                    rank={rank}
+                    selectedModel={selectedModel}
+                    onModelClick={(m: string) => setSelectedModel(m)}
+                    visibleRange={visibleRange}
+                  />
+               </div>)
+              }
             </div>
 
             {/* 图表 2: Detail */}
@@ -270,7 +283,7 @@ return (
                   textAlign: 'center', 
                 }}
               >
-                {`Across-ROIs Performance (Trained on ${
+                {`${region[0].toUpperCase()} Performance (Trained on ${
                   training === 'NSD' ? 'NSD1000' : 'Murty185'
                 })`}
               </h3>
@@ -287,7 +300,7 @@ return (
                 {/* 如果 HeatmapDetail 内部没有自动高度适应，
                    你可能需要给它传一个 style={{ height: '100%' }} 
                 */}
-                <HeatmapDetail
+                {(region?.[0] === 'Across Regions') && (<HeatmapDetail
                   data={getDataByTraining(training)} 
                   roi={'Overall'}
                   dataset={dataset[0] || ''}
@@ -295,7 +308,16 @@ return (
                   selectedModel={selectedModel}
                   onModelClick={(m: string) => setSelectedModel(m)}
                   onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
-                />
+                />)}
+                  {(region?.[0] !== 'Across Regions') && (<HeatmapDetail
+                  data={getDataByTraining(training)} 
+                  roi={region[0]}
+                  dataset={dataset[0] || ''}
+                  rank={rank}
+                  selectedModel={selectedModel}
+                  onModelClick={(m: string) => setSelectedModel(m)}
+                  onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
+                />)}
               </div>
             </div>
           </div>

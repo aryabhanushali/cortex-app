@@ -13,11 +13,11 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { ROI_OPTIONS } from './constants-scoreboard';
 
 const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mode, training }) => {
-  // 1. 定义常量以便逻辑判断 (对应 constants 中的 value)
+  // button logic group
   const ACROSS_VAL = 'Across Regions';
   const SPECIFIC_ROIS = ['ppa', 'ffa', 'eba'];
 
-  // ✅ 检查当前选项是否允许选择 (保持你原有的逻辑)
+  // dataset/roi enabled / disabled logic
   const isEnabled = (option) => {
     if ((dataset === 'bold_5000' || dataset === 'bonner_2021') && (option.value === 'ffa' || option.value === 'eba'))
       return false;
@@ -26,46 +26,53 @@ const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mod
     return true;
   };
 
-  // ✅ 核心互斥逻辑
+
+  // interactive logic
   const handleChange = (value) => {
     if (!isEnabled({ value })) return;
 
     setRegion((prev) => {
-      // 确保 prev 始终是数组
+      // 
       const current = Array.isArray(prev) ? prev : (prev ? [prev] : []);
       const isSelected = current.includes(value);
+      
+      let nextState = [];
 
-      // --- 情况 A: 点击的是 "Across Regions" ---
+      // 
       if (value === ACROSS_VAL) {
         if (isSelected) {
-          // 如果已经是选中状态，点击则取消选中
-          return current.filter((v) => v !== value);
+          // cancel the accross regions
+          nextState = current.filter((v) => v !== value);
         } else {
-          // 如果新选中 Across Regions：清空所有具体的 ROI，只选中它自己
-          return [value];
+          // clear all rois then selected accross regions
+          nextState = [value];
         }
-      }
-
-      // --- 情况 B: 点击的是具体的 ROI (PPA/FFA/EBA) ---
-      if (SPECIFIC_ROIS.includes(value)) {
+      } else if (SPECIFIC_ROIS.includes(value)) {
         if (isSelected) {
-          // 已选中，点击则移除
-          return current.filter((v) => v !== value);
+          // if it is roi then just cancel select
+          nextState = current.filter((v) => v !== value);
         } else {
-          // 新选中一个具体 ROI：自动移除 "Across Regions"，并保留已选的其他具体 ROI
+          // new roi then add it and cancel out accross rois
           const filtered = current.filter((v) => v !== ACROSS_VAL);
-          return [...filtered, value];
+          nextState = [...filtered, value];
         }
+      } else {
+        // other
+        nextState = isSelected 
+          ? current.filter((v) => v !== value) 
+          : [...current, value];
       }
 
-      // --- 情况 C: 其他情况 (兜底) ---
-      return isSelected 
-        ? current.filter((v) => v !== value) 
-        : [...current, value];
+      // non empty protect: always check across-region if it is empty
+      if (nextState.length === 0) {
+        return [ACROSS_VAL];
+      }
+
+      return nextState;
     });
   };
 
-  // ✅ 判断当前项是否被选中
+
   const isChecked = (value) => Array.isArray(region) && region.includes(value);
 
   return (
