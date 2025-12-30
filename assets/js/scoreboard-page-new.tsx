@@ -17,12 +17,15 @@ const { Title } = Typography;
 
 const ScoreboardPageNew: React.FC = () => {
   const [training, setTraining] = useState('NSD');
-  const [region, setRegion] = useState([]);
+  const [region, setRegion] = useState(['Across Regions']);
   const [dataset, setDataset] = useState([]);
 
   const [chartType, setChartType] = useState('uni'); 
   const [rank, setRank] = useState(''); 
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
+
+  // interaction variable for overview and details
+  const [visibleRange, setVisibleRange] = useState({ start: 0, end: 0 });
 
 
 
@@ -87,18 +90,24 @@ const ScoreboardPageNew: React.FC = () => {
   }
 };
 
-  return (
+
+return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: '1.5fr 7fr', // 左侧 filters + 右侧整体
-        gap: 16,
-        padding: 0,
-        alignItems: 'start',
+        // 1. 限制整个页面高度刚好为屏幕高度，禁止最外层滚动
+        height: '100vh', 
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden', // 防止溢出
+        padding: '16px',    // 统一给个外边距
+        boxSizing: 'border-box',
+        background: '#fff' // 或者是你的背景色
       }}
     >
-      {/* 顶部过滤标签栏 */}
-      <div style={{ gridColumn: '1 / -1', marginBottom: 8 }}>
+      {/* 2. 顶部 SelectedFiltersBar */}
+      {/* flex: 0 0 auto 让它根据内容自然撑开，不压缩也不拉伸 */}
+      <div style={{ flex: '0 0 auto', marginBottom: 16 }}>
         <SelectedFiltersBar
           training={training}
           region={region}
@@ -107,160 +116,192 @@ const ScoreboardPageNew: React.FC = () => {
         />
       </div>
 
-      {/* 左侧 Filters */}
+      {/* 3. 下方主体区域（左侧 Filter + 右侧 Charts） */}
+      {/* flex: 1 让它占据剩余的所有空间 */}
+      {/* minHeight: 0 是 Flex 布局嵌套滚动的关键，防止子元素撑破容器 */}
       <div
         style={{
-          height: 'calc(100vh - 200px)',
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          background: 'transparent',
-          padding: '4px 0px',
-          scrollbarWidth: 'thin',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Title level={4} style={{ marginBottom: 0 }}>
-            Filters
-          </Title>
-          <Button
-            type="default"
-            disabled={!hasFilters}
-            onClick={clearFilters}
-            style={{
-              borderRadius: 6,
-              fontWeight: 500,
-              color: hasFilters ? '#1890ff' : '#aaa',
-              borderColor: hasFilters ? '#1890ff' : '#ccc',
-            }}
-          >
-            Clear Filters
-          </Button>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
-          <TrainingSelectNew training={training} setTraining={setTraining} dataset={dataset} />
-          <DatasetSelectNew
-            dataset={dataset}
-            setDataset={setDataset}
-            training={training}
-            region={region}
-            allowToggle={true}
-            mode={1}
-          />
-          <ROISelectNew
-            region={region}
-            setRegion={setRegion}
-            dataset={dataset}
-            setDataset={setDataset}
-            allowToggle={true}
-            mode={1}
-            training={training}
-          />
-        </div>
-      </div>
-
-      {/* 右侧整体（中 + 右） */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: 'calc(100vh - 200px)',
+          flex: 1,
+          minHeight: 0, 
+          display: 'grid',
+          gridTemplateColumns: '1.5fr 7fr', // 左右比例
           gap: 16,
         }}
       >
-        {/* ✅ 顶部 ChartSelect 组件 */}
+        
+        {/* --- 左侧 Filters --- */}
         <div
           style={{
-            background: '#f5f5f5',
-            borderRadius: 8,
-            padding: '0px 0px',
             display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            flexDirection: 'column',
+            height: '100%',     // 填满父容器分配的高度
+            overflowY: 'auto',  // 内容过多时，只有左侧内部滚动
+            paddingRight: 4,    // 给滚动条留点位置
+            scrollbarWidth: 'thin',
           }}
         >
-          <ChartSelect
-            chartType={chartType}
-            setChartType={setChartType}
-            rank={rank}
-            setRank={setRank}
-            enable={true} 
-          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <Title level={4} style={{ margin: 0 }}>Filters</Title>
+            <Button
+              type="default"
+              disabled={!hasFilters}
+              onClick={clearFilters}
+              size="small" // 稍微改小一点可能更好看
+              style={{
+                borderRadius: 6,
+                fontWeight: 500,
+                color: hasFilters ? '#1890ff' : '#aaa',
+                borderColor: hasFilters ? '#1890ff' : '#ccc',
+              }}
+            >
+              Clear
+            </Button>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <TrainingSelectNew training={training} setTraining={setTraining} dataset={dataset} />
+            <DatasetSelectNew
+              dataset={dataset}
+              setDataset={setDataset}
+              training={training}
+              region={region}
+              allowToggle={true}
+              mode={1}
+            />
+            <ROISelectNew
+              region={region}
+              setRegion={setRegion}
+              dataset={dataset}
+              setDataset={setDataset}
+              allowToggle={true}
+              mode={1}
+              training={training}
+            />
+          </div>
         </div>
 
-    
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 5.5fr', gap: 16, flex: 1 }}>
+        {/* --- 右侧整体（ChartSelect + 两个图表） --- */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%', // 填满高度
+            gap: 16,
+            minHeight: 0, // 同样重要
+          }}
+        >
+          {/* ChartSelect 顶部栏 */}
           <div
             style={{
-              background: '#fafafa',
+              flex: '0 0 auto', // 自然高度
+              background: '#f5f5f5',
               borderRadius: 8,
-              padding: 8,
-              overflow: 'hidden',
+              padding: '4px',
+              display: 'flex',
+              justifyContent: 'center',
             }}
-
-            
           >
-             <HeatmapOverview
-              data={getDataByTraining(training)} 
-              roi={'Overall'}
-              dataset={dataset[0] || ''}
+            <ChartSelect
+              chartType={chartType}
+              setChartType={setChartType}
               rank={rank}
-              onModelClick={(m: string) => setSelectedModel(m)}
+              setRank={setRank}
+              enable={true} 
             />
           </div>
 
-         <div
-          style={{
-            background: '#fafafa',
-            borderRadius: 8,
-            padding: 16,
+          {/* 下方图表区域：横向排列 */}
+          <div 
+            style={{ 
+              flex: 1, // 占据剩余空间
+              minHeight: 0, 
+              display: 'grid', 
+              gridTemplateColumns: '1fr 6fr', 
+              gap: 16 
+            }}
+          >
             
-                 // ✅ 内容居中
-          }}
-        >
-          {/* === Title === */}
-          <h3
-            style={{
-              marginBottom: 8,
-              fontSize: '18px',
-              fontWeight: 600,
-              color: '#333',
-               textAlign: 'center', 
-            }}
-          >
-            {`Across-ROIs Performance (Trained on ${
-              training === 'NSD' ? 'NSD1000' : 'Murty185'
-            })`}
-          </h3>
+            {/* 图表 1: Overview */}
+            <div
+              style={{
+                background: '#fafafa',
+                borderRadius: 8,
+                padding: 8,
+                overflow: 'hidden', 
+                display: 'flex',       // 加上 flex
+                flexDirection: 'column' // 让内部组件能撑满
+              }}
+            >
+               {/* 注意：HeatmapOverview 内部现在使用了 ResizeObserver。
+                  因为这里是 grid item, 它有明确的高度，ResizeObserver 会正确工作。
+               */}
+               <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
+                 <HeatmapOverview
+                    data={getDataByTraining(training)} 
+                    roi={'Overall'}
+                    dataset={dataset[0] || ''}
+                    rank={rank}
+                    selectedModel={selectedModel}
+                    onModelClick={(m: string) => setSelectedModel(m)}
+                    visibleRange={visibleRange}
+                  />
+               </div>
+            </div>
 
-          {/* === Heatmap === */}
-          
-           <div
-            style={{
-              background: "#fafafa",
-              borderRadius: 8,
-              overflowX: "auto", // ✅ 可以水平滚动
-              justifyContent: "flex-start", // ✅ 改成左对齐
-              alignItems: "flex-start",
-              // marginLeft: "auto",
-              // marginRight: "auto",  
-            }}
-          >
-            <HeatmapDetail
-              data={getDataByTraining(training)} 
-              roi={'Overall'}
-              dataset={dataset[0] || ''}
-              rank={rank}
-              onModelClick={(m: string) => setSelectedModel(m)}
-            />
+            {/* 图表 2: Detail */}
+            <div
+              style={{
+                background: '#fafafa',
+                borderRadius: 8,
+                padding: 16,
+                display: 'flex',
+                flexDirection: 'column',
+                minWidth: 0, // 防止 flex item 被内容撑破
+                overflow: 'hidden'
+              }}
+            >
+              <h3
+                style={{
+                  flex: '0 0 auto',
+                  marginBottom: 8,
+                  fontSize: '18px',
+                  fontWeight: 600,
+                  color: '#333',
+                  textAlign: 'center', 
+                }}
+              >
+                {`Across-ROIs Performance (Trained on ${
+                  training === 'NSD' ? 'NSD1000' : 'Murty185'
+                })`}
+              </h3>
+
+              {/* 包裹 HeatmapDetail 的容器 */}
+              <div
+                style={{
+                  flex: 1,         // 占满剩余高度
+                  overflowX: "auto", // 允许横向滚动
+                  overflowY: "hidden", 
+                  position: 'relative'
+                }}
+              >
+                {/* 如果 HeatmapDetail 内部没有自动高度适应，
+                   你可能需要给它传一个 style={{ height: '100%' }} 
+                */}
+                <HeatmapDetail
+                  data={getDataByTraining(training)} 
+                  roi={'Overall'}
+                  dataset={dataset[0] || ''}
+                  rank={rank}
+                  selectedModel={selectedModel}
+                  onModelClick={(m: string) => setSelectedModel(m)}
+                  onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
+                />
+              </div>
+            </div>
           </div>
-        </div>
-
         </div>
       </div>
     </div>
   );
 };
-
 export default ScoreboardPageNew;

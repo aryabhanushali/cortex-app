@@ -1,8 +1,9 @@
 // constants-scoreboard.js
 export const UNAVAILABILITY = {
   trainingToDataset: {
-     NSD:['nsd1000' ],   
+    NSD:['nsd1000' ],   
     Murty185: ['murty185'], 
+   
    
   },
 
@@ -175,7 +176,7 @@ export const MODEL_OPTIONS = [
 export const TRAINING_OPTIONS = [
    { value: 'NSD', label: 'NSD' },
   { value: 'Murty185', label: 'Murty185' },
-  // { value: 'VS', label: 'Murty185 VS NSD1000'},
+  { value: 'Murty185 VS NSD1000', label: 'Murty185 VS NSD1000'},
  
 ];
 
@@ -186,10 +187,11 @@ export const TRAINING_OPTIONS_VS= [
 ];
   
 export const ROI_OPTIONS = [
-  
+  { value: 'Across Regions', label: 'Across Regions'},
   { value: 'ppa', label: 'PPA' },
   { value: 'ffa', label: 'FFA' },
   { value: 'eba', label: 'EBA' },
+
   // { value: 'FBA', label: 'FBA'},
   // { value: 'OFA', label: 'OFA'},
   // { value: 'OPA', label: 'OPA'},

@@ -1,46 +1,89 @@
-// components/HeatmapByROI.jsx
-import React, { useEffect, useRef, useState } from "react";
+// // components/HeatmapDetail.jsx
+import React, { useEffect, useRef } from "react"; 
 import * as d3 from "d3";
 
-const HeatmapDetail = ({ data, roi, dataset, rank, onModelClick  }) => {
+const HeatmapDetail = ({ data, roi, dataset, rank, selectedModel, onModelClick, onScrollUpdate }) => {
   const headerRef = useRef();
   const bodyRef = useRef();
   const legendRef = useRef();
 
-  const [selectedModel, setSelectedModel] = useState(null);
+  // sorted model for relocate the selected model
+  const sortedModelsRef = useRef([]);
 
   const datasetLabelMap = {
-  murty185: "Murty185",
-  nsd_1000: "NSD1000",
-  bold_5000: "BOLD5000v2",
-  bonner_2021: "Bonner2021",
-  bmd_2024: "BMD2024",
-  kingbaker_2019: "King2019",
-  wardle_2020: "Wardle2020",
-  nsd_syn: "NSD synthetic",
-  global_score: "Global Score" // special
-};
+    murty185: "Murty185",
+    nsd_1000: "NSD1000",
+    bold_5000: "BOLD5000v2",
+    bonner_2021: "Bonner2021",
+    bmd_2024: "BMD2024",
+    kingbaker_2019: "King2019",
+    wardle_2020: "Wardle2020",
+    nsd_syn: "NSD synthetic",
+    global_score: "Global Score",
+  };
+
+  const ROW_HEIGHT_TOTAL = 27;
+
+  const handleScroll = (e) => {
+    const { scrollLeft, scrollTop, clientHeight } = e.target;
+    if (headerRef.current) {
+      // header and body roll together
+      headerRef.current.scrollLeft = e.target.scrollLeft;
+    }
+
+    if (onScrollUpdate) {
+      const startIndex = Math.floor(scrollTop / ROW_HEIGHT_TOTAL);
+      // 向上取整确保覆盖底部边缘
+      const visibleCount = Math.ceil(clientHeight / ROW_HEIGHT_TOTAL);
+      const endIndex = startIndex + visibleCount -1;
+      
+      onScrollUpdate({ start: startIndex, end: endIndex });
+    }
+  };
+
+  // selectedModel: automatically roll to selected model row
   useEffect(() => {
-    setSelectedModel(null);
-    if (onModelClick) onModelClick(null); 
-  }, [data, roi, dataset]);
+    if (!selectedModel || !bodyRef.current || sortedModelsRef.current.length === 0) return;
 
+    // find the index of the selected model
+    const index = sortedModelsRef.current.indexOf(selectedModel);
+
+    if (index !== -1) {
+      const rowHeight = 25; // keep it the same number as below
+      const rowGap = 2;
+      
+      // calculate the y axis of the target selected row
+      const targetY = index * (rowHeight + rowGap);
+      
+      // container's height
+      const containerHeight = bodyRef.current.clientHeight;
+
+      // calculate the target Y to make it center
+      const scrollTo = targetY - (containerHeight / 2) + (rowHeight / 2);
+
+      bodyRef.current.scrollTo({
+        top: scrollTo,
+        behavior: "smooth",
+      });
+    }
+  }, [selectedModel]);
+
+  // 3. drawing logic
   useEffect(() => {
-    if (!data) return;
+    // if there is no data then return
+    if (!data || Object.keys(data).length === 0) return;
 
+    d3.select(headerRef.current).selectAll("*").remove();
+    d3.select(bodyRef.current).selectAll("*").remove();
+    d3.select(legendRef.current).selectAll("*").remove();
 
-    d3.select(headerRef.current).select("svg").remove();
-    d3.select(bodyRef.current).select("svg").remove();
-    d3.select(legendRef.current).select("svg").remove();
-
-    const headerMargin = { top: 80, right: 40, bottom: 10, left: 210};
-    const bodyMargin = { top: 0, right: 40, bottom: 0, left: 210 };
+    const headerMargin = { top: 80, right: 40, bottom: 10, left: 200 };
+    const bodyMargin = { top: 10, right: 40, bottom: 0, left: 200 };
     const rowHeight = 25;
     const rowGap = 2;
     const columnWidth = 75;
     const columnGap = 5;
 
-    // color legend
     const colorScale = d3.scaleLinear().domain([0, 1]).range(["#D3D3D3", "#9CC9FF"]);
 
     let xLabels = [];
@@ -48,15 +91,15 @@ const HeatmapDetail = ({ data, roi, dataset, rank, onModelClick  }) => {
     let cellData = [];
     let ceilingData = [];
 
-    if (roi) {
-      // case 1: fixed ROI
-      models = Object.keys(data[roi] || {}).filter((m) => m !== "ceiling");
+    // --- data processing ---
+    if (roi && data[roi]) {
+      models = Object.keys(data[roi]).filter((m) => m !== "ceiling");
       xLabels = Array.from(new Set(models.flatMap((m) => Object.keys(data[roi][m] || {}))));
 
       models.forEach((model) => {
         let rawVals = [];
         xLabels.forEach((ds) => {
-          if (["murty185", "nsd_1000"].includes(ds)) return; 
+          if (["murty185", "nsd_1000"].includes(ds)) return;
           const vals = data[roi][model]?.[ds];
           if (vals) {
             const raw = vals[0];
@@ -76,7 +119,7 @@ const HeatmapDetail = ({ data, roi, dataset, rank, onModelClick  }) => {
       });
 
       ceilingData = xLabels
-        .filter(ds => !["murty185", "nsd_1000"].includes(ds)) 
+        .filter((ds) => !["murty185", "nsd_1000"].includes(ds))
         .map((ds) => {
           const vals = data[roi]?.ceiling?.[ds];
           return vals ? { x: ds, raw: vals[0], norm: vals[1] } : {};
@@ -91,9 +134,8 @@ const HeatmapDetail = ({ data, roi, dataset, rank, onModelClick  }) => {
         });
       }
 
-      xLabels = ["global_score", ...xLabels.filter(ds => !["murty185", "nsd_1000"].includes(ds))];
+      xLabels = ["global_score", ...xLabels.filter((ds) => !["murty185", "nsd_1000"].includes(ds))];
     } else if (dataset) {
-      // case 2: fixed Dataset
       const rois = Object.keys(data).filter((roiName) => roiName.toLowerCase() !== "overall");
       models = [];
       let validRois = [];
@@ -103,7 +145,6 @@ const HeatmapDetail = ({ data, roi, dataset, rank, onModelClick  }) => {
         models = Array.from(new Set([...models, ...modelNames]));
 
         let roiHasData = false;
-
         modelNames.forEach((model) => {
           const vals = data[roiName]?.[model]?.[dataset];
           if (vals) {
@@ -121,16 +162,11 @@ const HeatmapDetail = ({ data, roi, dataset, rank, onModelClick  }) => {
             norm: ceilingVals[1],
           });
         }
-
-        if (roiHasData) {
-          validRois.push(roiName);
-        }
+        if (roiHasData) validRois.push(roiName);
       });
 
       models.forEach((model) => {
-        const rawVals = cellData
-          .filter((d) => d.model === model && d.raw != null)
-          .map((d) => d.raw);
+        const rawVals = cellData.filter((d) => d.model === model && d.raw != null).map((d) => d.raw);
         if (rawVals.length > 0) {
           cellData.push({
             model,
@@ -149,13 +185,14 @@ const HeatmapDetail = ({ data, roi, dataset, rank, onModelClick  }) => {
           norm: null,
         });
       }
-
       xLabels = ["global_score", ...validRois];
     } else {
       return;
     }
 
-    //ranking logic
+    if (!models.length) return;
+
+    // --- Ranking Logic ---
     if (rank && rank !== "") {
       const modelGlobal = {};
       cellData.forEach((d) => {
@@ -163,60 +200,39 @@ const HeatmapDetail = ({ data, roi, dataset, rank, onModelClick  }) => {
           modelGlobal[d.model] = d.raw ?? -Infinity;
         }
       });
-
       models.sort((a, b) => (modelGlobal[b] || -Infinity) - (modelGlobal[a] || -Infinity));
     }
 
-    // ======= dimensions =======
+    // 4. sorted rank store in Ref
+    sortedModelsRef.current = models;
+
+    // ======= Dimensions =======
     const chartWidth = xLabels.length * (columnWidth + columnGap);
     const headerHeight = headerMargin.top + rowHeight;
     const bodyHeight = models.length * (rowHeight + rowGap) + 50;
     const width = chartWidth + headerMargin.left + headerMargin.right;
 
     // ======= Header =======
-    
-    const svgHeader = d3
-      .select(headerRef.current)
-      .append("svg")
-      .attr("width", width)
-      .attr("height", headerHeight);
+    const svgHeader = d3.select(headerRef.current).append("svg").attr("width", width).attr("height", headerHeight);
 
-    // top x axis
     svgHeader
       .append("g")
       .attr("transform", `translate(${columnWidth / 2},${headerMargin.top - 40})`)
-      .call(
-        d3
-          .axisTop(
-            d3
-              .scalePoint()
-              .domain(xLabels)
-              .range([
-                headerMargin.left + columnWidth / 2,
-                headerMargin.left +
-                  xLabels.length * (columnWidth + columnGap) -
-                  columnGap -
-                  columnWidth / 2,
-              ])
-          )
-      )
+      .call(d3.axisTop(d3.scalePoint().domain(xLabels).range([headerMargin.left + columnWidth / 2, headerMargin.left + xLabels.length * (columnWidth + columnGap) - columnGap - columnWidth / 2])))
       .call((g) => {
         g.select(".domain").remove();
         g.selectAll("line").remove();
         g.selectAll("text").style("font-size", "12px").style("fill", "black");
       })
       .selectAll("text")
-      .text((d) => datasetLabelMap[d] || d)  
+      .text((d) => datasetLabelMap[d] || d)
       .attr("transform", "rotate(-30)")
       .style("text-anchor", "end");
 
-    // ceiling row
-    svgHeader
-      .selectAll("rect.ceiling")
+    // Ceiling Row
+    svgHeader.selectAll("rect.ceiling")
       .data(ceilingData)
-      .enter()
-      .append("rect")
-      .attr("class", "ceiling")
+      .enter().append("rect")
       .attr("x", (d) => headerMargin.left + xLabels.indexOf(d.x) * (columnWidth + columnGap))
       .attr("y", headerMargin.top)
       .attr("width", columnWidth)
@@ -224,23 +240,14 @@ const HeatmapDetail = ({ data, roi, dataset, rank, onModelClick  }) => {
       .attr("fill", (d) => {
         if (d.x === "global_score") return "rgba(158, 117, 214, 0.5)";
         if (d.norm == null) return "#f0f0f0";
-        if (d.norm < 0) return colorScale(0);
-        if (d.norm > 1) return colorScale(1);
-        return colorScale(d.norm);
+        return colorScale(d.norm > 1 ? 1 : d.norm < 0 ? 0 : d.norm);
       });
 
-    // ceiling label (raw)
-    svgHeader
-      .selectAll("text.ceiling-label")
+    // Ceiling Labels
+    svgHeader.selectAll("text.ceiling-label")
       .data(ceilingData.filter((d) => d.raw != null))
-      .enter()
-      .append("text")
-      .attr("class", "ceiling-label")
-      .attr("x", (d) =>
-        headerMargin.left +
-        xLabels.indexOf(d.x) * (columnWidth + columnGap) +
-        columnWidth / 2
-      )
+      .enter().append("text")
+      .attr("x", (d) => headerMargin.left + xLabels.indexOf(d.x) * (columnWidth + columnGap) + columnWidth / 2)
       .attr("y", headerMargin.top + rowHeight / 2)
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "central")
@@ -248,34 +255,44 @@ const HeatmapDetail = ({ data, roi, dataset, rank, onModelClick  }) => {
       .style("font-size", "12px")
       .text((d) => d.raw.toFixed(2));
 
-    // ceiling Y axis label
-    svgHeader
-      .append("g")
+    // Ceiling Y Axis
+    svgHeader.append("g")
       .attr("transform", `translate(${headerMargin.left - 10},0)`)
-      .call(
-        d3
-          .axisLeft(
-            d3.scalePoint().domain(["ceiling"]).range([headerMargin.top + rowHeight / 2, headerMargin.top + rowHeight / 2])
-          )
-      )
+      .call(d3.axisLeft(d3.scalePoint().domain(["ceiling"]).range([headerMargin.top + rowHeight / 2, headerMargin.top + rowHeight / 2])))
       .call((g) => {
         g.select(".domain").remove();
-        // g.selectAll("line").remove();
         g.selectAll("text").style("font-size", "12px").style("fill", "black");
       });
 
     // ======= Body =======
-    const svgBody = d3
-      .select(bodyRef.current)
-      .append("svg")
-      .attr("width", width)
-      .attr("height", bodyHeight);
+    const svgBody = d3.select(bodyRef.current).append("svg").attr("width", width).attr("height", bodyHeight);
 
-    svgBody
-      .selectAll("rect.cell")
+    // highlight logic
+    if (selectedModel) {
+        const modelIndex = models.indexOf(selectedModel);
+        if (modelIndex !== -1) {
+            // 计算高亮行的 Y 坐标
+            const highlightY = bodyMargin.top + modelIndex * (rowHeight + rowGap);
+            // 计算高亮行的总宽度（从 Y轴开始到最后一个单元格结束）
+            const highlightWidth = xLabels.length * (columnWidth + columnGap) + bodyMargin.left; // 稍微调整宽度计算方式
+            
+            svgBody.append("rect")
+                .attr("class", "highlight-border")
+                .attr("x", 0) // 从最左侧开始，包含 Y 轴标签区域
+                .attr("y", highlightY - rowGap / 2) // 稍微向上一点，包住行间距
+                .attr("width", width) // 使用整个 SVG 的宽度
+                .attr("height", rowHeight + rowGap) // 高度包含一个行间距
+                .attr("fill", "none") // 内部透明
+                .attr("stroke", "#FF4500") // ✨ 边框颜色：橙红色，非常显眼
+                .attr("stroke-width", 3) // ✨ 边框宽度：加粗
+                .style("pointer-events", "none"); // 让鼠标事件穿透，不影响下方单元格的点击
+        }
+    }
+
+    // Cells
+    svgBody.selectAll("rect.cell")
       .data(cellData)
-      .enter()
-      .append("rect")
+      .enter().append("rect")
       .attr("class", "cell")
       .attr("x", (d) => bodyMargin.left + xLabels.indexOf(d.x) * (columnWidth + columnGap))
       .attr("y", (d) => bodyMargin.top + models.indexOf(d.model) * (rowHeight + rowGap))
@@ -284,36 +301,29 @@ const HeatmapDetail = ({ data, roi, dataset, rank, onModelClick  }) => {
       .attr("fill", (d) => {
         if (d.x === "global_score") return "rgba(158, 117, 214, 0.5)";
         if (d.norm == null) return "#f0f0f0";
-        if (d.norm < 0) return colorScale(0);
-        if (d.norm > 1) return colorScale(1);
-        return colorScale(d.norm);
+        return colorScale(d.norm > 1 ? 1 : d.norm < 0 ? 0 : d.norm);
+      })
+      .style("cursor", "pointer")
+      // 5. click logic
+      .on("click", (event, d) => {
+        if (onModelClick) onModelClick(d.model === selectedModel ? null : d.model);
       });
 
-    // cell label (raw)
-    svgBody
-      .selectAll("text.cell-label")
+    // Cell Labels
+    svgBody.selectAll("text.cell-label")
       .data(cellData.filter((d) => d.raw != null))
-      .enter()
-      .append("text")
-      .attr("x", (d) =>
-        bodyMargin.left +
-        xLabels.indexOf(d.x) * (columnWidth + columnGap) +
-        columnWidth / 2
-      )
-      .attr("y", (d) =>
-        bodyMargin.top +
-        models.indexOf(d.model) * (rowHeight + rowGap) +
-        rowHeight / 2
-      )
+      .enter().append("text")
+      .attr("x", (d) => bodyMargin.left + xLabels.indexOf(d.x) * (columnWidth + columnGap) + columnWidth / 2)
+      .attr("y", (d) => bodyMargin.top + models.indexOf(d.model) * (rowHeight + rowGap) + rowHeight / 2)
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "central")
       .style("fill", "black")
       .style("font-size", "12px")
+      .style("pointer-events", "none")
       .text((d) => d.raw.toFixed(2));
 
-    // Y  (models)
-    svgBody
-      .append("g")
+    // Y Axis (Models)
+    svgBody.append("g")
       .attr("transform", `translate(${bodyMargin.left - 10},0)`)
       .call(
         d3.axisLeft(
@@ -327,65 +337,73 @@ const HeatmapDetail = ({ data, roi, dataset, rank, onModelClick  }) => {
         g.select(".domain").remove();
         g.selectAll("text")
           .style("font-size", "12px")
-          .style("fill", "black")
+          // .style("fill", "black")
+          .style("fill", (d) => (d === selectedModel ? "#FF4500" : "black"))
+          // 6. hightlight logic
           .style("font-weight", (d) => (d === selectedModel ? "bold" : "normal"))
-          .style("cursor", "pointer")  
+          .style("cursor", "pointer")
           .on("click", (event, d) => {
-              const newSelection = (selectedModel === d ? null : d);  
-              setSelectedModel(newSelection);
-              if (onModelClick) {
-                onModelClick(newSelection); 
-              }
+            if (onModelClick) onModelClick(d === selectedModel ? null : d);
           });
       });
 
     // ======= Legend =======
     const legendHeight = 250;
     const legendWidth = 12;
-    const svgLegend = d3
-      .select(legendRef.current)
-      .append("svg")
-      .attr("width", 80)
-      .attr("height", legendHeight + 40);
+    const svgLegend = d3.select(legendRef.current).append("svg").attr("width", 80).attr("height", legendHeight + 40);
 
     const defs = svgLegend.append("defs");
-    const gradient = defs
-      .append("linearGradient")
-      .attr("id", "legend-gradient-vertical")
-      .attr("x1", "0%")
-      .attr("y1", "100%")
-      .attr("x2", "0%")
-      .attr("y2", "0%");
-
+    const gradient = defs.append("linearGradient").attr("id", "legend-gradient-vertical").attr("x1", "0%").attr("y1", "100%").attr("x2", "0%").attr("y2", "0%");
     gradient.append("stop").attr("offset", "0%").attr("stop-color", "#D3D3D3");
     gradient.append("stop").attr("offset", "100%").attr("stop-color", "#9CC9FF");
 
-    svgLegend
-      .append("rect")
-      .attr("x", 30)
-      .attr("y", 20)
-      .attr("width", legendWidth)
-      .attr("height", legendHeight)
-      .style("fill", "url(#legend-gradient-vertical)");
-
+    svgLegend.append("rect").attr("x", 30).attr("y", 20).attr("width", legendWidth).attr("height", legendHeight).style("fill", "url(#legend-gradient-vertical)");
     const legendScale = d3.scaleLinear().domain([0, 1]).range([legendHeight + 20, 20]);
-    svgLegend
-      .append("g")
-      .attr("transform", `translate(42,0)`)
-      .call(d3.axisRight(legendScale).ticks(5));
-  }, [data, roi, dataset, rank, onModelClick]);
+    svgLegend.append("g").attr("transform", `translate(42,0)`).call(d3.axisRight(legendScale).ticks(5));
 
+    
+   
+
+
+
+  }, [data, roi, dataset, rank, onModelClick, selectedModel]); // 
+
+  // 8. layout
   return (
-    <div style={{ display: "flex", flexDirection: "row", justifyContent: "flex-start" }}>
-      <div style={{ flex: 0, alignSelf: "flex-start" }}>
-        <div ref={headerRef} style={{ lineHeight: "0", alignSelf: "flex-start" }}></div>
-        <div ref={bodyRef} style={{ maxHeight: "400px",  overflowY: "scroll", marginTop: "10px"}}></div>
+    <div style={{ display: "flex", flexDirection: "row", justifyContent: "flex-start", width: "100%", height: "100%", overflow: "hidden" }}>
+      {/* left: Header + Body */}
+      <div style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", height: "100%", overflow: "hidden" }}>
+        
+        {/* fixed head */}
+        <div ref={headerRef} 
+             style={{ 
+              flex: "0 0 auto", 
+              lineHeight: "0",
+              overflowX: "hidden",
+              width: "100%" 
+              }}>
+
+        </div>
+        
+        {/* rollable body */}
+        <div 
+          ref={bodyRef} 
+          onScroll={handleScroll}
+          style={{ 
+            flex: "1 1 auto",  // auto fill
+            overflowY: "auto", // flowY
+            overflowX: "auto", // flowX
+            marginTop: "0px",
+            minHeight: 0,      // 
+            scrollBehavior: "smooth" 
+          }}
+        ></div>
       </div>
-      <div ref={legendRef} style={{ marginLeft: "0px", marginTop: "100px" }}></div>
+      
+      {/* 右侧 Legend */}
+      <div ref={legendRef} style={{ flex: "0 0 auto", marginLeft: "0px", marginTop: "100px", width: "80px" }}></div>
     </div>
   );
-  
 };
-
 
 export default HeatmapDetail;
