@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+// import React, { useState, useEffect } from 'react';
 import {
   Accordion,
   AccordionSummary,
@@ -13,13 +13,11 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { ROI_OPTIONS } from './constants-scoreboard';
 
 const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mode, training }) => {
-  const [effectiveToggle, setEffectiveToggle] = useState(allowToggle);
+  // 1. 定义常量以便逻辑判断 (对应 constants 中的 value)
+  const ACROSS_VAL = 'Across Regions';
+  const SPECIFIC_ROIS = ['ppa', 'ffa', 'eba'];
 
-  useEffect(() => {
-    setEffectiveToggle(allowToggle);
-  }, [allowToggle]);
-
-  // ✅ 检查当前选项是否允许选择
+  // ✅ 检查当前选项是否允许选择 (保持你原有的逻辑)
   const isEnabled = (option) => {
     if ((dataset === 'bold_5000' || dataset === 'bonner_2021') && (option.value === 'ffa' || option.value === 'eba'))
       return false;
@@ -28,23 +26,42 @@ const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mod
     return true;
   };
 
-  // ✅ 点击时添加或移除该选项
+  // ✅ 核心互斥逻辑
   const handleChange = (value) => {
     if (!isEnabled({ value })) return;
 
     setRegion((prev) => {
-      if (Array.isArray(prev)) {
-        // 已选则移除
-        if (prev.includes(value)) {
-          return prev.filter((v) => v !== value);
+      // 确保 prev 始终是数组
+      const current = Array.isArray(prev) ? prev : (prev ? [prev] : []);
+      const isSelected = current.includes(value);
+
+      // --- 情况 A: 点击的是 "Across Regions" ---
+      if (value === ACROSS_VAL) {
+        if (isSelected) {
+          // 如果已经是选中状态，点击则取消选中
+          return current.filter((v) => v !== value);
         } else {
-          // 未选则添加
-          return [...prev, value];
+          // 如果新选中 Across Regions：清空所有具体的 ROI，只选中它自己
+          return [value];
         }
-      } else {
-        // 若是字符串（初始化），转成数组
-        return [value];
       }
+
+      // --- 情况 B: 点击的是具体的 ROI (PPA/FFA/EBA) ---
+      if (SPECIFIC_ROIS.includes(value)) {
+        if (isSelected) {
+          // 已选中，点击则移除
+          return current.filter((v) => v !== value);
+        } else {
+          // 新选中一个具体 ROI：自动移除 "Across Regions"，并保留已选的其他具体 ROI
+          const filtered = current.filter((v) => v !== ACROSS_VAL);
+          return [...filtered, value];
+        }
+      }
+
+      // --- 情况 C: 其他情况 (兜底) ---
+      return isSelected 
+        ? current.filter((v) => v !== value) 
+        : [...current, value];
     });
   };
 
@@ -74,7 +91,7 @@ const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mod
                 key={option.value}
                 control={
                   <Checkbox
-                    checked={isChecked(option.value)} // ✅ 多选状态判断
+                    checked={isChecked(option.value)}
                     onChange={() => handleChange(option.value)}
                     disabled={!isEnabled(option)}
                     sx={{
