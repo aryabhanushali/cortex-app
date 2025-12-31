@@ -102,6 +102,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
       .append("svg")
       .attr("width", width)
       .attr("height", height);
+      
 
 
 
@@ -347,7 +348,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
     : [];
 
   return (
-    <div style={{ display: "flex", width: "100%", height: "100%", background: "#fff", overflow: "hidden" }}>
+    <div style={{ display: "flex", width: "100%", height: "100%", background: "#fafafa", overflow: "hidden" }}>
       
       {/* left：graph*/}
       <div 
@@ -358,25 +359,25 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
  
       {/* right：model details */}
       <div style={{ 
-        width: "280px", 
+        width: "220px", 
         borderLeft: "1px solid #eee", 
         padding: "20px", 
         backgroundColor: "#fafafa",
         display: "flex",
         flexDirection: "column",
-        gap: "12px",
+        gap: "10px",
         zIndex: 10,
         overflowY: "auto", 
         boxShadow: "-2px 0 5px rgba(0,0,0,0.02)"
       }}>
-        <h4 style={{ margin: "0 0 10px 0", color: "#333", borderBottom: "2px solid #eee", paddingBottom: "10px" }}>
+        <h5 style={{ fontsize: "12px",margin: "10px 0 10px 0", color: "#333", borderBottom: "2px solid #eee", paddingBottom: "10px" }}>
           Model Details
-        </h4>
+        </h5>
         
         {activeModelName ? (
-          <div style={{ fontSize: "14px", lineHeight: "1.6" }}>
+          <div style={{ fontSize: "12px", lineHeight: "1.4" }}>
             {/* 1. model's name */}
-            <div style={{ fontWeight: "bold", color: "#1890ff", fontSize: "16px", marginBottom: "12px", wordBreak: "break-all" }}>
+            <div style={{ fontWeight: "bold", color: "#1890ff", fontSize: "12px", marginBottom: "12px", wordBreak: "break-all" }}>
               {activeModelName}
             </div>
 
@@ -395,7 +396,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
                   }}
                 >
                   {/* dataset name */}
-                  <div style={{ fontWeight: "bold", fontSize: "12px", color: "#555", marginBottom: "6px", borderBottom: "1px solid #f0f0f0", paddingBottom: "2px" }}>
+                  <div style={{ fontWeight: "bold", fontSize: "10px", color: "#555", marginBottom: "6px", borderBottom: "1px solid #f0f0f0", paddingBottom: "2px" }}>
                     Evaluation: {datasetLabelMap[entry.dataset] || entry.dataset}
                   </div>
                   
@@ -413,7 +414,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
             </div>
           </div>
         ) : (
-          <div style={{ color: "#999", fontSize: "13px", fontStyle: "italic", marginTop: "20px", textAlign: "center" }}>
+          <div style={{ color: "#999", fontSize: "11px", fontStyle: "italic", marginTop: "20px", textAlign: "center" }}>
             Hover or click a point to see details across all evaluation datasets
           </div>
         )}
