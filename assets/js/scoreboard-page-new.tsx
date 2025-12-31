@@ -95,7 +95,7 @@ const ScoreboardPageNew: React.FC = () => {
 return (
     <div
       style={{
-        // 1. 限制整个页面高度刚好为屏幕高度，禁止最外层滚动
+        // 1. restrict to screen's height
         height: '100vh', 
         width: '100%',
         display: 'flex',
