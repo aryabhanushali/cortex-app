@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography, Button, Radio } from 'antd';
 
 import TrainingSelectNew from './trainingselectnew.jsx';
@@ -17,6 +17,7 @@ import useLoadDataNew from './loadDataNew.jsx';
 
 const { Title } = Typography;
 
+
 const ScoreboardPageNew: React.FC = () => {
   const [training, setTraining] = useState('NSD');
   const [region, setRegion] = useState(['Across Regions']);
@@ -30,6 +31,24 @@ const ScoreboardPageNew: React.FC = () => {
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 0 });
 
   const [pageView, setPageView] = useState('rank');
+
+  // pageview logic
+  useEffect(() => {
+    if (pageView === 'rank') {
+      // 1. rank (Scoreboard)
+      setTraining('NSD'); 
+    } 
+    else if (pageView === '2') {
+      // 2.  2 (Comparison)
+      // force to comparison
+      setTraining('Murty185 VS NSD1000'); 
+    } 
+    else if (pageView === '3') {
+      // 3. 
+ 
+      setTraining('NSD'); 
+    }
+  }, [pageView]);
 
 
 
@@ -165,7 +184,7 @@ return (
           <PageSelect value={pageView} onChange={setPageView} />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <TrainingSelectNew training={training} setTraining={setTraining} dataset={dataset} />
+            <TrainingSelectNew training={training} setTraining={setTraining} dataset={dataset} pageView = {pageView} />
             <ROISelectNew
               region={region}
               setRegion={setRegion}
@@ -290,12 +309,12 @@ return (
                 }}
               >
                 {/* title logic*/}
-                {/* {training === 'Murty185 VS NSD1000' 
+                {training === 'Murty185 VS NSD1000' 
                   ? 'Murty185 vs NSD1000 Performance Comparison' 
                   : `${region[0].toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`
-                } */}
-                 {`${region[0].toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`
                 }
+                 {/* {`${region[0].toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`
+                } */}
                 
               </h3>
 
@@ -311,7 +330,7 @@ return (
                 }}
               >
                 {/* scatter plot */}
-                {/* {(training === 'Murty185 VS NSD1000') && (
+                {(training === 'Murty185 VS NSD1000') && (
                   <ScatterMurtyVsNsd
                     murtyData={murtyData}
                     nsdData={nsdData}
@@ -321,10 +340,10 @@ return (
                     showOverlay={true}
                     onModelClick={(m: string) => setSelectedModel(m)}
                   />
-                )} */}
+                )}
 
                 {/* 2.  Across Regions heatmap detail */}
-                {(region?.[0] === 'Across Regions') && (
+                {(training !== 'Murty185 VS NSD1000') &&(region?.[0] === 'Across Regions') && (
                   <HeatmapDetail
                     data={getDataByTraining(training)} 
                     roi={'Overall'}
@@ -337,7 +356,7 @@ return (
                 )}
 
                 {/* 3. region heatmap detail */}
-                {( region?.[0] !== 'Across Regions') && (
+                {(training !== 'Murty185 VS NSD1000') && ( region?.[0] !== 'Across Regions') && (
                   <HeatmapDetail
                     data={getDataByTraining(training)} 
                     roi={region[0]}
