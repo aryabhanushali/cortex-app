@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, Button } from 'antd';
+import { Typography, Button, Radio } from 'antd';
 
 import TrainingSelectNew from './trainingselectnew.jsx';
 import ROISelectNew from './roiselectnew.jsx';
@@ -9,6 +9,7 @@ import ChartSelect from './chartselect.jsx';
 import HeatmapOverview from './heatmapOverview.jsx';
 import HeatmapDetail from './heatmapDetail.jsx';
 import ScatterMurtyVsNsd from './scatterMurtyVsNsd.jsx';
+import PageSelect from './pageselect.jsx';
 
 
 
@@ -27,6 +28,8 @@ const ScoreboardPageNew: React.FC = () => {
 
   // interaction variable for overview and details
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 0 });
+
+  const [pageView, setPageView] = useState('rank');
 
 
 
@@ -159,16 +162,10 @@ return (
             </Button>
           </div>
 
+          <PageSelect value={pageView} onChange={setPageView} />
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <TrainingSelectNew training={training} setTraining={setTraining} dataset={dataset} />
-            <DatasetSelectNew
-              dataset={dataset}
-              setDataset={setDataset}
-              training={training}
-              region={region}
-              allowToggle={true}
-              mode={1}
-            />
             <ROISelectNew
               region={region}
               setRegion={setRegion}
@@ -178,6 +175,15 @@ return (
               mode={1}
               training={training}
             />
+            <DatasetSelectNew
+              dataset={dataset}
+              setDataset={setDataset}
+              training={training}
+              region={region}
+              allowToggle={true}
+              mode={1}
+            />
+            
           </div>
         </div>
 
@@ -284,10 +290,13 @@ return (
                 }}
               >
                 {/* title logic*/}
-                {training === 'Murty185 VS NSD1000' 
+                {/* {training === 'Murty185 VS NSD1000' 
                   ? 'Murty185 vs NSD1000 Performance Comparison' 
                   : `${region[0].toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`
+                } */}
+                 {`${region[0].toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`
                 }
+                
               </h3>
 
               {/* content */}
@@ -302,7 +311,7 @@ return (
                 }}
               >
                 {/* scatter plot */}
-                {(training === 'Murty185 VS NSD1000') && (
+                {/* {(training === 'Murty185 VS NSD1000') && (
                   <ScatterMurtyVsNsd
                     murtyData={murtyData}
                     nsdData={nsdData}
@@ -312,10 +321,10 @@ return (
                     showOverlay={true}
                     onModelClick={(m: string) => setSelectedModel(m)}
                   />
-                )}
+                )} */}
 
                 {/* 2.  Across Regions heatmap detail */}
-                {(training !== 'Murty185 VS NSD1000' && region?.[0] === 'Across Regions') && (
+                {(region?.[0] === 'Across Regions') && (
                   <HeatmapDetail
                     data={getDataByTraining(training)} 
                     roi={'Overall'}
@@ -328,7 +337,7 @@ return (
                 )}
 
                 {/* 3. region heatmap detail */}
-                {(training !== 'Murty185 VS NSD1000' && region?.[0] !== 'Across Regions') && (
+                {( region?.[0] !== 'Across Regions') && (
                   <HeatmapDetail
                     data={getDataByTraining(training)} 
                     roi={region[0]}

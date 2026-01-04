@@ -176,14 +176,14 @@ export const MODEL_OPTIONS = [
 export const TRAINING_OPTIONS = [
    { value: 'NSD', label: 'NSD' },
   { value: 'Murty185', label: 'Murty185' },
-  { value: 'Murty185 VS NSD1000', label: 'Murty185 VS NSD1000'},
+  // { value: 'Murty185 VS NSD1000', label: 'Murty185 VS NSD1000'},
  
 ];
 
 export const TRAINING_OPTIONS_VS= [
-  { value: 'Murty185', label: 'Murty185' },
+
   { value: 'VS', label: 'Murty185 VS NSD1000'},
-  { value: 'NSD', label: 'NSD' },
+
 ];
   
 export const ROI_OPTIONS = [
@@ -244,7 +244,11 @@ export const RANK = [
   { value: 'rank', label: 'Rank' },
 ];
 
-
+export const PAGE_VIEW_OPTIONS = [
+  { value: 'rank', label: 'Rank' },
+  { value: '2', label: '2' },
+  { value: '3', label: '3' },
+];
 
 
     
