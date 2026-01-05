@@ -320,11 +320,13 @@ return (
                 display: 'flex',
                 flexDirection: 'column',
                 minWidth: 0, 
+                
                 overflow: 'hidden',
-                flex: isDatasetDetailMode ? 1 : 'none'
+                flex: isDatasetDetailMode ? 1 : 'none',
+                overflowY: 'auto',
               }}
             >
-              <h3
+             <h3
                 style={{
                   flex: '0 0 auto',
                   marginBottom: 8,
@@ -334,27 +336,29 @@ return (
                   textAlign: 'center', 
                 }}
               >
-                {/* title logic*/}
-                {dataset.length === 0 && (
-                  training === 'Murty185 VS NSD1000' 
-                    ? 'Murty185 vs NSD1000 Performance Comparison' 
-                    : `${region[0].toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`
-                )}
-                
+               
+                {isDatasetDetailMode 
+                  ? `Performance On Specific Dataset Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'} `
+                  : (training === 'Murty185 VS NSD1000' 
+                      ? 'Murty185 vs NSD1000 Performance Comparison' 
+                      : `${region[0]?.toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`)
+                }
               </h3>
 
               {/* content */}
               <div
                 style={{
                   flex: 1,
-                  overflowX: "auto", // 支持横向滚动，防止 ROI 太多挤在一起
-                  
-                  overflowY: isDatasetDetailMode ? "auto" : "hidden",
+                 overflowY: isDatasetDetailMode ? "auto" : "hidden",
+                
+                  overflowX: isDatasetDetailMode ? "hidden" : "auto",
                   position: 'relative',
                   display: 'flex', // 始终使用 flex 布局以支持多图横向排列
+                  flexDirection: isDatasetDetailMode ? 'column' : 'row',
                   justifyContent: training === 'Murty185 VS NSD1000' ? 'center' : 'flex-start',
-                  gap: 24, // 区域之间的间隔
+                  gap: isDatasetDetailMode ? 0 : 24, 
                   paddingBottom: 10
+                  
                 }}
               >
                 {/* scatter plot */}
@@ -370,23 +374,52 @@ return (
                   />
                 )}
 
-                {isDatasetDetailMode && region.map((roiValue) => (
-                <div key={roiValue} style={{ display: 'flex', flexDirection: 'column', minWidth: 600, flexShrink: 0 }}>
-                  <div style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: 8, color: '#1890ff' }}>
-                    {roiValue} Score Distribution
-                  </div>
-                    <BarChartDetail
-                      data={getDataByTraining(training)}
-                      roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
-                      dataset={dataset[0]}
-                      ceiling={Ceiling} // 传入组件顶部定义的 Ceiling 变量
-                      rank={rank}
-                      yLabel={yLabel}
-                      onModelClick={(m: string) => setSelectedModel(m)}
-                    />
-                </div>
-              ))}
+              {isDatasetDetailMode && dataset.map((dsName) => (
+                      <React.Fragment key={dsName}>
+                        {region.map((roiValue) => (
+                          <div 
+                            key={`${dsName}-${roiValue}`} 
+                            style={{ 
+                              display: 'flex', 
+                              flexDirection: 'column', 
+                              width: '100%', 
+                              position: 'relative' 
+                            }}
+                          >
+                            {/* ✨ 纵向吸顶标题 */}
+                            <div style={{ 
+                              position: 'sticky',
+                              top: 0,           // 向下滚动时固定在顶部
+                              zIndex: 10,
+                              background: '#fafafa', 
+                              padding: '10px 0',
+                              borderBottom: '2px solid #1890ff',
+                              marginBottom: 15,
+                              fontWeight: 'bold',
+                              color: '#1890ff',
+                              fontSize: '14px',
+                              textTransform: 'uppercase'
+                            }}>
+                              {dsName} —— {roiValue === 'Across Regions' ? 'Overall' : roiValue}
+                            </div>
 
+                            {/* 柱状图组件 */}
+                            <div style={{ width: '100%', overflowX: 'auto' }}>
+                              <BarChartDetail
+                                data={getDataByTraining(training)}
+                                roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
+                                dataset={dsName}
+                                ceiling={Ceiling}
+                                rank={rank}
+                                yLabel={yLabel}
+                                onModelClick={(m: string | null) => setSelectedModel(m)}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </React.Fragment>
+                    ))}
+        
                 
 
                 {training !== 'Murty185 VS NSD1000' &&  dataset.length === 0 && region.map((roiValue, index) => (

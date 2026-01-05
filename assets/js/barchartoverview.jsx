@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-const BarChartDetail = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }) => {
+const BarChartOverview = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }) => {
   const ceilingRef = useRef();
   const barsRef = useRef();
   const [selectedModel, setSelectedModel] = useState(null);
@@ -41,8 +41,8 @@ const BarChartDetail = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClic
 
     // ====scale ====
     const barWidth = 20;
-    const margin = { top: 30, right: 20, bottom: 180, left: 60 };
-    const height = 350;
+    const margin = { top: 40, right: 20, bottom: 180, left: 60 };
+    const height = 200;
 
     const y = d3
       .scaleLinear()
@@ -353,4 +353,4 @@ const BarChartDetail = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClic
   );
 };
 
-export default BarChartDetail;
+export default BarChartOverview;
