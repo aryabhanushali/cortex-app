@@ -85,16 +85,21 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
     
     // margin calculation 
     const margin = { 
-      top: height * 0.18, 
-      right: width * 0.15, 
-      bottom: 70, 
+      top: height * 0.12, 
+      right: width * 0.12, 
+      bottom: 50, 
       left: 70 
     };
 
-    
-    const plotAreaWidth = width - margin.left - margin.right;
+    const availableWidth = width; 
+    const plotAreaWidth = availableWidth - margin.left - margin.right;
     const plotAreaHeight = height - margin.top - margin.bottom;
     const mainSize = Math.min(plotAreaWidth, plotAreaHeight);
+    // const plotAreaWidth = width - margin.left - margin.right;
+    // const plotAreaHeight = height - margin.top - margin.bottom;
+    // const mainSize = Math.min(plotAreaWidth, plotAreaHeight);
+    const totalContentWidth = mainSize + margin.left + margin.right;
+    const centerXOffset = Math.max(0, (width - totalContentWidth) / 2);
 
     
 
@@ -128,12 +133,25 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
     const minVal = (d3.min(allVals) || 0) - 0.05;
     const maxVal = (d3.max(allVals) || 1) + 0.05;
 
-    const xScale = d3.scaleLinear().domain([minVal, maxVal]).range([margin.left, margin.left + mainSize]);
-    const yScale = d3.scaleLinear().domain([minVal, maxVal]).range([margin.top + mainSize, margin.top]);
+    // const xScale = d3.scaleLinear().domain([minVal, maxVal]).range([margin.left, margin.left + mainSize]);
+    // const yScale = d3.scaleLinear().domain([minVal, maxVal]).range([margin.top + mainSize, margin.top]);
+    const xScale = d3.scaleLinear()
+      .domain([minVal, maxVal])
+      .range([margin.left + centerXOffset, margin.left + centerXOffset + mainSize]);
+    
+    const yScale = d3.scaleLinear()
+      .domain([minVal, maxVal])
+      .range([margin.top + mainSize, margin.top]);
 
   
-    svg.append("g").attr("transform", `translate(0,${margin.top + mainSize})`).call(d3.axisBottom(xScale).ticks(6));
-    svg.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(yScale).ticks(6));
+    svg.append("g")
+      .attr("transform", `translate(0,${margin.top + mainSize})`)
+      .call(d3.axisBottom(xScale).ticks(6));
+    
+
+    svg.append("g")
+      .attr("transform", `translate(${margin.left + centerXOffset},0)`)
+      .call(d3.axisLeft(yScale).ticks(6));
 
     // Y=X 
     svg.append("line")
@@ -142,27 +160,21 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
       .attr("stroke", "#999").attr("stroke-dasharray", "4 2").attr("opacity", 0.6);
 
     // axis label
-    svg.append("text").attr("x", margin.left + mainSize/2).attr("y", height - 20).attr("text-anchor", "middle").style("font-size", "15px").text("Murty185 Performance (Pearson r)");
-    svg.append("text").attr("transform", "rotate(-90)").attr("x", -(margin.top + mainSize/2)).attr("y", 25).attr("text-anchor", "middle").style("font-size", "15px").text("NSD1000 Performance (Pearson r)");
+   svg.append("text")
+      .attr("x", margin.left + centerXOffset + mainSize/2)
+      .attr("y", height - 10)
+      .attr("text-anchor", "middle")
+      .style("font-size", "15px")
+      .text("Murty185 Performance (Pearson r)");
+    
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -(margin.top + mainSize/2))
+      .attr("y", centerXOffset + 25) // ✨ Y 位置由于旋转也要调整
+      .attr("text-anchor", "middle")
+      .style("font-size", "15px")
+      .text("NSD1000 Performance (Pearson r)");
 
-    // =====  draw scatter points/ dots =====
-    // const dots = svg.selectAll("circle.dot")
-    //   .data(points)
-    //   .enter()
-    //   .append("circle")
-    //   .attr("class", "dot")
-    //   .attr("cx", d => xScale(d.x))
-    //   .attr("cy", d => yScale(d.y))
-    //   .attr("r", 5)
-    //   .attr("fill", d => color_map[d.dataset])
-    //   .attr("opacity", 0.5)
-    //   .attr("stroke", "#fff")
-    //   .style("cursor", "pointer")
-    //   .on("click", (event, d) => {
-    //     const newSelection = selectedModel === d.model ? null : d.model;
-    //     setSelectedModel(newSelection);
-    //     if (onModelClick) onModelClick(newSelection);
-    //   });
     const dots = svg.selectAll("circle.dot")
       .data(points)
       .enter()
@@ -275,17 +287,18 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
       const histScale = d3.scaleLinear().domain([0, maxCount]).range([0, margin.top - 40]);
 
       svg.append("g").selectAll(".h-rect")
-        .data(xHist).enter().append("rect")
-        .attr("x", d => xScale(d.x0))
-        .attr("y", d => margin.top - 10 - histScale(d.length)) 
-        .attr("width", d => Math.max(0, xScale(d.x1) - xScale(d.x0) - 1))
-        .attr("height", d => histScale(d.length)) 
-        .attr("fill", color_map[ds]).attr("opacity", 0.4);
+          .data(xHist).enter().append("rect")
+          .attr("x", d => xScale(d.x0))
+          .attr("y", d => margin.top - 10 - histScale(d.length)) 
+          .attr("width", d => Math.max(0, xScale(d.x1) - xScale(d.x0) - 1))
+          .attr("height", d => histScale(d.length)) 
+          .attr("fill", color_map[ds]).attr("opacity", 0.4);
 
+      // 右侧直方图 (✨ 修改 x 坐标)
       svg.append("g").selectAll(".v-rect")
         .data(yHist).enter().append("rect")
         .attr("y", d => yScale(d.x1))
-        .attr("x", margin.left + mainSize + 10)
+        .attr("x", margin.left + centerXOffset + mainSize + 10) 
         .attr("height", d => Math.max(0, yScale(d.x0) - yScale(d.x1) - 1))
         .attr("width", d => histScale(d.length)) 
         .attr("fill", color_map[ds]).attr("opacity", 0.4);
@@ -298,8 +311,9 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
       const linePts = kdeVals.map(([u, dens]) => {
         const base = [u * dVec[0], u * dVec[1]];
         const offset = [dens * 1500 * d_orth[0], dens * 1500 * d_orth[1]];
-        return [kdeCenter[0] + base[0] + offset[0]+ mainSize/2, kdeCenter[1] + base[1] + offset[1]-mainSize/2]; // mainsize for offset
+        return [kdeCenter[0] + base[0] + offset[0]+ mainSize/2 + centerXOffset/2, kdeCenter[1] + base[1] + offset[1]-mainSize/2-centerXOffset/2]; // mainsize for offset
       });
+      
       svg.append("path").datum(linePts).attr("d", line).attr("fill", "none").attr("stroke", color_map[ds]).attr("stroke-width", 2).attr("opacity", 0.8);
     });
 
@@ -308,7 +322,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
     if (showOverlay) {
       svg.append("image")
         .attr("href", chartType === "uni" ? uniIcon : multiIcon)
-        .attr("x", margin.left + mainSize - 160)
+        .attr("x", margin.left +  centerXOffset+ mainSize - 160)
         .attr("y", margin.top + mainSize - 130)
         .attr("width", 150)
         .attr("height", 120)
@@ -317,7 +331,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
     }
 
     // ===== (Legend) =====
-    const legend = svg.append("g").attr("transform", `translate(${margin.left + 20}, ${margin.top + 20})`);
+    const legend = svg.append("g").attr("transform", `translate(${margin.left + centerXOffset+ 20}, ${margin.top + 20})`);
     legendData.forEach((ds, i) => {
       const lg = legend.append("g").attr("transform", `translate(0, ${i * 22})`);
       lg.append("circle").attr("r", 6).attr("fill", color_map[ds]).attr("stroke", "#333");
@@ -359,7 +373,7 @@ const ScatterMurtyVsNsd = ({ murtyData, nsdData, roi, dataset, chartType, showOv
  
       {/* right：model details */}
       <div style={{ 
-        width: "220px", 
+        width: "250px", 
         borderLeft: "1px solid #eee", 
         padding: "20px", 
         backgroundColor: "#fafafa",

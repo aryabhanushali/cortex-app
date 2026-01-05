@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from "react"; 
 import * as d3 from "d3";
 
-const HeatmapDetail = ({ data, roi, dataset, rank, selectedModel, onModelClick, onScrollUpdate }) => {
+const HeatmapDetail = ({ data, roi, dataset, rank, selectedModel, onModelClick, onScrollUpdate,showYAxis = true,isMultiRegion = false }) => {
   const headerRef = useRef();
   const bodyRef = useRef();
   const legendRef = useRef();
@@ -76,9 +76,9 @@ const HeatmapDetail = ({ data, roi, dataset, rank, selectedModel, onModelClick, 
     d3.select(headerRef.current).selectAll("*").remove();
     d3.select(bodyRef.current).selectAll("*").remove();
     d3.select(legendRef.current).selectAll("*").remove();
-
-    const headerMargin = { top: 80, right: 40, bottom: 10, left: 200 };
-    const bodyMargin = { top: 10, right: 40, bottom: 0, left: 200 };
+    const LEFT_MARGIN = showYAxis ? 200 : 10;
+    const headerMargin = { top: 80, right: 40, bottom: 10, left: LEFT_MARGIN };
+    const bodyMargin = { top: 10, right: 40, bottom: 0, left: LEFT_MARGIN };
     const rowHeight = 25;
     const rowGap = 2;
     const columnWidth = 75;
@@ -193,14 +193,21 @@ const HeatmapDetail = ({ data, roi, dataset, rank, selectedModel, onModelClick, 
     if (!models.length) return;
 
     // --- Ranking Logic ---
+    // if (rank && rank !== "") {
+    //   const modelGlobal = {};
+    //   cellData.forEach((d) => {
+    //     if (d.x === "global_score") {
+    //       modelGlobal[d.model] = d.raw ?? -Infinity;
+    //     }
+    //   });
+    //   models.sort((a, b) => (modelGlobal[b] || -Infinity) - (modelGlobal[a] || -Infinity));
+    // }
     if (rank && rank !== "") {
       const modelGlobal = {};
-      cellData.forEach((d) => {
-        if (d.x === "global_score") {
-          modelGlobal[d.model] = d.raw ?? -Infinity;
-        }
-      });
+      cellData.forEach((d) => { if (d.x === "global_score") modelGlobal[d.model] = d.raw ?? -Infinity; });
       models.sort((a, b) => (modelGlobal[b] || -Infinity) - (modelGlobal[a] || -Infinity));
+    } else {
+      models.sort(); // 默认按字母排序，保证并排显示时模型行号一致
     }
 
     // 4. sorted rank store in Ref
@@ -256,14 +263,20 @@ const HeatmapDetail = ({ data, roi, dataset, rank, selectedModel, onModelClick, 
       .text((d) => d.raw.toFixed(2));
 
     // Ceiling Y Axis
-    svgHeader.append("g")
-      .attr("transform", `translate(${headerMargin.left - 10},0)`)
-      .call(d3.axisLeft(d3.scalePoint().domain(["ceiling"]).range([headerMargin.top + rowHeight / 2, headerMargin.top + rowHeight / 2])))
-      .call((g) => {
-        g.select(".domain").remove();
-        g.selectAll("text").style("font-size", "12px").style("fill", "black");
-      });
+    // svgHeader.append("g")
+    //   .attr("transform", `translate(${headerMargin.left - 10},0)`)
+    //   .call(d3.axisLeft(d3.scalePoint().domain(["ceiling"]).range([headerMargin.top + rowHeight / 2, headerMargin.top + rowHeight / 2])))
+    //   .call((g) => {
+    //     g.select(".domain").remove();
+    //     g.selectAll("text").style("font-size", "12px").style("fill", "black");
+    //   });
 
+    if (showYAxis) {
+      svgHeader.append("g")
+        .attr("transform", `translate(${headerMargin.left - 10},0)`)
+        .call(d3.axisLeft(d3.scalePoint().domain(["ceiling"]).range([headerMargin.top + rowHeight / 2, headerMargin.top + rowHeight / 2])))
+        .call((g) => { g.select(".domain").remove(); g.selectAll("text").style("font-size", "12px").style("font-weight", "bold"); });
+    }
     // ======= Body =======
     const svgBody = d3.select(bodyRef.current).append("svg").attr("width", width).attr("height", bodyHeight);
 
@@ -323,43 +336,69 @@ const HeatmapDetail = ({ data, roi, dataset, rank, selectedModel, onModelClick, 
       .text((d) => d.raw.toFixed(2));
 
     // Y Axis (Models)
-    svgBody.append("g")
-      .attr("transform", `translate(${bodyMargin.left - 10},0)`)
-      .call(
-        d3.axisLeft(
-          d3.scalePoint().domain(models).range([
-            bodyMargin.top + rowHeight / 2,
-            bodyMargin.top + models.length * (rowHeight + rowGap) - rowGap - rowHeight / 2,
-          ])
-        )
-      )
-      .call((g) => {
-        g.select(".domain").remove();
-        g.selectAll("text")
-          .style("font-size", "12px")
-          // .style("fill", "black")
-          .style("fill", (d) => (d === selectedModel ? "#FF4500" : "black"))
-          // 6. hightlight logic
-          .style("font-weight", (d) => (d === selectedModel ? "bold" : "normal"))
-          .style("cursor", "pointer")
-          .on("click", (event, d) => {
-            if (onModelClick) onModelClick(d === selectedModel ? null : d);
-          });
-      });
+    // svgBody.append("g")
+    //   .attr("transform", `translate(${bodyMargin.left - 10},0)`)
+    //   .call(
+    //     d3.axisLeft(
+    //       d3.scalePoint().domain(models).range([
+    //         bodyMargin.top + rowHeight / 2,
+    //         bodyMargin.top + models.length * (rowHeight + rowGap) - rowGap - rowHeight / 2,
+    //       ])
+    //     )
+    //   )
+    //   .call((g) => {
+    //     g.select(".domain").remove();
+    //     g.selectAll("text")
+    //       .style("font-size", "12px")
+    //       // .style("fill", "black")
+    //       .style("fill", (d) => (d === selectedModel ? "#FF4500" : "black"))
+    //       // 6. hightlight logic
+    //       .style("font-weight", (d) => (d === selectedModel ? "bold" : "normal"))
+    //       .style("cursor", "pointer")
+    //       .on("click", (event, d) => {
+    //         if (onModelClick) onModelClick(d === selectedModel ? null : d);
+    //       });
+    //   });
+    // ✨ 仅当显示 Y 轴时绘制模型名
+    if (showYAxis) {
+      svgBody.append("g")
+        .attr("transform", `translate(${bodyMargin.left - 10},0)`)
+        .call(d3.axisLeft(d3.scalePoint().domain(models).range([bodyMargin.top + rowHeight / 2, bodyMargin.top + models.length * (rowHeight + rowGap) - rowGap - rowHeight / 2])))
+        .call((g) => {
+          g.select(".domain").remove();
+          g.selectAll("text")
+            .style("font-size", "11px")
+            .style("fill", (d) => (d === selectedModel ? "#FF4500" : "black"))
+            .style("font-weight", (d) => (d === selectedModel ? "bold" : "normal"))
+            .style("cursor", "pointer")
+            .on("click", (_, d) => onModelClick && onModelClick(d === selectedModel ? null : d));
+        });
+    }
 
     // ======= Legend =======
-    const legendHeight = 250;
-    const legendWidth = 12;
-    const svgLegend = d3.select(legendRef.current).append("svg").attr("width", 80).attr("height", legendHeight + 40);
+    // const legendHeight = 250;
+    // const legendWidth = 12;
+    // const svgLegend = d3.select(legendRef.current).append("svg").attr("width", 80).attr("height", legendHeight + 40);
 
-    const defs = svgLegend.append("defs");
-    const gradient = defs.append("linearGradient").attr("id", "legend-gradient-vertical").attr("x1", "0%").attr("y1", "100%").attr("x2", "0%").attr("y2", "0%");
-    gradient.append("stop").attr("offset", "0%").attr("stop-color", "#D3D3D3");
-    gradient.append("stop").attr("offset", "100%").attr("stop-color", "#9CC9FF");
+    // const defs = svgLegend.append("defs");
+    // const gradient = defs.append("linearGradient").attr("id", "legend-gradient-vertical").attr("x1", "0%").attr("y1", "100%").attr("x2", "0%").attr("y2", "0%");
+    // gradient.append("stop").attr("offset", "0%").attr("stop-color", "#D3D3D3");
+    // gradient.append("stop").attr("offset", "100%").attr("stop-color", "#9CC9FF");
 
-    svgLegend.append("rect").attr("x", 30).attr("y", 20).attr("width", legendWidth).attr("height", legendHeight).style("fill", "url(#legend-gradient-vertical)");
-    const legendScale = d3.scaleLinear().domain([0, 1]).range([legendHeight + 20, 20]);
-    svgLegend.append("g").attr("transform", `translate(42,0)`).call(d3.axisRight(legendScale).ticks(5));
+    // svgLegend.append("rect").attr("x", 30).attr("y", 20).attr("width", legendWidth).attr("height", legendHeight).style("fill", "url(#legend-gradient-vertical)");
+    // const legendScale = d3.scaleLinear().domain([0, 1]).range([legendHeight + 20, 20]);
+    // svgLegend.append("g").attr("transform", `translate(42,0)`).call(d3.axisRight(legendScale).ticks(5));
+    if (showYAxis && !isMultiRegion) {
+        const legendHeight = 200;
+        const svgLegend = d3.select(legendRef.current).append("svg").attr("width", 60).attr("height", legendHeight + 40);
+        const defs = svgLegend.append("defs");
+        const gradient = defs.append("linearGradient").attr("id", "grad").attr("x1", "0%").attr("y1", "100%").attr("x2", "0%").attr("y2", "0%");
+        gradient.append("stop").attr("offset", "0%").attr("stop-color", "#D3D3D3");
+        gradient.append("stop").attr("offset", "100%").attr("stop-color", "#9CC9FF");
+        svgLegend.append("rect").attr("x", 10).attr("y", 20).attr("width", 10).attr("height", legendHeight).style("fill", "url(#grad)");
+        const legScale = d3.scaleLinear().domain([0, 1]).range([legendHeight + 20, 20]);
+        svgLegend.append("g").attr("transform", "translate(20,0)").call(d3.axisRight(legScale).ticks(5));
+    }
 
     
    

@@ -242,48 +242,51 @@ return (
               flex: 1, // fill space
               minHeight: 0, 
               display: 'grid', 
-              gridTemplateColumns: '1fr 6fr', 
+              // gridTemplateColumns: '1fr 6fr', 
+              gridTemplateColumns: pageView === '2' ? '1fr' : '1fr 6fr',
               gap: 16 
             }}
           >
             
-            {/* chart 1: Overview */}
-            <div
-              style={{
-                background: '#fafafa',
-                borderRadius: 8,
-                padding: 8,
-                overflow: 'hidden', 
-                display: 'flex',       // 
-                flexDirection: 'column' // 
-              }}
-            >
-            
-               {(region?.[0] === 'Across Regions') && (<div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
-                 <HeatmapOverview
-                    data={getDataByTraining(training)} 
-                    roi={'Overall'}
-                    dataset={dataset[0] || ''}
-                    rank={rank}
-                    selectedModel={selectedModel}
-                    onModelClick={(m: string) => setSelectedModel(m)}
-                    visibleRange={visibleRange}
-                  />
-               </div>)
-              }
-                {(region?.[0] !== 'Across Regions') && (<div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
-                 <HeatmapOverview
-                    data={getDataByTraining(training)} 
-                    roi={region[0]}
-                    dataset={dataset[0] || ''}
-                    rank={rank}
-                    selectedModel={selectedModel}
-                    onModelClick={(m: string) => setSelectedModel(m)}
-                    visibleRange={visibleRange}
-                  />
-               </div>)
-              }
-            </div>
+           {pageView !== '2' && (
+              <div
+                style={{
+                  background: '#fafafa',
+                  borderRadius: 8,
+                  padding: 8,
+                  overflow: 'hidden', 
+                  display: 'flex',       
+                  flexDirection: 'column' 
+                }}
+              >
+                {/* 这里的逻辑保持不变 */}
+                {region?.[0] === 'Across Regions' ? (
+                  <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
+                    <HeatmapOverview
+                      data={getDataByTraining(training)} 
+                      roi={'Overall'}
+                      dataset={dataset[0] || ''}
+                      rank={rank}
+                      selectedModel={selectedModel}
+                      onModelClick={(m: string) => setSelectedModel(m)}
+                      visibleRange={visibleRange}
+                    />
+                  </div>
+                ) : (
+                  <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
+                    <HeatmapOverview
+                      data={getDataByTraining(training)} 
+                      roi={region[0]}
+                      dataset={dataset[0] || ''}
+                      rank={rank}
+                      selectedModel={selectedModel}
+                      onModelClick={(m: string) => setSelectedModel(m)}
+                      visibleRange={visibleRange}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* chart 2: Detail */}
            
@@ -322,11 +325,13 @@ return (
               <div
                 style={{
                   flex: 1,
-                  overflowX: "auto",
+                  overflowX: "auto", // 支持横向滚动，防止 ROI 太多挤在一起
                   overflowY: "hidden", 
                   position: 'relative',
-                  display: training === 'Murty185 VS NSD1000' ? 'flex' : 'block', // scatterplot display setting
-                  justifyContent: 'center'
+                  display: 'flex', // 始终使用 flex 布局以支持多图横向排列
+                  justifyContent: training === 'Murty185 VS NSD1000' ? 'center' : 'flex-start',
+                  gap: 24, // 区域之间的间隔
+                  paddingBottom: 10
                 }}
               >
                 {/* scatter plot */}
@@ -343,7 +348,7 @@ return (
                 )}
 
                 {/* 2.  Across Regions heatmap detail */}
-                {(training !== 'Murty185 VS NSD1000') &&(region?.[0] === 'Across Regions') && (
+                {/* {(training !== 'Murty185 VS NSD1000') &&(region?.[0] === 'Across Regions') && (
                   <HeatmapDetail
                     data={getDataByTraining(training)} 
                     roi={'Overall'}
@@ -353,10 +358,10 @@ return (
                     onModelClick={(m: string) => setSelectedModel(m)}
                     onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
                   />
-                )}
+                )} */}
 
                 {/* 3. region heatmap detail */}
-                {(training !== 'Murty185 VS NSD1000') && ( region?.[0] !== 'Across Regions') && (
+                {/* {(training !== 'Murty185 VS NSD1000') && ( region?.[0] !== 'Across Regions') && (
                   <HeatmapDetail
                     data={getDataByTraining(training)} 
                     roi={region[0]}
@@ -366,7 +371,48 @@ return (
                     onModelClick={(m: string) => setSelectedModel(m)}
                     onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
                   />
-                )}
+                )} */}
+
+                {training !== 'Murty185 VS NSD1000' && region.map((roiValue, index) => (
+                <div 
+                  key={roiValue} 
+                  style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    // 如果是第一个（带 Y 轴标签），宽度设宽一点，后面不带标签的设窄一点
+                    minWidth: index === 0 ? 450 : 350, 
+                    flexShrink: 0 
+                  }}
+                >
+                  {/* 区域小标题 */}
+                  <div style={{ 
+                    textAlign: 'center', 
+                    fontWeight: 'bold', 
+                    marginBottom: 12, 
+                    fontSize: '14px', 
+                    color: '#555',
+                    textTransform: 'uppercase',
+                    background: '#eee',
+                    padding: '4px 0',
+                    borderRadius: '4px'
+                  }}>
+                    {roiValue === 'Across Regions' ? 'Across Regions' : roiValue}
+                  </div>
+
+                  <HeatmapDetail
+                    data={getDataByTraining(training)} 
+                    roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
+                    dataset={dataset[0] || ''}
+                    rank={rank}
+                    selectedModel={selectedModel}
+                    onModelClick={(m: string) => setSelectedModel(m)}
+                    onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
+                    // ✨ 新增 Props：控制是否显示左侧模型名称
+                    showYAxis={index === 0} 
+                    isMultiRegion={region.length > 1}
+                  />
+                </div>
+              ))}
               </div>
             </div>
           </div>
