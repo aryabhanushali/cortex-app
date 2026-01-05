@@ -10,6 +10,7 @@ import HeatmapOverview from './heatmapOverview.jsx';
 import HeatmapDetail from './heatmapDetail.jsx';
 import ScatterMurtyVsNsd from './scatterMurtyVsNsd.jsx';
 import PageSelect from './pageselect.jsx';
+import BarChartDetail from './barchartdetail.jsx'; 
 
 
 
@@ -31,6 +32,7 @@ const ScoreboardPageNew: React.FC = () => {
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 0 });
 
   const [pageView, setPageView] = useState('rank');
+  const isDatasetDetailMode = pageView === 'rank' && dataset.length > 0;
 
   // pageview logic
   useEffect(() => {
@@ -147,7 +149,8 @@ return (
           flex: 1,
           minHeight: 0, 
           display: 'grid',
-          gridTemplateColumns: '1.5fr 7fr', // ratio for overview and detail
+          // gridTemplateColumns: '1.5fr 7fr', // ratio for overview and detail
+          gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 7fr)',
           gap: 16,
         }}
       >
@@ -214,6 +217,7 @@ return (
             height: '100%', // fill height
             gap: 16,
             minHeight: 0, // 
+            minWidth: 0,
           }}
         >
           {/* ChartSelect button group*/}
@@ -237,54 +241,72 @@ return (
           </div>
 
           {/* chart: horizontal*/}
-          <div 
-            style={{ 
-              flex: 1, // fill space
-              minHeight: 0, 
-              display: 'grid', 
-              // gridTemplateColumns: '1fr 6fr', 
-              gridTemplateColumns: pageView === '2' ? '1fr' : '1fr 6fr',
-              gap: 16 
-            }}
-          >
+        <div 
+          style={{ 
+            flex: 1, 
+            minHeight: 0, 
+            display: isDatasetDetailMode ? 'flex' : 'grid', // 模式切换：上下堆叠用 flex，左右并排用 grid
+            flexDirection: 'column',                        // 上下堆叠方向
+            gridTemplateColumns: pageView === '2' ? '1fr' : '1fr 6fr', 
+            gap: 16 
+          }}
+        >
             
-           {pageView !== '2' && (
+           {/* --- ScoreboardPageNew.tsx 内部 Overview 区域修改 --- */}
+
+            {pageView !== '2' && dataset.length === 0 && (
               <div
                 style={{
                   background: '#fafafa',
                   borderRadius: 8,
-                  padding: 8,
+                  padding: '8px 4px', // 减少内边距给图表留空间
                   overflow: 'hidden', 
                   display: 'flex',       
-                  flexDirection: 'column' 
+                  flexDirection: 'row', // 改为横向排列
+                  gap: 8,               // 多个 ROI 之间的间隔
+                  height: isDatasetDetailMode ? '20%' : '100%',
+                  flexShrink: 0
                 }}
               >
-                {/* 这里的逻辑保持不变 */}
-                {region?.[0] === 'Across Regions' ? (
-                  <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
-                    <HeatmapOverview
-                      data={getDataByTraining(training)} 
-                      roi={'Overall'}
-                      dataset={dataset[0] || ''}
-                      rank={rank}
-                      selectedModel={selectedModel}
-                      onModelClick={(m: string) => setSelectedModel(m)}
-                      visibleRange={visibleRange}
-                    />
+                {region.map((roiValue) => (
+                  <div 
+                    key={roiValue} 
+                    style={{ 
+                      flex: 1, 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      minWidth: 40, // 保证至少有一定宽度，防止挤成线
+                      height: '100%'
+                    }}
+                  >
+                    {/* 1. Overview 的 ROI 小标题 */}
+                    <div style={{ 
+                      textAlign: 'center', 
+                      fontSize: '10px', 
+                      fontWeight: 'bold', 
+                      color: '#888',
+                      marginBottom: 4,
+                      textTransform: 'uppercase',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden'
+                    }}>
+                      {roiValue === 'Across Regions' ? 'Overall' : roiValue}
+                    </div>
+
+                    {/* 2. Overview 图表主体 */}
+                    <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
+                      <HeatmapOverview
+                        data={getDataByTraining(training)} 
+                        roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
+                        dataset={dataset[0] || ''}
+                        rank={rank}
+                        selectedModel={selectedModel}
+                        onModelClick={(m: string) => setSelectedModel(m)}
+                        visibleRange={visibleRange}
+                      />
+                    </div>
                   </div>
-                ) : (
-                  <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
-                    <HeatmapOverview
-                      data={getDataByTraining(training)} 
-                      roi={region[0]}
-                      dataset={dataset[0] || ''}
-                      rank={rank}
-                      selectedModel={selectedModel}
-                      onModelClick={(m: string) => setSelectedModel(m)}
-                      visibleRange={visibleRange}
-                    />
-                  </div>
-                )}
+                ))}
               </div>
             )}
 
@@ -298,7 +320,8 @@ return (
                 display: 'flex',
                 flexDirection: 'column',
                 minWidth: 0, 
-                overflow: 'hidden'
+                overflow: 'hidden',
+                flex: isDatasetDetailMode ? 1 : 'none'
               }}
             >
               <h3
@@ -312,12 +335,11 @@ return (
                 }}
               >
                 {/* title logic*/}
-                {training === 'Murty185 VS NSD1000' 
-                  ? 'Murty185 vs NSD1000 Performance Comparison' 
-                  : `${region[0].toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`
-                }
-                 {/* {`${region[0].toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`
-                } */}
+                {dataset.length === 0 && (
+                  training === 'Murty185 VS NSD1000' 
+                    ? 'Murty185 vs NSD1000 Performance Comparison' 
+                    : `${region[0].toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`
+                )}
                 
               </h3>
 
@@ -326,7 +348,8 @@ return (
                 style={{
                   flex: 1,
                   overflowX: "auto", // 支持横向滚动，防止 ROI 太多挤在一起
-                  overflowY: "hidden", 
+                  
+                  overflowY: isDatasetDetailMode ? "auto" : "hidden",
                   position: 'relative',
                   display: 'flex', // 始终使用 flex 布局以支持多图横向排列
                   justifyContent: training === 'Murty185 VS NSD1000' ? 'center' : 'flex-start',
@@ -347,33 +370,26 @@ return (
                   />
                 )}
 
-                {/* 2.  Across Regions heatmap detail */}
-                {/* {(training !== 'Murty185 VS NSD1000') &&(region?.[0] === 'Across Regions') && (
-                  <HeatmapDetail
-                    data={getDataByTraining(training)} 
-                    roi={'Overall'}
-                    dataset={dataset[0] || ''}
-                    rank={rank}
-                    selectedModel={selectedModel}
-                    onModelClick={(m: string) => setSelectedModel(m)}
-                    onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
-                  />
-                )} */}
+                {isDatasetDetailMode && region.map((roiValue) => (
+                <div key={roiValue} style={{ display: 'flex', flexDirection: 'column', minWidth: 600, flexShrink: 0 }}>
+                  <div style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: 8, color: '#1890ff' }}>
+                    {roiValue} Score Distribution
+                  </div>
+                    <BarChartDetail
+                      data={getDataByTraining(training)}
+                      roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
+                      dataset={dataset[0]}
+                      ceiling={Ceiling} // 传入组件顶部定义的 Ceiling 变量
+                      rank={rank}
+                      yLabel={yLabel}
+                      onModelClick={(m: string) => setSelectedModel(m)}
+                    />
+                </div>
+              ))}
 
-                {/* 3. region heatmap detail */}
-                {/* {(training !== 'Murty185 VS NSD1000') && ( region?.[0] !== 'Across Regions') && (
-                  <HeatmapDetail
-                    data={getDataByTraining(training)} 
-                    roi={region[0]}
-                    dataset={dataset[0] || ''}
-                    rank={rank}
-                    selectedModel={selectedModel}
-                    onModelClick={(m: string) => setSelectedModel(m)}
-                    onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
-                  />
-                )} */}
+                
 
-                {training !== 'Murty185 VS NSD1000' && region.map((roiValue, index) => (
+                {training !== 'Murty185 VS NSD1000' &&  dataset.length === 0 && region.map((roiValue, index) => (
                 <div 
                   key={roiValue} 
                   style={{ 
