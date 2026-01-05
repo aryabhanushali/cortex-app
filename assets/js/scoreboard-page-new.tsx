@@ -11,6 +11,7 @@ import HeatmapDetail from './heatmapDetail.jsx';
 import ScatterMurtyVsNsd from './scatterMurtyVsNsd.jsx';
 import PageSelect from './pageselect.jsx';
 import BarChartDetail from './barchartdetail.jsx'; 
+import BarChartOverview from './barchartoverview.jsx';
 
 
 
@@ -254,47 +255,63 @@ return (
             
            {/* --- ScoreboardPageNew.tsx 内部 Overview 区域修改 --- */}
 
-            {pageView !== '2' && dataset.length === 0 && (
-              <div
-                style={{
-                  background: '#fafafa',
-                  borderRadius: 8,
-                  padding: '8px 4px', // 减少内边距给图表留空间
-                  overflow: 'hidden', 
-                  display: 'flex',       
-                  flexDirection: 'row', // 改为横向排列
-                  gap: 8,               // 多个 ROI 之间的间隔
-                  height: isDatasetDetailMode ? '20%' : '100%',
-                  flexShrink: 0
-                }}
-              >
-                {region.map((roiValue) => (
-                  <div 
-                    key={roiValue} 
-                    style={{ 
-                      flex: 1, 
-                      display: 'flex', 
-                      flexDirection: 'column',
-                      minWidth: 40, // 保证至少有一定宽度，防止挤成线
-                      height: '100%'
-                    }}
-                  >
-                    {/* 1. Overview 的 ROI 小标题 */}
-                    <div style={{ 
-                      textAlign: 'center', 
-                      fontSize: '10px', 
-                      fontWeight: 'bold', 
-                      color: '#888',
-                      marginBottom: 4,
-                      textTransform: 'uppercase',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden'
-                    }}>
-                      {roiValue === 'Across Regions' ? 'Overall' : roiValue}
-                    </div>
+           {/* --- ScoreboardPageNew.tsx 概览区域并行切换逻辑 --- */}
 
-                    {/* 2. Overview 图表主体 */}
-                    <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
+          {pageView !== '2' && ( 
+            <div
+              style={{
+                background: '#fafafa',
+                borderRadius: 8,
+                padding: '8px 4px',
+                overflow: 'hidden', 
+                display: 'flex',       
+                flexDirection: 'row', 
+                gap: 8,
+                // ✨ 动态高度：isDatasetDetailMode 为 true 时压缩为 20%，否则占满 100%
+                height: isDatasetDetailMode ? '20%' : '100%',
+                flexShrink: 0
+              }}
+            >
+              {region.map((roiValue) => (
+                <div 
+                  key={roiValue} 
+                  style={{ 
+                    flex: 1, 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    minWidth: 40,
+                    height: '100%'
+                  }}
+                >
+                  {/* ROI 小标题 */}
+                  <div style={{ 
+                    textAlign: 'center', 
+                    fontSize: '10px', 
+                    fontWeight: 'bold', 
+                    color: '#888',
+                    marginBottom: 4,
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden'
+                  }}>
+                    {roiValue === 'Across Regions' ? 'Overall' : roiValue}
+                  </div>
+
+                  {/* ✨ 并行逻辑：在这里根据 dataset.length 进行组件切换 */}
+                  <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
+                    {dataset.length > 0 ? (
+                      /* 并行分支 A: 选择了数据集，渲染折线图概览 */
+                      <BarChartOverview
+                        data={getDataByTraining(training)}
+                        roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
+                        dataset={dataset[0]} 
+                        ceiling={Ceiling}
+                        rank={rank}
+                        onModelClick={(m: string | null) => setSelectedModel(m)}
+                        selectedModel={selectedModel}
+                      />
+                    ) : (
+                      /* 并行分支 B: 未选择数据集，渲染热力图概览 */
                       <HeatmapOverview
                         data={getDataByTraining(training)} 
                         roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
@@ -304,11 +321,16 @@ return (
                         onModelClick={(m: string) => setSelectedModel(m)}
                         visibleRange={visibleRange}
                       />
-                    </div>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
+          )}
+
+            
+
+
 
             {/* chart 2: Detail */}
            

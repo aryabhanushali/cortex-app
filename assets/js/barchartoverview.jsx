@@ -1,356 +1,146 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-const BarChartOverview = ({ data, roi, dataset, ceiling, rank, yLabel, onModelClick }) => {
-  const ceilingRef = useRef();
-  const barsRef = useRef();
-  const [selectedModel, setSelectedModel] = useState(null);
-  const [stats, setStats] = useState({ max: null, mean: null });
-  const [scaleY, setScaleY] = useState(null);
+const LineChartROIDataset = ({ data, roi, dataset, ceiling, rank, onModelClick, selectedModel }) => {
+  const containerRef = useRef();
+  const svgRef = useRef();
+  const [dimensions, setDimensions] = useState({ width: 0, height: 120 });
 
-   useEffect(() => {
-      setSelectedModel(null);
-      if (onModelClick) onModelClick(null); 
-    }, [data, roi, dataset]);
+  // 1. 监听容器宽度
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (!entries || entries.length === 0) return;
+      setDimensions((prev) => ({ ...prev, width: entries[0].contentRect.width }));
+    });
+    resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, []);
 
   useEffect(() => {
-    console.log("🔍 RoiBarChart props:", { roi, dataset, ceiling, data });
+    // 确保有足够的数据进行渲染
+    if (!data || !roi || !data[roi] || dimensions.width === 0) return;
 
-    if (!data || !roi || !data[roi]) return;
-    if (!ceiling || !ceiling[roi] || !ceiling[roi][dataset]) return;
+    const svg = d3.select(svgRef.current);
+    svg.selectAll("*").remove();
 
+    const { width, height } = dimensions;
+    const margin = { top: 20, right: 20, bottom: 25, left: 40 };
+
+    // ==== 2. 数据处理 ====
     const roiData = data[roi];
-
-    // ==== data preprocessing ====
     const models = Object.keys(roiData).filter((m) => m !== "ceiling");
+    
     let results = models
       .map((model) => {
+        // 根据传入的 dataset 获取具体数值
         const val = roiData[model]?.[dataset]?.[0];
         return { model, val };
       })
       .filter((d) => d.val !== undefined);
 
+    // 排序逻辑
     if (rank && rank !== "") {
       results = [...results].sort((a, b) => d3.descending(a.val, b.val));
     }
 
-    const ceilingMean = ceiling[roi][dataset]?.ceiling_mean ?? null;
-    const ceilingMax = ceiling[roi][dataset]?.ceiling_max ?? null;
+    const ceilingMean = ceiling?.[roi]?.[dataset]?.ceiling_mean ?? null;
 
-    setStats({ max: ceilingMax, mean: ceilingMean });
+    // ==== 3. 比例尺 ====
+    const xScale = d3.scalePoint()
+      .domain(results.map(d => d.model))
+      .range([margin.left, width - margin.right]);
 
-    // ====scale ====
-    const barWidth = 20;
-    const margin = { top: 40, right: 20, bottom: 180, left: 60 };
-    const height = 200;
-
-    const y = d3
-      .scaleLinear()
-      .domain([-0.3, 1])
+    // 动态 Y 轴，确保包含 0 和 1 (或数据中的极值)
+    const minY = d3.min(results, d => d.val) < -0.1 ? d3.min(results, d => d.val) : -0.2;
+    const yScale = d3.scaleLinear()
+      .domain([minY, 1.0]) 
       .range([height - margin.bottom, margin.top]);
 
-    setScaleY(() => y);
+    // ==== 4. 绘制 y=0 基准线 (关键新增) ====
+    svg.append("line")
+      .attr("x1", margin.left)
+      .attr("x2", width - margin.right)
+      .attr("y1", yScale(0))
+      .attr("y2", yScale(0))
+      .attr("stroke", "#999") // 深灰色
+      .attr("stroke-width", 1)
+      .attr("stroke-dasharray", "2 2") // 虚线表示
+      .style("opacity", 0.8);
 
-    // ================= left ceiling SVG =================
-    const ceilingSvg = d3.select(ceilingRef.current);
-    ceilingSvg.selectAll("*").remove();
-    const ceilingWidth = margin.left + 50;
-
-    ceilingSvg.attr("width", ceilingWidth).attr("height", height);
-
-    // dot lines
-    if (ceilingMax != null) {
-      ceilingSvg
-        .append("line")
-        .attr("x1", margin.left + 15 + barWidth / 2)
-        .attr("x2", margin.left + 15 + barWidth / 2)
-        .attr("y1", y(0.9))
-        .attr("y2", y(-0.3))
-        .attr("stroke", "gray")
-        .attr("stroke-dasharray", "3 3")
-        .attr("stroke-width", 1);
+    // ==== 5. 绘制 Ceiling 线 (可选) ====
+    if (ceilingMean !== null) {
+      svg.append("line")
+        .attr("x1", margin.left)
+        .attr("x2", width - margin.right)
+        .attr("y1", yScale(ceilingMean))
+        .attr("y2", yScale(ceilingMean))
+        .attr("stroke", "#ff4d4f")
+        .attr("stroke-dasharray", "4 4")
+        .attr("opacity", 0.5);
     }
 
-    // ceiling bar
-    if (ceilingMean != null) {
-      const rect = ceilingSvg
-        .append("rect")
-        .attr("x", margin.left + 15)
-        .attr("y", Math.min(y(0), y(ceilingMean)))
-        .attr("width", barWidth)
-        .attr("height", Math.abs(y(0) - y(ceilingMean)))
-        .attr("fill", "#d3d3d3")
-        .attr("stroke", "black");
+    // ==== 6. 绘制折线 ====
+    const lineGenerator = d3.line()
+      .x(d => xScale(d.model))
+      .y(d => yScale(d.val))
+      .curve(d3.curveMonotoneX);
 
-      // 👉 hover tooltip when roi !== "Overall"
-      if (roi !== "Overall") {
-        rect
-          .on("mouseover", (event) => {
-            d3.select("#roi-tooltip")
-              .style("opacity", 1)
-              .style("left", event.pageX + 10 + "px")
-              .style("top", event.pageY - 20 + "px")
-              .html("Pairwise Subjects Correlations");
-          })
-          .on("mousemove", (event) => {
-            d3.select("#roi-tooltip")
-              .style("left", event.pageX + 10 + "px")
-              .style("top", event.pageY - 20 + "px");
-          })
-          .on("mouseout", () => {
-            d3.select("#roi-tooltip").style("opacity", 0);
-          });
-      }
+    svg.append("path")
+      .datum(results)
+      .attr("fill", "none")
+      .attr("stroke", "#1890ff")
+      .attr("stroke-width", 2)
+      .attr("d", lineGenerator);
 
-      // ceiling label fixed at 0.95
-      ceilingSvg
-        .append("text")
-        .attr("x", margin.left + 15 + barWidth / 2)
-        .attr("y", y(0.95))
-        .attr("text-anchor", "middle")
-        .attr("font-size", "12px")
-        .attr("fill", "black")
-        .text(ceilingMean.toFixed(2));
-
-      // correlation_points
-      const points = ceiling[roi][dataset]?.correlation_points || [];
-      if (points.length > 0) {
-        const jitter = d3
-          .scaleLinear()
-          .domain([0, points.length - 1])
-          .range([-barWidth / 4, barWidth / 4]);
-
-        ceilingSvg
-          .append("g")
-          .selectAll("circle")
-          .data(points)
-          .enter()
-          .append("circle")
-          .attr("cx", (_, i) => margin.left + 15 + barWidth / 2 + jitter(i))
-          .attr("cy", (d) => y(d))
-          .attr("r", 5)
-          .attr("fill", "#74C5F7")
-          .attr("stroke", "black")
-          .attr("stroke-width", 0.6);
-      }
-    }
-
-    // y axis
-    ceilingSvg
-      .append("g")
-      .attr("transform", `translate(${margin.left},0)`)
-      .call(d3.axisLeft(y).ticks(5))
-      .call((g) => {
-        g.select(".domain").attr("stroke", "black");
-        g.selectAll("line").remove();
-        g.selectAll("text").attr("fill", "black");
-      });
-
-    // y  label
-    const centerY = (height - margin.bottom) / 2;
-    ceilingSvg
-      .append("text")
-      .attr("text-anchor", "middle")
-      .style("font-size", "14px")
-      .attr("fill", "black")
-      .attr(
-        "transform",
-        `translate(${margin.left - 45}, ${centerY}) rotate(-90)`
-      )
-      .text(yLabel);
-
-    // x label for ceiling
-    ceilingSvg
-      .append("text")
-      .attr("x", margin.left + barWidth / 2 + 15)
-      .attr("y", height - margin.bottom + 10)
-      .attr("text-anchor", "start")
-      .attr("font-size", "9px")
-      .attr("fill", "black")
-      .attr(
-        "transform",
-        `rotate(60, ${margin.left + barWidth / 2 + 15}, ${
-          height - margin.bottom
-        })`
-      )
-      .text("Ceiling");
-
-    // ================= right bars SVG =================
-    const barsSvg = d3.select(barsRef.current);
-    barsSvg.selectAll("*").remove();
-
-    const width = results.length * (barWidth + 10) + margin.right;
-    barsSvg.attr("width", width).attr("height", height);
-
-    const x = d3
-      .scaleBand()
-      .domain(results.map((d) => d.model))
-      .range([10, width - margin.right])
-      .padding(0.2);
-
-    // dot line
-    barsSvg
-      .append("g")
-      .selectAll("line.value-dash")
+    // ==== 7. 绘制交互点 ====
+    svg.selectAll("circle.dot")
       .data(results)
       .enter()
-      .append("line")
-      .attr("x1", (d) => x(d.model) + x.bandwidth() / 2)
-      .attr("x2", (d) => x(d.model) + x.bandwidth() / 2)
-      .attr("y1", y(0.9))
-      .attr("y2", y(-0.3))
-      .attr("stroke", "gray")
-      .attr("stroke-dasharray", "3 3")
-      .attr("stroke-width", 1);
-
-    // bars
-    barsSvg
-      .append("g")
-      .selectAll("rect")
-      .data(results)
-      .enter()
-      .append("rect")
-      .attr("x", (d) => x(d.model))
-      .attr("y", (d) => Math.min(y(0), y(d.val)))
-      .attr("height", (d) => Math.abs(y(0) - y(d.val)))
-      .attr("width", x.bandwidth())
-      .attr("fill", "#d3d3d3")
-      .attr("stroke", "black");
-
-    // bar label
-    barsSvg
-      .append("g")
-      .selectAll("text.value-label")
-      .data(results)
-      .enter()
-      .append("text")
-      .attr("x", (d) => x(d.model) + x.bandwidth() / 2)
-      .attr("y", y(0.95))
-      .attr("text-anchor", "middle")
-      .attr("font-size", "12px")
-      .attr("fill", "black")
-      .text((d) => d.val.toFixed(2));
-
-    // X labels
-    barsSvg
-      .append("g")
-      .selectAll("text.model-label")
-      .data(results)
-      .enter()
-      .append("text")
-      .attr("x", (d) => x(d.model) + x.bandwidth() / 2)
-      .attr("y", height - margin.bottom + 10)
-      .attr("text-anchor", "start")
-      .attr("font-size", "9px")
-      .attr("fill", "black")
-      .attr(
-        "transform",
-        (d) =>
-          `rotate(60, ${x(d.model) + x.bandwidth() / 2}, ${
-            height - margin.bottom
-          })`
-      )
-      //model cards
-      .text((d) => d.model)
-      .style("cursor", "pointer") 
+      .append("circle")
+      .attr("class", "dot")
+      .attr("cx", d => xScale(d.model))
+      .attr("cy", d => yScale(d.val))
+      .attr("r", d => d.model === selectedModel ? 5 : 3.5)
+      .attr("fill", d => d.model === selectedModel ? "#ff4500" : "#1890ff")
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 1.5)
+      .style("cursor", "pointer")
       .on("click", (event, d) => {
-        const newSelection = selectedModel === d.model ? null : d.model; 
-        setSelectedModel(newSelection);
         if (onModelClick) {
-          onModelClick(newSelection);
+          onModelClick(d.model === selectedModel ? null : d.model);
         }
       });
 
-    function drawLine(svg, value, color, svgWidth, offsetX = 0) {
-      if (value == null) return;
-      const [yMin, yMax] = y.domain();
-      const safeVal = Math.min(Math.max(value, yMin), yMax);
-      svg
-        .append("line")
-        .attr("x1", offsetX)
-        .attr("x2", svgWidth)
-        .attr("y1", y(safeVal))
-        .attr("y2", y(safeVal))
-        .attr("stroke", color)
-        .attr("stroke-dasharray", "4 2")
-        .attr("stroke-width", 1);
-    }
+    // ==== 8. 坐标轴渲染 ====
+    // 只显示 0 和 1 的刻度标签
+    const yAxis = d3.axisLeft(yScale)
+      .tickValues([0, 0.5, 1.0])
+      .tickFormat(d3.format(".1f"));
 
-    // ceiling mean/max
-    drawLine(ceilingSvg, ceilingMax, "red", ceilingWidth, margin.left);
-    drawLine(ceilingSvg, ceilingMean, "blue", ceilingWidth, margin.left);
-    drawLine(barsSvg, ceilingMax, "red", width, 0);
-    drawLine(barsSvg, ceilingMean, "blue", width, 0);
-  }, [data, roi, dataset, ceiling, rank, yLabel, onModelClick]);
+    svg.append("g")
+      .attr("transform", `translate(${margin.left}, 0)`)
+      .call(yAxis)
+      .call(g => g.select(".domain").remove()); // 移除轴线，保持简洁
+
+  }, [data, roi, dataset, ceiling, rank, dimensions, selectedModel]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "row", position: "relative" }}>
-      {/* left ceiling + y axis */}
-      <div>
-        <svg ref={ceilingRef}></svg>
-      </div>
-
-      {/* right bars */}
-      <div style={{ overflowX: "auto" }}>
-        <svg ref={barsRef}></svg>
-      </div>
-
-      {/* fixed mean/max label */}
-      {scaleY && (
-        <div
-          style={{
-            position: "absolute",
-            right: 0,
-            top: 0,
-            width: "150px",
-            pointerEvents: "none",
-          }}
-        >
-          {stats.max !== null && (
-            <div
-              style={{
-                position: "absolute",
-                top: scaleY(stats.max) - 17,
-                right: 0,
-                color: "red",
-                fontSize: "12px",
-              }}
-            >
-              Ceiling Max: {stats.max.toFixed(2)}
-            </div>
-          )}
-          {stats.mean !== null && (
-            <div
-              style={{
-                position: "absolute",
-                top: scaleY(stats.mean),
-                right: 0,
-                color: "blue",
-                fontSize: "12px",
-              }}
-            >
-              Ceiling Mean: {stats.mean.toFixed(2)}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Tooltip */}
-      <div
-        id="roi-tooltip"
-        style={{
-          position: "fixed",
-          pointerEvents: "none",
-          background: "white",
-          border: "1px solid black",
-          padding: "4px 6px",
-          fontSize: "12px",
-          borderRadius: "4px",
-          opacity: 0,
-        }}
-      />
+    <div 
+      ref={containerRef} 
+      style={{ 
+        width: "100%", 
+        height: "100%", // 稍微增加一点高度
+        backgroundColor: "#fafafa",
+        border: "1px solid #f0f0f0",
+        borderRadius: "8px",
+        overflow: "hidden",
+        marginTop: "10px"
+      }}
+    >
+      <svg ref={svgRef} width={dimensions.width} height={dimensions.height}></svg>
     </div>
   );
 };
 
-export default BarChartOverview;
+export default LineChartROIDataset;
