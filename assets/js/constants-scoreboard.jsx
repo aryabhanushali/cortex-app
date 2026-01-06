@@ -180,6 +180,8 @@ export const TRAINING_OPTIONS = [
  
 ];
 
+
+
 export const TRAINING_OPTIONS_VS= [
 
   { value: 'Murty185 VS NSD1000', label: 'Murty185 VS NSD1000'},
@@ -250,6 +252,11 @@ export const PAGE_VIEW_OPTIONS = [
 
 ];
 
+export const ADVANCED_QUESTION = [
+  { value: 'q1', label: 'Which Training Dataset is Better' },
+  { value: 'q2', label: 'Which ROI is harder to predict' },
+  { value: 'q3', label: 'Which Dataset is harder to predict' },
+];
 
     
 export const MURTY185_DATASET = ['nsd_1000', 'bold_5000', 'bonner_2021','bmd_2024','kingbaker_2019','wardle_2020','nsd_syn' ];
