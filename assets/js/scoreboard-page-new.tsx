@@ -255,79 +255,123 @@ return (
             
            {/* --- ScoreboardPageNew.tsx 内部 Overview 区域修改 --- */}
 
-           {/* --- ScoreboardPageNew.tsx 概览区域并行切换逻辑 --- */}
+      
 
-          {pageView !== '2' && ( 
-            <div
-              style={{
-                background: '#fafafa',
-                borderRadius: 8,
-                padding: '8px 4px',
-                overflow: 'hidden', 
-                display: 'flex',       
-                flexDirection: 'row', 
-                gap: 8,
-                // ✨ 动态高度：isDatasetDetailMode 为 true 时压缩为 20%，否则占满 100%
-                height: isDatasetDetailMode ? '20%' : '100%',
-                flexShrink: 0
-              }}
-            >
-              {region.map((roiValue) => (
-                <div 
-                  key={roiValue} 
-                  style={{ 
-                    flex: 1, 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    minWidth: 40,
-                    height: '100%'
-                  }}
-                >
-                  {/* ROI 小标题 */}
+
+           {/* --- ScoreboardPageNew.tsx 概览区域修复：找回标题与间距 --- */}
+{/* --- ScoreboardPageNew.tsx 概览区域修复：间距、标题与高度适配 --- */}
+            {pageView !== '2' && ( 
+              <div
+                style={{
+                  background: 'transparent', 
+                  borderRadius: 8,
+                  padding: '0px',
+                  // ✨ 关键：高度设为 25%，并允许内容在内部滚动
+                  height: isDatasetDetailMode ? '25%' : '100%', 
+                  display: 'flex',       
+                  flexDirection: 'column', 
+                  overflowY: 'auto',      
+                  overflowX: 'hidden',
+                  flexShrink: 0,
+                  border: isDatasetDetailMode ? '1px solid #f0f0f0' : 'none',
+                  // 这里的 gap 负责 Branch A 卡片之间的纵向间距
+                  gap: dataset.length > 0 ? 12 : 0 
+                }}
+              >
+                {dataset.length > 0 ? (
+                  /* --- 分支 A: 选择了数据集 (纵向列表模式) --- */
+                  dataset.map((dsName) => (
+                    region.map((roiValue) => (
+                      <div 
+                        key={`${dsName}-${roiValue}`} 
+                        style={{ 
+                          flex: '0 0 auto',      // ✨ 修复：防止 flex 压缩导致显示不全
+                          height: '100px',       // ✨ 给定一个明确的基础高度
+                          width: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          padding: '8px 4px',
+                          background: '#fafafa', 
+                          borderRadius: 6,
+                          borderBottom: '1px solid #eee'
+                        }}
+                      >
+                        {/* ✨ 恢复标题：居中显示以匹配整体风格 */}
+                        <div style={{ 
+                          textAlign: 'center', 
+                          fontSize: '10px', 
+                          fontWeight: 'bold', 
+                          color: '#888',
+                          marginBottom: 4,
+                          textTransform: 'uppercase'
+                        }}>
+                          {roiValue === 'Across Regions' ? 'Overall' : roiValue} 
+                          <span style={{ fontWeight: 'normal', opacity: 0.6, marginLeft: 6 }}>({dsName})</span>
+                        </div>
+
+                        <div style={{ flex: 1, width: '100%', minHeight: 0 }}>
+                          <BarChartOverview
+                            data={getDataByTraining(training)}
+                            roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
+                            dataset={dsName} 
+                            ceiling={Ceiling}
+                            rank={rank}
+                            onModelClick={(m: string | null) => setSelectedModel(m)}
+                            selectedModel={selectedModel}
+                          />
+                        </div>
+                      </div>
+                    ))
+                  ))
+                ) : (
+                  /* --- 分支 B: 未选择数据集 (热力图横向模式) --- */
                   <div style={{ 
-                    textAlign: 'center', 
-                    fontSize: '10px', 
-                    fontWeight: 'bold', 
-                    color: '#888',
-                    marginBottom: 4,
-                    textTransform: 'uppercase',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden'
+                    display: 'flex', 
+                    flexDirection: 'row', 
+                    flex: 1, 
+                    height: '100%',
+                    // ✨ 关键修复：找回 PPA, FFA, EBA 之间的横向 Gap
+                    gap: 2
                   }}>
-                    {roiValue === 'Across Regions' ? 'Overall' : roiValue}
+                    {region.map((roiValue) => (
+                      <div 
+                        key={roiValue} 
+                        style={{ 
+                          flex: 1, 
+                          display: 'flex', 
+                          flexDirection: 'column',
+                          minWidth: 50,
+                          height: '100%',
+                          // gap: 2 // 标题与图表之间的间距
+                        }}
+                      >
+                        {/* ROI 小标题 */}
+                        <div style={{ 
+                          textAlign: 'center', 
+                          fontSize: '10px', 
+                          fontWeight: 'bold', 
+                          color: '#888',
+                          textTransform: 'uppercase'
+                        }}>
+                          {roiValue === 'Across Regions' ? 'Overall' : roiValue}
+                        </div>
+                        <div style={{ flex: 1, position: 'relative' }}>
+                          <HeatmapOverview
+                            data={getDataByTraining(training)} 
+                            roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
+                            dataset={''}
+                            rank={rank}
+                            selectedModel={selectedModel}
+                            onModelClick={(m: string) => setSelectedModel(m)}
+                            visibleRange={visibleRange}
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-
-                  {/* ✨ 并行逻辑：在这里根据 dataset.length 进行组件切换 */}
-                  <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
-                    {dataset.length > 0 ? (
-                      /* 并行分支 A: 选择了数据集，渲染折线图概览 */
-                      <BarChartOverview
-                        data={getDataByTraining(training)}
-                        roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
-                        dataset={dataset[0]} 
-                        ceiling={Ceiling}
-                        rank={rank}
-                        onModelClick={(m: string | null) => setSelectedModel(m)}
-                        selectedModel={selectedModel}
-                      />
-                    ) : (
-                      /* 并行分支 B: 未选择数据集，渲染热力图概览 */
-                      <HeatmapOverview
-                        data={getDataByTraining(training)} 
-                        roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
-                        dataset={dataset[0] || ''}
-                        rank={rank}
-                        selectedModel={selectedModel}
-                        onModelClick={(m: string) => setSelectedModel(m)}
-                        visibleRange={visibleRange}
-                      />
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
+                )}
+              </div>
+            )}
             
 
 
@@ -493,3 +537,77 @@ return (
   );
 };
 export default ScoreboardPageNew;
+
+
+    //  {/* --- ScoreboardPageNew.tsx 概览区域并行切换逻辑 --- */}
+
+    //       {pageView !== '2' && ( 
+    //         <div
+    //           style={{
+    //             background: '#fafafa',
+    //             borderRadius: 8,
+    //             padding: '8px 4px',
+    //             overflow: 'hidden', 
+    //             display: 'flex',       
+    //             flexDirection: 'row', 
+    //             gap: 8,
+    //             // ✨ 动态高度：isDatasetDetailMode 为 true 时压缩为 20%，否则占满 100%
+    //             height: isDatasetDetailMode ? '20%' : '100%',
+    //             flexShrink: 0
+    //           }}
+    //         >
+    //           {region.map((roiValue) => (
+    //             <div 
+    //               key={roiValue} 
+    //               style={{ 
+    //                 flex: 1, 
+    //                 display: 'flex', 
+    //                 flexDirection: 'column',
+    //                 minWidth: 40,
+    //                 height: '100%'
+    //               }}
+    //             >
+    //               {/* ROI 小标题 */}
+    //               <div style={{ 
+    //                 textAlign: 'center', 
+    //                 fontSize: '10px', 
+    //                 fontWeight: 'bold', 
+    //                 color: '#888',
+    //                 marginBottom: 4,
+    //                 textTransform: 'uppercase',
+    //                 whiteSpace: 'nowrap',
+    //                 overflow: 'hidden'
+    //               }}>
+    //                 {roiValue === 'Across Regions' ? 'Overall' : roiValue}
+    //               </div>
+
+    //               {/* ✨ 并行逻辑：在这里根据 dataset.length 进行组件切换 */}
+    //               <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
+    //                 {dataset.length > 0 ? (
+    //                   /* 并行分支 A: 选择了数据集，渲染折线图概览 */
+    //                   <BarChartOverview
+    //                     data={getDataByTraining(training)}
+    //                     roi={roiValue === 'Across Regions' ? ' Across Regions' : roiValue}
+    //                     dataset={dataset[0]} 
+    //                     ceiling={Ceiling}
+    //                     rank={rank}
+    //                     onModelClick={(m: string | null) => setSelectedModel(m)}
+    //                     selectedModel={selectedModel}
+    //                   />
+    //                 ) : (
+    //                   /* 并行分支 B: 未选择数据集，渲染热力图概览 */
+    //                   <HeatmapOverview
+    //                     data={getDataByTraining(training)} 
+    //                     roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
+    //                     dataset={dataset[0] || ''}
+    //                     rank={rank}
+    //                     selectedModel={selectedModel}
+    //                     onModelClick={(m: string) => setSelectedModel(m)}
+    //                     visibleRange={visibleRange}
+    //                   />
+    //                 )}
+    //               </div>
+    //             </div>
+    //           ))}
+    //         </div>
+    //       )}

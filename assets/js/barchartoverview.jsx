@@ -1,86 +1,66 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-const LineChartROIDataset = ({ data, roi, dataset, ceiling, rank, onModelClick, selectedModel }) => {
+const BarChartOverview = ({ data, roi, dataset, ceiling, rank, onModelClick, selectedModel }) => {
   const containerRef = useRef();
   const svgRef = useRef();
-  const [dimensions, setDimensions] = useState({ width: 0, height: 120 });
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  // 1. 监听容器宽度
   useEffect(() => {
     if (!containerRef.current) return;
     const resizeObserver = new ResizeObserver((entries) => {
       if (!entries || entries.length === 0) return;
-      setDimensions((prev) => ({ ...prev, width: entries[0].contentRect.width }));
+      // 获取容器实际占用的宽高
+      setDimensions({ 
+        width: entries[0].contentRect.width, 
+        height: entries[0].contentRect.height 
+      });
     });
     resizeObserver.observe(containerRef.current);
     return () => resizeObserver.disconnect();
   }, []);
 
   useEffect(() => {
-    // 确保有足够的数据进行渲染
     if (!data || !roi || !data[roi] || dimensions.width === 0) return;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
     const { width, height } = dimensions;
-    const margin = { top: 20, right: 20, bottom: 25, left: 40 };
+    // 移除大 Margin，只留极小边距防止点被切掉
+    const margin = { top: 5, right: 5, bottom: 5, left: 0 };
 
-    // ==== 2. 数据处理 ====
     const roiData = data[roi];
     const models = Object.keys(roiData).filter((m) => m !== "ceiling");
     
     let results = models
-      .map((model) => {
-        // 根据传入的 dataset 获取具体数值
-        const val = roiData[model]?.[dataset]?.[0];
-        return { model, val };
-      })
+      .map((model) => ({ model, val: roiData[model]?.[dataset]?.[0] }))
       .filter((d) => d.val !== undefined);
 
-    // 排序逻辑
     if (rank && rank !== "") {
       results = [...results].sort((a, b) => d3.descending(a.val, b.val));
     }
 
-    const ceilingMean = ceiling?.[roi]?.[dataset]?.ceiling_mean ?? null;
-
-    // ==== 3. 比例尺 ====
+    // ==== 比例尺 ====
     const xScale = d3.scalePoint()
       .domain(results.map(d => d.model))
       .range([margin.left, width - margin.right]);
 
-    // 动态 Y 轴，确保包含 0 和 1 (或数据中的极值)
-    const minY = d3.min(results, d => d.val) < -0.1 ? d3.min(results, d => d.val) : -0.2;
     const yScale = d3.scaleLinear()
-      .domain([minY, 1.0]) 
+      .domain([-0.2, 1.0]) 
       .range([height - margin.bottom, margin.top]);
 
-    // ==== 4. 绘制 y=0 基准线 (关键新增) ====
+    // ==== 1. 绘制 y=0 基准线 (全宽) ====
     svg.append("line")
-      .attr("x1", margin.left)
-      .attr("x2", width - margin.right)
+      .attr("x1", 0)
+      .attr("x2", width)
       .attr("y1", yScale(0))
       .attr("y2", yScale(0))
-      .attr("stroke", "#999") // 深灰色
+      .attr("stroke", "#ddd")
       .attr("stroke-width", 1)
-      .attr("stroke-dasharray", "2 2") // 虚线表示
-      .style("opacity", 0.8);
+      .attr("stroke-dasharray", "2 2");
 
-    // ==== 5. 绘制 Ceiling 线 (可选) ====
-    if (ceilingMean !== null) {
-      svg.append("line")
-        .attr("x1", margin.left)
-        .attr("x2", width - margin.right)
-        .attr("y1", yScale(ceilingMean))
-        .attr("y2", yScale(ceilingMean))
-        .attr("stroke", "#ff4d4f")
-        .attr("stroke-dasharray", "4 4")
-        .attr("opacity", 0.5);
-    }
-
-    // ==== 6. 绘制折线 ====
+    // ==== 2. 绘制折线 ====
     const lineGenerator = d3.line()
       .x(d => xScale(d.model))
       .y(d => yScale(d.val))
@@ -90,57 +70,67 @@ const LineChartROIDataset = ({ data, roi, dataset, ceiling, rank, onModelClick, 
       .datum(results)
       .attr("fill", "none")
       .attr("stroke", "#1890ff")
-      .attr("stroke-width", 2)
+      .attr("stroke-width", 1.5)
       .attr("d", lineGenerator);
 
-    // ==== 7. 绘制交互点 ====
-    svg.selectAll("circle.dot")
+    // ==== 3. 绘制交互点 ====
+    svg.selectAll("circle")
       .data(results)
       .enter()
       .append("circle")
-      .attr("class", "dot")
       .attr("cx", d => xScale(d.model))
       .attr("cy", d => yScale(d.val))
-      .attr("r", d => d.model === selectedModel ? 5 : 3.5)
+      .attr("r", d => d.model === selectedModel ? 4 : 2)
       .attr("fill", d => d.model === selectedModel ? "#ff4500" : "#1890ff")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 1.5)
       .style("cursor", "pointer")
       .on("click", (event, d) => {
-        if (onModelClick) {
-          onModelClick(d.model === selectedModel ? null : d.model);
-        }
+        onModelClick?.(d.model === selectedModel ? null : d.model);
       });
 
-    // ==== 8. 坐标轴渲染 ====
-    // 只显示 0 和 1 的刻度标签
-    const yAxis = d3.axisLeft(yScale)
-      .tickValues([0, 0.5, 1.0])
-      .tickFormat(d3.format(".1f"));
+    // ==== 4. 内部 Y 轴刻度 (因为没有 Margin，所以画在里面) ====
+    [0, 1].forEach(tick => {
+      svg.append("text")
+        .attr("x", 5)
+        .attr("y", yScale(tick) - 2)
+        .attr("font-size", "9px")
+        .attr("fill", "#ccc")
+        .text(tick);
+    });
 
-    svg.append("g")
-      .attr("transform", `translate(${margin.left}, 0)`)
-      .call(yAxis)
-      .call(g => g.select(".domain").remove()); // 移除轴线，保持简洁
-
-  }, [data, roi, dataset, ceiling, rank, dimensions, selectedModel]);
+  }, [data, roi, dataset, rank, dimensions, selectedModel]);
 
   return (
-    <div 
-      ref={containerRef} 
-      style={{ 
-        width: "100%", 
-        height: "100%", // 稍微增加一点高度
-        backgroundColor: "#fafafa",
-        border: "1px solid #f0f0f0",
-        borderRadius: "8px",
-        overflow: "hidden",
-        marginTop: "10px"
-      }}
-    >
-      <svg ref={svgRef} width={dimensions.width} height={dimensions.height}></svg>
+    <div style={{ 
+      display: "flex", 
+      width: "100%", 
+      height: "100%", 
+      alignItems: "center",
+      background: "transparent" // 去掉白色背景
+    }}>
+      {/* 左侧 Dataset:ROI 标题 */}
+      <div style={{ 
+        width: "110px", 
+        paddingRight: "10px", 
+        fontSize: "10px", 
+        color: "#999", 
+        textAlign: "right",
+        flexShrink: 0,
+        lineHeight: "1.1",
+        fontWeight: 500
+      }}>
+        <div style={{ color: "#666" }}>{dataset}</div>
+        <div style={{ fontWeight: "bold" }}>{roi}</div>
+      </div>
+
+      {/* 绘图区 */}
+      <div 
+        ref={containerRef} 
+        style={{ flex: 1, height: "100%", position: "relative" }}
+      >
+        <svg ref={svgRef} width={dimensions.width} height={dimensions.height} style={{ display: "block" }}></svg>
+      </div>
     </div>
   );
 };
 
-export default LineChartROIDataset;
+export default BarChartOverview;
