@@ -224,7 +224,7 @@ return (
           {/* ChartSelect button group*/}
           <div
             style={{
-              flex: '0 0 auto', // 自然高度
+              flex: '0 0 auto', 
               background: '#f5f5f5',
               borderRadius: 8,
               padding: '4px',
@@ -246,8 +246,8 @@ return (
           style={{ 
             flex: 1, 
             minHeight: 0, 
-            display: isDatasetDetailMode ? 'flex' : 'grid', // 模式切换：上下堆叠用 flex，左右并排用 grid
-            flexDirection: 'column',                        // 上下堆叠方向
+            display: isDatasetDetailMode ? 'flex' : 'grid', 
+            flexDirection: 'column',                        
             gridTemplateColumns: pageView === '2' ? '1fr' : '1fr 6fr', 
             gap: 16 
           }}
@@ -255,7 +255,7 @@ return (
             
            {/* --- Overview Section --- */}
 
-           {/* --- ScoreboardPageNew.tsx 概览区域：修复 EBA 溢出问题 --- */}
+      
             {pageView !== '2' && ( 
               <div
                 style={{
@@ -264,19 +264,19 @@ return (
                   padding: '0px',
                   height: isDatasetDetailMode ? '25%' : '100%', 
                   display: 'flex',       
-                  // 根据模式切换方向
+                  // flexdirection change logic
                   flexDirection: dataset.length > 0 ? 'column' : 'row', 
-                  // 关键：整体不产生滚动条
-                  overflow: 'hidden', 
+                  overflowY: dataset.length > 0 ? 'auto' : 'hidden', // rollable 
+                  overflowX: dataset.length > 0 ? 'hidden' : 'hidden', 
                   flexShrink: 0,
-                  // ✨ 外部 Gap 只在纵向模式生效
+                  
                   gap: dataset.length > 0 ? 12 : 0, 
                   border: isDatasetDetailMode ? '1px solid #f0f0f0' : 'none',
                   width: '100%',
                 }}
               >
                 {dataset.length > 0 ? (
-                  /* --- 分支 A: 纵向列表模式 --- */
+                  /* vertical for barchart --- */
                   dataset.map((dsName) => (
                     region.map((roiValue) => (
                       <div 
@@ -311,31 +311,30 @@ return (
                     ))
                   ))
                 ) : (
-                  /* --- 分支 B: 恢复横向 Heatmap 模式 --- */
-                  /* ✨ 关键：使用 gap 并且确保所有子项 min-width 为 0 */
+                  /* --- horizontal for heap map --- */
                   <div style={{ 
                     display: 'flex', 
                     flexDirection: 'row', 
                     flex: 1, 
                     height: '100%',
                     width: '100%',
-                    gap: 12, // 这里的 gap 就是你想要的间隔
-                    overflow: 'hidden' // 确保不溢出
+                    gap: 12, 
+                    overflow: 'hidden' 
                   }}>
                     {region.map((roiValue) => (
                       <div 
                         key={roiValue} 
                         style={{ 
-                          // ✨ 关键修复：flex-basis 为 0% 强制它们平分宽度并挤压
+                         
                           flex: '1 1 0%', 
                           minWidth: 0,
                           display: 'flex', 
                           flexDirection: 'column',
                           height: '100%',
-                          overflow: 'hidden' // 防止内部 Heatmap 撑开宽度
+                          overflow: 'hidden'
                         }}
                       >
-                        {/* ROI 小标题 */}
+                        {/* ROI subtitle */}
                         <div style={{ 
                           textAlign: 'center', 
                           fontSize: '10px', 
@@ -349,13 +348,14 @@ return (
                           {roiValue === 'Across Regions' ? 'Overall' : roiValue}
                         </div>
                         
-                        {/* 图表绘图容器 */}
+                        {/* chart container*/}
                         <div style={{ 
                           flex: 1, 
                           position: 'relative', 
                           width: '100%', 
                           minHeight: 0,
-                          overflow: 'hidden' // 再次确保 D3 不会撑开容器
+                          overflow: 'hidden', 
+                          marginBottom: 8
                         }}>
                           <HeatmapOverview
                             data={getDataByTraining(training)} 
