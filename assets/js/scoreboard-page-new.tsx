@@ -282,12 +282,12 @@ return (
                       <div 
                         key={`${dsName}-${roiValue}`} 
                         style={{ 
-                          flex: '0 0 auto',
-                          height: '100px',
+                          flex: 1,
+                          minHeight: '80px',
                           width: '100%',
                           display: 'flex',
                           flexDirection: 'column',
-                          padding: '8px 4px',
+                          padding: '6px 4px',
                           background: '#fafafa', 
                           borderRadius: 6,
                           borderBottom: '1px solid #eee'
