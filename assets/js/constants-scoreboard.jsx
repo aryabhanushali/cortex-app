@@ -254,8 +254,8 @@ export const PAGE_VIEW_OPTIONS = [
 
 export const ADVANCED_QUESTION = [
   { value: 'q1', label: 'Which Training Dataset is Better' },
-  { value: 'q2', label: 'Which ROI is harder to predict' },
-  { value: 'q3', label: 'Which Dataset is harder to predict' },
+  { value: 'q2', label: 'Which ROI/ Dataset is harder to predict' },
+
 ];
 
     

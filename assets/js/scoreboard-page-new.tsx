@@ -12,6 +12,7 @@ import ScatterMurtyVsNsd from './scatterMurtyVsNsd.jsx';
 import PageSelect from './pageselect.jsx';
 import BarChartDetail from './barchartdetail.jsx'; 
 import BarChartOverview from './barchartoverview.jsx';
+import QuestionSelect from './questionselect.jsx';
 
 
 
@@ -33,7 +34,22 @@ const ScoreboardPageNew: React.FC = () => {
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 0 });
 
   const [pageView, setPageView] = useState('rank');
+ 
   const isDatasetDetailMode = pageView === 'rank' && dataset.length > 0;
+  const [activeQuestion, setActiveQuestion] = useState('q1');
+
+  const isVS = pageView === '2' && activeQuestion === 'q1';
+
+  useEffect(() => {
+  if (isVS) {
+    setTraining('Murty185 VS NSD1000');
+  } else {
+    
+    if (training === 'Murty185 VS NSD1000') {
+      setTraining('NSD');
+    }
+  }
+}, [isVS]);
 
   // pageview logic
   useEffect(() => {
@@ -52,6 +68,8 @@ const ScoreboardPageNew: React.FC = () => {
     //   setTraining('NSD'); 
     // }
   }, [pageView]);
+
+
 
 
 
@@ -177,6 +195,7 @@ return (
       </div>
       {/* 3. body part（left: Filter + right: Charts） */}
       {/* flex: 1 fit all space */}
+   
      
       <div
         style={{
@@ -242,7 +261,7 @@ return (
           
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <TrainingSelectNew training={training} setTraining={setTraining} dataset={dataset} pageView = {pageView} />
+            <TrainingSelectNew training={training} setTraining={setTraining} dataset={dataset} vsOption = {isVS} />
             <ROISelectNew
               region={region}
               setRegion={setRegion}
@@ -265,6 +284,8 @@ return (
         </div>
 
         {/* --- right（ChartSelect + overview + details） --- */}
+
+      
         <div
           style={{
             display: 'flex',
@@ -274,8 +295,14 @@ return (
             minHeight: 0, // 
             minWidth: 0,
           }}
+
         >
-          
+          {pageView === '2' && (
+            <QuestionSelect 
+              value={activeQuestion} 
+              onChange={(val: string) => setActiveQuestion(val)} 
+            />
+          )}
 
           {/* chart: horizontal*/}
         <div 
@@ -465,7 +492,7 @@ return (
                 }}
               >
                 {/* scatter plot */}
-                {(training === 'Murty185 VS NSD1000') && (
+                {(training === 'Murty185 VS NSD1000') &&  activeQuestion === "q1" && (
                   <ScatterMurtyVsNsd
                     murtyData={murtyData}
                     nsdData={nsdData}
@@ -525,7 +552,7 @@ return (
         
                 
 
-                {training !== 'Murty185 VS NSD1000' &&  dataset.length === 0 && region.map((roiValue, index) => (
+                {pageView === "rank" &&  training !== 'Murty185 VS NSD1000' &&  dataset.length === 0 && region.map((roiValue, index) => (
                 <div 
                   key={roiValue} 
                   style={{ 

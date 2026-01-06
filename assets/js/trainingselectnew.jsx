@@ -13,16 +13,16 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { TRAINING_OPTIONS, TRAINING_OPTIONS_VS } from './constants-scoreboard';
 
 // 增加了 pageView prop，并保留了 dataset
-const TrainingSelectNew = ({ training, setTraining, dataset, pageView }) => {
+const TrainingSelectNew = ({ training, setTraining, dataset, vsOption }) => {
   
   // 判断是否为 rank 模式
-  const isRankMode = pageView === 'rank';
+  const isVSMode = !!vsOption;
   // 根据模式选择对应的常量选项
-  const options = isRankMode ? TRAINING_OPTIONS : TRAINING_OPTIONS_VS;
+  const options = isVSMode ?  TRAINING_OPTIONS_VS :TRAINING_OPTIONS ;
 
   const handleChange = (value) => {
     // 如果不是 rank 模式（即对比模式），直接返回，不允许修改
-    if (!isRankMode) return;
+    if (isVSMode) return;
     setTraining((prev) => (prev === value ? '' : value));
   };
 
@@ -50,16 +50,16 @@ const TrainingSelectNew = ({ training, setTraining, dataset, pageView }) => {
                 control={
                   <Checkbox
                     // 如果不是 rank 模式，强制设为选中状态
-                    checked={!isRankMode ? true : training === option.value}
+                    checked={isVSMode ? true : training === option.value}
                     onChange={() => handleChange(option.value)}
                     // 如果不是 rank 模式，禁用交互（变灰不可点）
-                    disabled={!isRankMode}
+                    disabled={isVSMode}
                     sx={{
                       '&.Mui-checked': { color: '#5562d6ff' },
                       // 确保禁用状态下勾选颜色依然明显，不至于太灰看不清
                       '&.Mui-disabled': { 
-                        color: !isRankMode ? '#5562d6ff' : 'inherit',
-                        opacity: !isRankMode ? 0.8 : 1 
+                        color: isVSMode ? '#5562d6ff' : 'inherit',
+                        opacity: isVSMode ? 0.8 : 1 
                       },
                     }}
                   />
