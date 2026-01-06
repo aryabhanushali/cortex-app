@@ -13,6 +13,7 @@ import PageSelect from './pageselect.jsx';
 import BarChartDetail from './barchartdetail.jsx'; 
 import BarChartOverview from './barchartoverview.jsx';
 import QuestionSelect from './questionselect.jsx';
+import ScatterGapCeiling from './roiDatasetScatter.jsx';
 
 
 
@@ -503,6 +504,21 @@ return (
                     onModelClick={(m: string) => setSelectedModel(m)}
                   />
                 )}
+
+                 {activeQuestion === "q2" && (
+                  <ScatterGapCeiling 
+                    nsdData={ROI_DATASET_NSD} 
+                    murtyData={ROI_DATASET_Murty} 
+                    ceilingData={Ceiling} 
+                    // 确保 region[0] 存在，否则传空字符串
+                    roi={""} 
+                    // 散点图通常显示所有数据集，如果只想看选中的，传 dataset[0]
+                    dataset={""} 
+                    training={training}
+                  />
+                )}
+
+                
 
               {isDatasetDetailMode && dataset.map((dsName) => (
                       <React.Fragment key={dsName}>
