@@ -10,16 +10,20 @@ const PageSelect = ({ value, onChange }) => {
         value={value} 
         onChange={(e) => onChange(e.target.value)} 
         buttonStyle="solid"
-        style={{ width: '100%', display: 'flex' }}
+        style={{ display: 'inline-flex', whiteSpace: 'nowrap' }}
       >
         {PAGE_VIEW_OPTIONS.map(opt => (
           <Radio.Button 
             key={opt.value} 
             value={opt.value} 
             style={{ 
-              flex: 1, 
+            //   flex: 1, 
+              padding: '0 16px',
               textAlign: 'center',
-              fontWeight: 500
+              fontWeight: 500,
+              height: '32px',
+              lineHeight: '30px',
+              fontSize: '13px'
             }}
           >
             {opt.label}

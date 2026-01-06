@@ -46,11 +46,11 @@ const ScoreboardPageNew: React.FC = () => {
       // force to comparison
       setTraining('Murty185 VS NSD1000'); 
     } 
-    else if (pageView === '3') {
-      // 3. 
+    // else if (pageView === '3') {
+    //   // 3. 
  
-      setTraining('NSD'); 
-    }
+    //   setTraining('NSD'); 
+    // }
   }, [pageView]);
 
 
@@ -133,15 +133,48 @@ return (
     >
       {/* 2. SelectedFiltersBar */}
       {/* flex: 0 0 auto  */}
-      <div style={{ flex: '0 0 auto', marginBottom: 16 }}>
+      {/* <div style={{ flex: '0 0 auto', marginBottom: 16 }}>
         <SelectedFiltersBar
           training={training}
           region={region}
           dataset={dataset}
           clearSingle={clearSingle}
         />
-      </div>
+      </div> */}
 
+      {/* --- 顶部工具栏：SelectedFiltersBar 在左(自动换行)，PageSelect 在右(固定) --- */}
+      <div style={{ 
+        flex: '0 0 auto', 
+        marginBottom: 16, 
+        display: 'flex', 
+        flexDirection: 'row',          
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start',      
+        width: '100%',
+        gap: '10px'                    
+      }}>
+        
+        {/* left：auto warp*/}
+        <div style={{ 
+          flex: '1 1 auto', 
+          minWidth: 0 
+        }}>
+          <SelectedFiltersBar
+            training={training}
+            region={region}
+            dataset={dataset}
+            clearSingle={clearSingle}
+          />
+        </div>
+
+        {/* right page setting */}
+        <div style={{ 
+          flex: '0 0 auto',
+          whiteSpace: 'nowrap' 
+        }}>
+          <PageSelect value={pageView} onChange={setPageView} />
+        </div>
+      </div>
       {/* 3. body part（left: Filter + right: Charts） */}
       {/* flex: 1 fit all space */}
      
@@ -185,7 +218,28 @@ return (
             </Button>
           </div>
 
-          <PageSelect value={pageView} onChange={setPageView} />
+          {/* ChartSelect button group*/}
+          <div
+            style={{
+              flex: '0 0 auto', 
+              background: '#f5f5f5',
+              borderRadius: 8,
+              padding: '4px',
+              display: 'flex',
+              justifyContent: 'center',
+              marginBottom:12
+            }}
+          >
+            <ChartSelect
+              chartType={chartType}
+              setChartType={setChartType}
+              rank={rank}
+              setRank={setRank}
+              enable={true} 
+            />
+          </div>
+
+          
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <TrainingSelectNew training={training} setTraining={setTraining} dataset={dataset} pageView = {pageView} />
@@ -221,25 +275,7 @@ return (
             minWidth: 0,
           }}
         >
-          {/* ChartSelect button group*/}
-          <div
-            style={{
-              flex: '0 0 auto', 
-              background: '#f5f5f5',
-              borderRadius: 8,
-              padding: '4px',
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
-            <ChartSelect
-              chartType={chartType}
-              setChartType={setChartType}
-              rank={rank}
-              setRank={setRank}
-              enable={true} 
-            />
-          </div>
+          
 
           {/* chart: horizontal*/}
         <div 
@@ -540,75 +576,4 @@ return (
 export default ScoreboardPageNew;
 
 
-    //  {/* --- ScoreboardPageNew.tsx 概览区域并行切换逻辑 --- */}
-
-    //       {pageView !== '2' && ( 
-    //         <div
-    //           style={{
-    //             background: '#fafafa',
-    //             borderRadius: 8,
-    //             padding: '8px 4px',
-    //             overflow: 'hidden', 
-    //             display: 'flex',       
-    //             flexDirection: 'row', 
-    //             gap: 8,
-    //             // ✨ 动态高度：isDatasetDetailMode 为 true 时压缩为 20%，否则占满 100%
-    //             height: isDatasetDetailMode ? '20%' : '100%',
-    //             flexShrink: 0
-    //           }}
-    //         >
-    //           {region.map((roiValue) => (
-    //             <div 
-    //               key={roiValue} 
-    //               style={{ 
-    //                 flex: 1, 
-    //                 display: 'flex', 
-    //                 flexDirection: 'column',
-    //                 minWidth: 40,
-    //                 height: '100%'
-    //               }}
-    //             >
-    //               {/* ROI 小标题 */}
-    //               <div style={{ 
-    //                 textAlign: 'center', 
-    //                 fontSize: '10px', 
-    //                 fontWeight: 'bold', 
-    //                 color: '#888',
-    //                 marginBottom: 4,
-    //                 textTransform: 'uppercase',
-    //                 whiteSpace: 'nowrap',
-    //                 overflow: 'hidden'
-    //               }}>
-    //                 {roiValue === 'Across Regions' ? 'Overall' : roiValue}
-    //               </div>
-
-    //               {/* ✨ 并行逻辑：在这里根据 dataset.length 进行组件切换 */}
-    //               <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
-    //                 {dataset.length > 0 ? (
-    //                   /* 并行分支 A: 选择了数据集，渲染折线图概览 */
-    //                   <BarChartOverview
-    //                     data={getDataByTraining(training)}
-    //                     roi={roiValue === 'Across Regions' ? ' Across Regions' : roiValue}
-    //                     dataset={dataset[0]} 
-    //                     ceiling={Ceiling}
-    //                     rank={rank}
-    //                     onModelClick={(m: string | null) => setSelectedModel(m)}
-    //                     selectedModel={selectedModel}
-    //                   />
-    //                 ) : (
-    //                   /* 并行分支 B: 未选择数据集，渲染热力图概览 */
-    //                   <HeatmapOverview
-    //                     data={getDataByTraining(training)} 
-    //                     roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
-    //                     dataset={dataset[0] || ''}
-    //                     rank={rank}
-    //                     selectedModel={selectedModel}
-    //                     onModelClick={(m: string) => setSelectedModel(m)}
-    //                     visibleRange={visibleRange}
-    //                   />
-    //                 )}
-    //               </div>
-    //             </div>
-    //           ))}
-    //         </div>
-    //       )}
+    

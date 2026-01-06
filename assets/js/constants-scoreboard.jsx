@@ -245,9 +245,9 @@ export const RANK = [
 ];
 
 export const PAGE_VIEW_OPTIONS = [
-  { value: 'rank', label: 'Rank' },
-  { value: '2', label: '2' },
-  { value: '3', label: '3' },
+  { value: 'rank', label: 'LeaderBoard' },
+  { value: '2', label: 'Advanced Insights' },
+
 ];
 
 
