@@ -253,40 +253,37 @@ return (
           }}
         >
             
-           {/* --- ScoreboardPageNew.tsx 内部 Overview 区域修改 --- */}
+           {/* --- Overview Section --- */}
 
-      
-
-
-           {/* --- ScoreboardPageNew.tsx 概览区域修复：找回标题与间距 --- */}
-{/* --- ScoreboardPageNew.tsx 概览区域修复：间距、标题与高度适配 --- */}
+           {/* --- ScoreboardPageNew.tsx 概览区域：修复 EBA 溢出问题 --- */}
             {pageView !== '2' && ( 
               <div
                 style={{
                   background: 'transparent', 
                   borderRadius: 8,
                   padding: '0px',
-                  // ✨ 关键：高度设为 25%，并允许内容在内部滚动
                   height: isDatasetDetailMode ? '25%' : '100%', 
                   display: 'flex',       
-                  flexDirection: 'column', 
-                  overflowY: 'auto',      
-                  overflowX: 'hidden',
+                  // 根据模式切换方向
+                  flexDirection: dataset.length > 0 ? 'column' : 'row', 
+                  // 关键：整体不产生滚动条
+                  overflow: 'hidden', 
                   flexShrink: 0,
+                  // ✨ 外部 Gap 只在纵向模式生效
+                  gap: dataset.length > 0 ? 12 : 0, 
                   border: isDatasetDetailMode ? '1px solid #f0f0f0' : 'none',
-                  // 这里的 gap 负责 Branch A 卡片之间的纵向间距
-                  gap: dataset.length > 0 ? 12 : 0 
+                  width: '100%',
                 }}
               >
                 {dataset.length > 0 ? (
-                  /* --- 分支 A: 选择了数据集 (纵向列表模式) --- */
+                  /* --- 分支 A: 纵向列表模式 --- */
                   dataset.map((dsName) => (
                     region.map((roiValue) => (
                       <div 
                         key={`${dsName}-${roiValue}`} 
                         style={{ 
-                          flex: '0 0 auto',      // ✨ 修复：防止 flex 压缩导致显示不全
-                          height: '100px',       // ✨ 给定一个明确的基础高度
+                          flex: '0 0 auto',
+                          height: '100px',
                           width: '100%',
                           display: 'flex',
                           flexDirection: 'column',
@@ -296,19 +293,9 @@ return (
                           borderBottom: '1px solid #eee'
                         }}
                       >
-                        {/* ✨ 恢复标题：居中显示以匹配整体风格 */}
-                        <div style={{ 
-                          textAlign: 'center', 
-                          fontSize: '10px', 
-                          fontWeight: 'bold', 
-                          color: '#888',
-                          marginBottom: 4,
-                          textTransform: 'uppercase'
-                        }}>
-                          {roiValue === 'Across Regions' ? 'Overall' : roiValue} 
-                          <span style={{ fontWeight: 'normal', opacity: 0.6, marginLeft: 6 }}>({dsName})</span>
+                        <div style={{ textAlign: 'center', fontSize: '10px', fontWeight: 'bold', color: '#888', marginBottom: 4 }}>
+                          {roiValue === 'Across Regions' ? 'Overall' : roiValue} ({dsName})
                         </div>
-
                         <div style={{ flex: 1, width: '100%', minHeight: 0 }}>
                           <BarChartOverview
                             data={getDataByTraining(training)}
@@ -324,25 +311,28 @@ return (
                     ))
                   ))
                 ) : (
-                  /* --- 分支 B: 未选择数据集 (热力图横向模式) --- */
+                  /* --- 分支 B: 恢复横向 Heatmap 模式 --- */
+                  /* ✨ 关键：使用 gap 并且确保所有子项 min-width 为 0 */
                   <div style={{ 
                     display: 'flex', 
                     flexDirection: 'row', 
                     flex: 1, 
                     height: '100%',
-                    // ✨ 关键修复：找回 PPA, FFA, EBA 之间的横向 Gap
-                    gap: 2
+                    width: '100%',
+                    gap: 12, // 这里的 gap 就是你想要的间隔
+                    overflow: 'hidden' // 确保不溢出
                   }}>
                     {region.map((roiValue) => (
                       <div 
                         key={roiValue} 
                         style={{ 
-                          flex: 1, 
+                          // ✨ 关键修复：flex-basis 为 0% 强制它们平分宽度并挤压
+                          flex: '1 1 0%', 
+                          minWidth: 0,
                           display: 'flex', 
                           flexDirection: 'column',
-                          minWidth: 50,
                           height: '100%',
-                          // gap: 2 // 标题与图表之间的间距
+                          overflow: 'hidden' // 防止内部 Heatmap 撑开宽度
                         }}
                       >
                         {/* ROI 小标题 */}
@@ -351,11 +341,22 @@ return (
                           fontSize: '10px', 
                           fontWeight: 'bold', 
                           color: '#888',
-                          textTransform: 'uppercase'
+                          textTransform: 'uppercase',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
                         }}>
                           {roiValue === 'Across Regions' ? 'Overall' : roiValue}
                         </div>
-                        <div style={{ flex: 1, position: 'relative' }}>
+                        
+                        {/* 图表绘图容器 */}
+                        <div style={{ 
+                          flex: 1, 
+                          position: 'relative', 
+                          width: '100%', 
+                          minHeight: 0,
+                          overflow: 'hidden' // 再次确保 D3 不会撑开容器
+                        }}>
                           <HeatmapOverview
                             data={getDataByTraining(training)} 
                             roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
