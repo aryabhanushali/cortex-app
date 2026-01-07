@@ -355,50 +355,54 @@ const ScatterGapCeiling = ({ murtyData, nsdData, ceilingData, roi, dataset, trai
 
   // 1. 数据处理：确保 cRange 始终有值，防止报错
   const aggregatedPoints = useMemo(() => {
-    if (!murtyData && !nsdData) return [];
-    
-    const process = (rawData, source) => {
-      if (!rawData || typeof rawData !== 'object') return [];
-      return Object.entries(rawData).map(([key, stats]) => {
-        if (!key || !key.includes("/")) return null;
-        const [ds, rName] = key.split("/");
-        
-        // ✨ 修复：根据你的扁平 Key 结构查找 Ceiling 原始点
-        // 尝试两种路径以确保兼容性
-        const ceilingObj = ceilingData?.[key] || ceilingData?.[rName]?.[ds];
-        const rawCeilingVals = ceilingObj?.correlation_points || [];
-        
-        // 兜底逻辑：如果没有原始点，就用均值作为范围的两端
-        const cMin = rawCeilingVals.length > 0 ? d3.min(rawCeilingVals) : (stats?.ceiling_mean || 0);
-        const cMax = rawCeilingVals.length > 0 ? d3.max(rawCeilingVals) : (stats?.ceiling_mean || 0);
+      if (!murtyData && !nsdData) return [];
+      
+      const process = (rawData, sourceLabel) => {
+        if (!rawData || typeof rawData !== 'object') return [];
+        return Object.entries(rawData).map(([key, stats]) => {
+          if (!key || !key.includes("/")) return null;
+          const [ds, rName] = key.split("/");
+          
+          const ceilingObj = ceilingData?.[key] || ceilingData?.[rName]?.[ds];
+          const rawCeilingVals = ceilingObj?.correlation_points || [];
+          const cMin = rawCeilingVals.length > 0 ? d3.min(rawCeilingVals) : (stats?.ceiling_mean || 0);
+          const cMax = rawCeilingVals.length > 0 ? d3.max(rawCeilingVals) : (stats?.ceiling_mean || 0);
 
-        return {
-          id: key, dataset: ds, roi: rName.toLowerCase(), train: source,
-          gap: stats?.normalized_gap ?? 0, 
-          ceiling: stats?.ceiling_mean ?? 0, 
-          cRange: [cMin, cMax], // 确保这是一个数组 [min, max]
-          raw: stats
-        };
-      }).filter(item => item !== null);
-    };
+          return {
+            id: key, dataset: ds, roi: rName.toLowerCase(), train: sourceLabel,
+            gap: stats?.normalized_gap ?? 0, ceiling: stats?.ceiling_mean ?? 0, 
+            cRange: [cMin, cMax], raw: stats
+          };
+        }).filter(item => item !== null);
+      };
 
-    const all = [...process(murtyData, "Murty185"), ...process(nsdData, "NSD1000")];
-    const targetROI = (roi === "Across Regions" || !roi) ? "" : String(roi).toLowerCase();
-    const targetDS = (dataset || "").toLowerCase();
+      // ✨ 这里的逻辑对应你之前代码中的 training filter
+      let all = [];
+      if (training === "Murty185") {
+        all = process(murtyData, "Murty185");
+      } else if (training === "NSD") {
+        all = process(nsdData, "NSD1000");
+      } else {
+        // 当 training 为空或为 "Murty185 VS NSD1000" 时，显示全部
+        all = [...process(murtyData, "Murty185"), ...process(nsdData, "NSD1000")];
+      }
 
-    const filtered = all.filter(d => {
-      const roiMatch = targetROI === "" || d.roi === targetROI;
-      const dsMatch = targetDS === "" || d.dataset.toLowerCase() === targetDS;
-      return roiMatch && dsMatch;
-    });
+      const targetROI = (roi === "Across Regions" || !roi) ? "" : String(roi).toLowerCase();
+      const targetDS = (dataset || "").toLowerCase();
 
-    return d3.rollups(filtered, v => ({
-      ceiling_mean: d3.mean(v, d => d.ceiling) || 0,
-      gap_mean: d3.mean(v, d => d.gap) || 0,
-      cRange: [d3.min(v, d => d.cRange[0]), d3.max(v, d => d.cRange[1])],
-      points: v 
-    }), d => `${d.dataset}/${d.roi}`).map(([key, val]) => ({ id: key, ...val }));
-  }, [murtyData, nsdData, ceilingData, roi, dataset]);
+      const filtered = all.filter(d => {
+        const roiMatch = targetROI === "" || d.roi === targetROI;
+        const dsMatch = targetDS === "" || d.dataset.toLowerCase() === targetDS;
+        return roiMatch && dsMatch;
+      });
+
+      return d3.rollups(filtered, v => ({
+        ceiling_mean: d3.mean(v, d => d.ceiling) || 0,
+        gap_mean: d3.mean(v, d => d.gap) || 0,
+        cRange: [d3.min(v, d => d.cRange[0]), d3.max(v, d => d.cRange[1])],
+        points: v 
+      }), d => `${d.dataset}/${d.roi}`).map(([key, val]) => ({ id: key, ...val }));
+    }, [murtyData, nsdData, ceilingData, roi, dataset, training]); // ✨ 确保监听 training
 
   useEffect(() => {
     if (dimensions.width === 0 || dimensions.height === 0 || aggregatedPoints.length === 0) return;
