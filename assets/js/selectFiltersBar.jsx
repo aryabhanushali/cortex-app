@@ -37,13 +37,13 @@ const SelectedFiltersBar = ({ training, region, dataset, clearSingle, onTagClick
           key={item.key}
           color={item.color}
           closable
-          // ✨ 新增：点击 Tag 主体时，根据 key 的前缀判断展开哪个面板
+          // 点击 Tag 主体时，根据 key 的前缀判断展开哪个面板
           onClick={() => {
             const type = item.key.startsWith('region') ? 'region' : 
                          item.key.startsWith('dataset') ? 'dataset' : 'training';
             onTagClick(type);
           }}
-          onClose={() => {
+          onClose={(e) => {
             e.stopPropagation();
             // region/ dataset support single remove
             if (item.key.startsWith('region-')) {
