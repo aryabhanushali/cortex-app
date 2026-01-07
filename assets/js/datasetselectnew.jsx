@@ -17,7 +17,7 @@ import {
   NSD_DATASET,
 } from './constants-scoreboard';
 
-const DatasetSelectNew = ({ dataset, setDataset, training, region, allowToggle, mode }) => {
+const DatasetSelectNew = ({ dataset, setDataset, training, region, allowToggle, mode, expanded, onToggle }) => {
   const options = mode === 4 ? DATASET_OPTIONS_LESS : DATASET_OPTIONS;
 
   const isEnabled = (option) => {
@@ -46,7 +46,7 @@ const DatasetSelectNew = ({ dataset, setDataset, training, region, allowToggle, 
 
   return (
     //defaultExpanded (disabled default expand)
-    <Accordion disableGutters sx={{ bgcolor: 'transparent' }}>
+    <Accordion expanded={expanded}  onChange={onToggle}  disableGutters sx={{ bgcolor: 'transparent' }}>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
         sx={{

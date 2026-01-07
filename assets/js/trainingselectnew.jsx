@@ -13,7 +13,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { TRAINING_OPTIONS, TRAINING_OPTIONS_VS } from './constants-scoreboard';
 
 
-const TrainingSelectNew = ({ training, setTraining, dataset, vsOption }) => {
+const TrainingSelectNew = ({ training, setTraining, dataset, vsOption, expanded, onToggle }) => {
   
   // if vs option
   const isVSMode = !!vsOption;
@@ -28,7 +28,7 @@ const TrainingSelectNew = ({ training, setTraining, dataset, vsOption }) => {
 
   return (
     //defaultExpanded (disabled default expand)
-    <Accordion disableGutters sx={{ bgcolor: 'transparent' }}>
+    <Accordion expanded={expanded}  onChange={onToggle} disableGutters sx={{ bgcolor: 'transparent' }}>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
         sx={{

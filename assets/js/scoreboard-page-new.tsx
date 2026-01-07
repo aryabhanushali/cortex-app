@@ -41,6 +41,12 @@ const ScoreboardPageNew: React.FC = () => {
 
   const isVS = pageView === '2' && activeQuestion === 'q1';
 
+  const [expandedPanel, setExpandedPanel] = useState<string | false>(false); // false: unexpanded
+
+  const handlePanelChange = (panelName: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+    setExpandedPanel(isExpanded ? panelName : false);
+  };
+
   useEffect(() => {
   if (isVS) {
     setTraining('Murty185 VS NSD1000');
@@ -183,6 +189,7 @@ return (
             region={region}
             dataset={dataset}
             clearSingle={clearSingle}
+            onTagClick={(type: string) => setExpandedPanel(type)}
           />
         </div>
 
@@ -262,7 +269,15 @@ return (
           
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <TrainingSelectNew training={training} setTraining={setTraining} dataset={dataset} vsOption = {isVS} />
+            <TrainingSelectNew 
+              training={training} 
+              setTraining={setTraining} 
+              dataset={dataset}
+              vsOption = {isVS} 
+              expanded={expandedPanel === 'training'} 
+              onToggle={handlePanelChange('training')}
+            />
+
             <ROISelectNew
               region={region}
               setRegion={setRegion}
@@ -271,6 +286,8 @@ return (
               allowToggle={true}
               mode={1}
               training={training}
+              expanded={expandedPanel === 'region'} 
+              onToggle={handlePanelChange('region')} 
             />
             <DatasetSelectNew
               dataset={dataset}
@@ -279,6 +296,8 @@ return (
               region={region}
               allowToggle={true}
               mode={1}
+              expanded={expandedPanel === 'dataset'} 
+              onToggle={handlePanelChange('dataset')}
             />
             
           </div>

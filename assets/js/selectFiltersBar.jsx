@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tag } from 'antd';
 
-const SelectedFiltersBar = ({ training, region, dataset, clearSingle }) => {
+const SelectedFiltersBar = ({ training, region, dataset, clearSingle, onTagClick }) => {
   const selected = [];
 
   // order: training region dataset
@@ -37,7 +37,14 @@ const SelectedFiltersBar = ({ training, region, dataset, clearSingle }) => {
           key={item.key}
           color={item.color}
           closable
+          // ✨ 新增：点击 Tag 主体时，根据 key 的前缀判断展开哪个面板
+          onClick={() => {
+            const type = item.key.startsWith('region') ? 'region' : 
+                         item.key.startsWith('dataset') ? 'dataset' : 'training';
+            onTagClick(type);
+          }}
           onClose={() => {
+            e.stopPropagation();
             // region/ dataset support single remove
             if (item.key.startsWith('region-')) {
               const r = item.key.replace('region-', '');
@@ -53,6 +60,7 @@ const SelectedFiltersBar = ({ training, region, dataset, clearSingle }) => {
           style={{
             borderRadius: 20,
             padding: '4px 12px',
+            cursor: 'pointer',
             fontWeight: 500,
             fontSize: '0.95em',
           }}

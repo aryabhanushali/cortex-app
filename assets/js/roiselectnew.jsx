@@ -12,7 +12,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { ROI_OPTIONS } from './constants-scoreboard';
 
-const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mode, training }) => {
+const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mode, training,expanded, onToggle }) => {
   // button logic group
   const ACROSS_VAL = 'Across Regions';
   const SPECIFIC_ROIS = ['ppa', 'ffa', 'eba'];
@@ -77,7 +77,7 @@ const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mod
 
   return (
     //defaultExpanded (disabled default expand)
-    <Accordion  disableGutters sx={{ bgcolor: 'transparent' }}> 
+    <Accordion  expanded={expanded}  onChange={onToggle}   disableGutters sx={{ bgcolor: 'transparent' }}> 
       <AccordionSummary
         expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
         sx={{
