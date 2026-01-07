@@ -114,8 +114,8 @@ const ScoreboardPageNew: React.FC = () => {
     (Array.isArray(region) && region.length > 0);
 
   const clearFilters = () => {
-    setTraining('');
-    setRegion([]);
+    setTraining('NSD');
+    setRegion(['Across Regions']);
     setDataset([]);
   };
 
@@ -234,7 +234,7 @@ return (
                 borderColor: hasFilters ? '#1890ff' : '#ccc',
               }}
             >
-              Clear
+              Default
             </Button>
           </div>
 
