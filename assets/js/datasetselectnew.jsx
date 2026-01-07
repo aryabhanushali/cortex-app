@@ -45,7 +45,8 @@ const DatasetSelectNew = ({ dataset, setDataset, training, region, allowToggle, 
   };
 
   return (
-    <Accordion defaultExpanded disableGutters sx={{ bgcolor: 'transparent' }}>
+    //defaultExpanded (disabled default expand)
+    <Accordion disableGutters sx={{ bgcolor: 'transparent' }}>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
         sx={{

@@ -76,7 +76,8 @@ const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mod
   const isChecked = (value) => Array.isArray(region) && region.includes(value);
 
   return (
-    <Accordion defaultExpanded disableGutters sx={{ bgcolor: 'transparent' }}>
+    //defaultExpanded (disabled default expand)
+    <Accordion  disableGutters sx={{ bgcolor: 'transparent' }}> 
       <AccordionSummary
         expandIcon={<ExpandMoreIcon sx={{ color: 'black' }} />}
         sx={{
