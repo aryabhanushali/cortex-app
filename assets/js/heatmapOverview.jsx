@@ -24,36 +24,85 @@ const HeatmapOverview = ({ data, roi, dataset, rank, onModelClick, selectedModel
     container.select("svg").remove();
 
     // --- 1. 数据处理 (保持你原来的逻辑) ---
-    let xLabels = [];
-    let models = [];
-    let cellData = [];
+    // let xLabels = [];
+    // let models = [];
+    // let cellData = [];
 
-    if (roi && data[roi]) {
-      models = Object.keys(data[roi]).filter((m) => m !== "ceiling");
-      xLabels = Array.from(new Set(models.flatMap((m) => Object.keys(data[roi][m] || {}))));
-      models.forEach((model) => {
-        xLabels.forEach((x) => {
-          const vals = data[roi][model]?.[x];
-          if (vals) cellData.push({ model, x, raw: vals[0], norm: vals[1] });
+    // if (roi && data[roi]) {
+    //   models = Object.keys(data[roi]).filter((m) => m !== "ceiling");
+    //   xLabels = Array.from(new Set(models.flatMap((m) => Object.keys(data[roi][m] || {}))));
+    //   models.forEach((model) => {
+    //     xLabels.forEach((x) => {
+    //       const vals = data[roi][model]?.[x];
+    //       if (vals) cellData.push({ model, x, raw: vals[0], norm: vals[1] });
+    //     });
+    //   });
+    // } else if (dataset) {
+    //   const rois = Object.keys(data).filter((r) => r !== "overall");
+    //   const seen = new Set();
+    //   rois.forEach((r) => {
+    //     const modelNames = Object.keys(data[r] || {}).filter((m) => m !== "ceiling");
+    //     modelNames.forEach((model) => {
+    //       const vals = data[r][model]?.[dataset];
+    //       if (vals) cellData.push({ model, x: r, raw: vals[0], norm: vals[1] });
+    //       seen.add(model);
+    //     });
+    //   });
+    //   models = Array.from(seen);
+    //   xLabels = rois;
+    // }
+
+    // if (!cellData.length) return;
+
+    // if (rank === "rank") {
+    //   const avg = {};
+    //   models.forEach((m) => {
+    //     const vals = cellData.filter((d) => d.model === m).map((d) => d.raw);
+    //     avg[m] = d3.mean(vals);
+    //   });
+    //   models.sort((a, b) => (avg[b] || 0) - (avg[a] || 0));
+    // }
+
+    // --- 1. 数据处理 ---
+    let cellData = [];
+    let modelsSet = new Set();
+    let xLabelsSet = new Set();
+
+    if (roi && data[roi] && !dataset) {
+      // 模式 A: 固定 ROI，对比不同 Dataset
+      const rawModels = Object.keys(data[roi]).filter((m) => m !== "ceiling");
+      rawModels.forEach((model) => {
+        Object.entries(data[roi][model] || {}).forEach(([x, vals]) => {
+          if (vals) {
+            cellData.push({ model, x, raw: vals[0], norm: vals[1] });
+            modelsSet.add(model);
+            xLabelsSet.add(x); // 只有有数据的 x 轴标签才会被加入
+          }
         });
       });
     } else if (dataset) {
-      const rois = Object.keys(data).filter((r) => r !== "overall");
-      const seen = new Set();
+      // 模式 B: 固定 Dataset，对比不同 ROI
+      const rois = Object.keys(data).filter((r) => r !== "overall" && r !== "Across Regions");
       rois.forEach((r) => {
         const modelNames = Object.keys(data[r] || {}).filter((m) => m !== "ceiling");
         modelNames.forEach((model) => {
           const vals = data[r][model]?.[dataset];
-          if (vals) cellData.push({ model, x: r, raw: vals[0], norm: vals[1] });
-          seen.add(model);
+          if (vals) {
+            cellData.push({ model, x: r, raw: vals[0], norm: vals[1] });
+            modelsSet.add(model);
+            xLabelsSet.add(r); // 只有这个 Dataset 下有数据的 ROI 才会被加入
+          }
         });
       });
-      models = Array.from(seen);
-      xLabels = rois;
     }
 
     if (!cellData.length) return;
 
+    // 关键：现在的 xLabels 和 models 只包含有数据的项
+    let xLabels = Array.from(xLabelsSet);
+    let models = Array.from(modelsSet);
+
+    // 排序逻辑 (如果是 rank 模式)
     if (rank === "rank") {
       const avg = {};
       models.forEach((m) => {

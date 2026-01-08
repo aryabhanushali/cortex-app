@@ -47,7 +47,7 @@ const ScoreboardPageNew: React.FC = () => {
     dataset: false,
   });
 
-  const datasetLabelMap = {
+  const datasetLabelMap: Record<string, string> = {
     murty185: "Murty185",
     nsd_1000: "NSD1000",
     bold_5000: "BOLD5000v2",
@@ -364,126 +364,116 @@ return (
           }}
         >
             
-           {/* --- Overview Section --- */}
+        {/* --- Overview Section --- */}
+        {pageView !== '2' && (
+          <div style={{
+            background: 'transparent',
+            // 如果是详情模式，占 25%，否则占满 100%
+            height: isDatasetDetailMode  ? '25%' : '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            minHeight: 0, // 👈 关键：允许容器在 grid 内部正确缩放
+            gap: 12,
+            overflowY: isDatasetDetailMode ? 'auto' : 'hidden', // rollable 
+            overflowX: isDatasetDetailMode ? 'hidden' : 'hidden', 
+            flexShrink: 0,
 
-      
-            {pageView !== '2' && ( 
-              <div
-                style={{
-                  background: 'transparent', 
-                  borderRadius: 8,
-                  padding: '0px',
-                  height: isDatasetDetailMode ? '25%' : '100%', 
-                  display: 'flex',       
-                  // flexdirection change logic
-                  flexDirection: dataset.length > 0 ? 'column' : 'row', 
-                  overflowY: dataset.length > 0 ? 'auto' : 'hidden', // rollable 
-                  overflowX: dataset.length > 0 ? 'hidden' : 'hidden', 
-                  flexShrink: 0,
-                  
-                  gap: dataset.length > 0 ? 12 : 0, 
-                  border: isDatasetDetailMode ? '1px solid #f0f0f0' : 'none',
-                  width: '100%',
-                }}
-              >
-                {isDatasetDetailMode ? (
-                  /* vertical for barchart --- */
-                  dataset.map((dsName) => (
-                    region.map((roiValue) => (
-                      <div 
-                        key={`${dsName}-${roiValue}`} 
-                        style={{ 
-                          flex: 1,
-                          minHeight: '80px',
-                          width: '100%',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          padding: '6px 4px',
-                          background: '#fafafa', 
-                          borderRadius: 6,
-                          borderBottom: '1px solid #eee'
-                        }}
-                      >
-                        <div style={{ textAlign: 'center', fontSize: '10px', fontWeight: 'bold', color: '#888', marginBottom: 4 }}>
-                          {roiValue === 'Across Regions' ? 'Overall' : roiValue} ({dsName})
-                        </div>
-                        <div style={{ flex: 1, width: '100%', minHeight: 0 }}>
-                          <BarChartOverview
-                            data={getDataByTraining(training)}
-                            roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
-                            dataset={dsName} 
-                            ceiling={Ceiling}
-                            rank={rank}
-                            onModelClick={(m: string | null) => setSelectedModel(m)}
-                            selectedModel={selectedModel}
-                          />
-                        </div>
-                      </div>
-                    ))
-                  ))
-                ) : (
-                  /* --- horizontal for heap map --- */
-                  <div style={{ 
-                    display: 'flex', 
-                    flexDirection: 'row', 
-                    flex: 1, 
-                    height: '100%',
-                    width: '100%',
-                    gap: 12, 
-                    overflow: 'hidden' 
-                  }}>
-                    {region.map((roiValue) => (
-                      <div 
-                        key={roiValue} 
-                        style={{ 
-                         
-                          flex: '1 1 0%', 
-                          minWidth: 0,
-                          display: 'flex', 
-                          flexDirection: 'column',
-                          height: '100%',
-                          overflow: 'hidden'
-                        }}
-                      >
-                        {/* ROI subtitle */}
-                        <div style={{ 
-                          textAlign: 'center', 
-                          fontSize: '10px', 
-                          fontWeight: 'bold', 
-                          color: '#888',
-                          textTransform: 'uppercase',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis'
-                        }}>
-                          {roiValue === 'Across Regions' ? 'Overall' : roiValue}
-                        </div>
-                        
-                        {/* chart container*/}
-                        <div style={{ 
-                          flex: 1, 
-                          position: 'relative', 
-                          width: '100%', 
-                          minHeight: 0,
-                          overflow: 'hidden', 
-                          marginBottom: 8
-                        }}>
-                          <HeatmapOverview
-                            data={getDataByTraining(training)} 
-                            roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
-                            dataset={''}
-                            rank={rank}
-                            selectedModel={selectedModel}
-                            onModelClick={(m: string) => setSelectedModel(m)}
-                            visibleRange={visibleRange}
-                          />
-                        </div>
-                      </div>
-                    ))}
+          }}>
+
+            {/* 分支 1：BarChart 模式 (详情模式保持不变) */}
+            {isDatasetDetailMode && dataset.map((dsName) => (
+              region.map((roiValue) => (
+                <div key={`${dsName}-${roiValue}`} style={{ flex: 1, minHeight: '80px', background: '#fafafa', padding: '6px', borderRadius: 6, display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ textAlign: 'center', fontSize: '10px', fontWeight: 'bold', color: '#888' }}>
+                    {roiValue === 'Across Regions' ? 'Overall' : roiValue} ({dsName})
                   </div>
-                )}
+                  <div style={{ flex: 1, minHeight: 0 }}>
+                    <BarChartOverview
+                      data={getDataByTraining(training)}
+                      roi={roiValue === 'Across Regions' ? 'Overall' : roiValue}
+                      dataset={dsName}
+                      ceiling={Ceiling}
+                      rank={rank}
+                      onModelClick={setSelectedModel}
+                      selectedModel={selectedModel}
+                    />
+                  </div>
+                </div>
+              ))
+            ))}
+
+            {/* 统一分支 2 和 3：Heatmap 模式 */}
+            {(!isDatasetDetailMode) && (
+              <div style={{ 
+                display: 'flex', 
+                flexDirection: 'row', 
+                flex: 1,          
+                gap: 12, 
+                height: '100%', 
+                minHeight: 0,
+                overflowX: 'auto',
+                
+              }}>
+               
+                {(dataset.length === 0 ? region : dataset).map((item) => {
+                  // 统一标题和参数逻辑
+                  const isBranch2 = dataset.length === 0;
+                  const subtitle = isBranch2 
+                    ? (item === 'Across Regions' ? 'Overall' : item)
+                    : (datasetLabelMap[item] || item);
+                  
+                  const currentRoi = isBranch2 
+                    ? (item === 'Across Regions' ? 'Overall' : item) 
+                    : "Across Regions";
+                  
+                  const currentDataset = isBranch2 ? null : item;
+
+                  return (
+                    <div 
+                      key={item} 
+                      style={{ 
+                        flex: '1 0 60px', 
+                         
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        height: '100%', 
+                        minWidth: '60px',
+                      }}
+                    >
+                      {/* 标题 */}
+                      <div style={{ textAlign: 'center', fontSize: '10px', fontWeight: 'bold', color: '#888', marginBottom: 4 }}>
+                        {subtitle}
+                      </div>
+
+                      {/* 热图容器：增加 flex: 1 并强制 display: flex */}
+                      <div style={{ 
+                        flex: 1, 
+                        minHeight: 0, 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        
+                      }}>
+                        <HeatmapOverview
+                          data={getDataByTraining(training)}
+                          roi={currentRoi}
+                          dataset={currentDataset}
+                          rank={rank}
+                          selectedModel={selectedModel}
+                          onModelClick={setSelectedModel}
+                          visibleRange={visibleRange}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
+          </div>
+        )}
+         
+      
+         
             
 
 
@@ -709,4 +699,4 @@ return (
 export default ScoreboardPageNew;
 
 
-    
+ 
