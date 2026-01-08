@@ -41,10 +41,26 @@ const ScoreboardPageNew: React.FC = () => {
 
   const isVS = pageView === '2' && activeQuestion === 'q1';
 
-  const [expandedPanel, setExpandedPanel] = useState<string | false>(false); // false: unexpanded
+  const [expandedStates, setExpandedStates] = useState({
+    training: false,
+    region: false,
+    dataset: false,
+  });
 
-  const handlePanelChange = (panelName: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-    setExpandedPanel(isExpanded ? panelName : false);
+  
+
+  const handleTogglePanel = (panelName: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+    setExpandedStates(prev => ({
+      ...prev,
+      [panelName]: isExpanded 
+    }));
+  };
+
+  const handleTagClick = (type:string) => {
+  setExpandedStates(prev => ({
+      ...prev,
+      [type]: true 
+    }));
   };
 
   useEffect(() => {
@@ -189,7 +205,7 @@ return (
             region={region}
             dataset={dataset}
             clearSingle={clearSingle}
-            onTagClick={(type: string) => setExpandedPanel(type)}
+            onTagClick={handleTagClick}
           />
         </div>
 
@@ -274,8 +290,8 @@ return (
               setTraining={setTraining} 
               dataset={dataset}
               vsOption = {isVS} 
-              expanded={expandedPanel === 'training'} 
-              onToggle={handlePanelChange('training')}
+              expanded={expandedStates.training} //read property
+              onToggle={handleTogglePanel('training')}
             />
 
             <ROISelectNew
@@ -286,8 +302,8 @@ return (
               allowToggle={true}
               mode={1}
               training={training}
-              expanded={expandedPanel === 'region'} 
-              onToggle={handlePanelChange('region')} 
+              expanded={expandedStates.region} // read property
+              onToggle={handleTogglePanel('region')}
             />
             <DatasetSelectNew
               dataset={dataset}
@@ -296,8 +312,8 @@ return (
               region={region}
               allowToggle={true}
               mode={1}
-              expanded={expandedPanel === 'dataset'} 
-              onToggle={handlePanelChange('dataset')}
+              expanded={expandedStates.dataset} 
+              onToggle={handleTogglePanel('dataset')}
             />
             
           </div>

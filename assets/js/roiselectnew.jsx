@@ -18,11 +18,45 @@ const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mod
   const SPECIFIC_ROIS = ['ppa', 'ffa', 'eba'];
 
   // dataset/roi enabled / disabled logic
+  // const isEnabled = (option) => {
+
+  //    if (
+  //     Array.isArray(dataset) &&
+  //     (dataset.includes('bold_5000') || dataset.includes('bonner_2021')) &&
+  //     (option.value === 'ffa' || option.value === 'eba')
+  //   )
+  //     return false;
+
+  //   if (
+  //     Array.isArray(dataset) &&
+  //     (dataset.includes('kingbaker_2019') || dataset.includes('wardle_2020')) &&
+  //     (option.value === 'eba' )
+  //   )
+  //     return false;
+  //   return true;
+  // };
+
   const isEnabled = (option) => {
-    if ((dataset === 'bold_5000' || dataset === 'bonner_2021') && (option.value === 'ffa' || option.value === 'eba'))
-      return false;
-    if ((dataset === 'kingbaker_2019' || dataset === 'wardle_2020') && option.value === 'eba')
-      return false;
+    const ds = Array.isArray(dataset) ? dataset : [];
+
+    if (ds.length === 0) return true;
+
+    // 2. 'Across Regions' (PPA) light all
+    if (option.value === ACROSS_VAL || option.value === 'ppa') return true;
+
+    // 3. ffa support list
+    if (option.value === 'ffa') {
+      
+      return ds.some(d => !['bold_5000', 'bonner_2021'].includes(d));
+    }
+
+    // 4. eba support list
+    if (option.value === 'eba') {
+      
+      const unsupportedForEBA = ['bold_5000', 'bonner_2021', 'kingbaker_2019', 'wardle_2020'];
+      return ds.some(d => !unsupportedForEBA.includes(d));
+    }
+
     return true;
   };
 
