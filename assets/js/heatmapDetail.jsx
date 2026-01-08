@@ -92,102 +92,174 @@ const HeatmapDetail = ({ data, roi, dataset, rank, selectedModel, onModelClick, 
     let ceilingData = [];
 
     // --- data processing ---
+    // if (roi && data[roi]) {
+    //   models = Object.keys(data[roi]).filter((m) => m !== "ceiling");
+    //   xLabels = Array.from(new Set(models.flatMap((m) => Object.keys(data[roi][m] || {}))));
+
+    //   models.forEach((model) => {
+    //     let rawVals = [];
+    //     xLabels.forEach((ds) => {
+    //       if (["murty185", "nsd_1000"].includes(ds)) return;
+    //       const vals = data[roi][model]?.[ds];
+    //       if (vals) {
+    //         const raw = vals[0];
+    //         const norm = vals[1];
+    //         rawVals.push(raw);
+    //         cellData.push({ model, x: ds, raw, norm });
+    //       }
+    //     });
+    //     if (rawVals.length > 0) {
+    //       cellData.push({
+    //         model,
+    //         x: "global_score",
+    //         raw: d3.mean(rawVals),
+    //         norm: null,
+    //       });
+    //     }
+    //   }) 
+
+    //   ceilingData = xLabels
+    //     .filter((ds) => !["murty185", "nsd_1000"].includes(ds))
+    //     .map((ds) => {
+    //       const vals = data[roi]?.ceiling?.[ds];
+    //       return vals ? { x: ds, raw: vals[0], norm: vals[1] } : {};
+    //     });
+
+    //   const ceilingVals = ceilingData.map((d) => d.raw).filter((v) => v != null);
+    //   if (ceilingVals.length > 0) {
+    //     ceilingData.push({
+    //       x: "global_score",
+    //       raw: d3.mean(ceilingVals),
+    //       norm: null,
+    //     });
+    //   }
+
+    //   xLabels = ["global_score", ...xLabels.filter((ds) => !["murty185", "nsd_1000"].includes(ds))];
+    // } else if (dataset) {
+    //   const rois = Object.keys(data).filter((roiName) => roiName.toLowerCase() !== "overall");
+    //   models = [];
+    //   let validRois = [];
+
+    //   rois.forEach((roiName) => {
+    //     const modelNames = Object.keys(data[roiName] || {}).filter((m) => m !== "ceiling");
+    //     models = Array.from(new Set([...models, ...modelNames]));
+
+    //     let roiHasData = false;
+    //     modelNames.forEach((model) => {
+    //       const vals = data[roiName]?.[model]?.[dataset];
+    //       if (vals) {
+    //         roiHasData = true;
+    //         cellData.push({ model, x: roiName, raw: vals[0], norm: vals[1] });
+    //       }
+    //     });
+
+    //     const ceilingVals = data[roiName]?.ceiling?.[dataset];
+    //     if (ceilingVals) {
+    //       roiHasData = true;
+    //       ceilingData.push({
+    //         x: roiName,
+    //         raw: ceilingVals[0],
+    //         norm: ceilingVals[1],
+    //       });
+    //     }
+    //     if (roiHasData) validRois.push(roiName);
+    //   });
+
+    //   models.forEach((model) => {
+    //     const rawVals = cellData.filter((d) => d.model === model && d.raw != null).map((d) => d.raw);
+    //     if (rawVals.length > 0) {
+    //       cellData.push({
+    //         model,
+    //         x: "global_score",
+    //         raw: d3.mean(rawVals),
+    //         norm: null,
+    //       });
+    //     }
+    //   });
+
+    //   const ceilingVals = ceilingData.map((d) => d.raw).filter((v) => v != null);
+    //   if (ceilingVals.length > 0) {
+    //     ceilingData.push({
+    //       x: "global_score",
+    //       raw: d3.mean(ceilingVals),
+    //       norm: null,
+    //     });
+    //   }
+    //   xLabels = ["global_score", ...validRois];
+    // } else {
+    //   return;
+    // }
     if (roi && data[roi]) {
+      // Case 1: 固定 ROI -> X轴是 Dataset
       models = Object.keys(data[roi]).filter((m) => m !== "ceiling");
-      xLabels = Array.from(new Set(models.flatMap((m) => Object.keys(data[roi][m] || {}))));
+      const allPossibleDatasets = Array.from(new Set(models.flatMap((m) => Object.keys(data[roi][m] || {}))));
 
       models.forEach((model) => {
         let rawVals = [];
-        xLabels.forEach((ds) => {
+        allPossibleDatasets.forEach((ds) => {
           if (["murty185", "nsd_1000"].includes(ds)) return;
           const vals = data[roi][model]?.[ds];
           if (vals) {
-            const raw = vals[0];
-            const norm = vals[1];
-            rawVals.push(raw);
-            cellData.push({ model, x: ds, raw, norm });
+            rawVals.push(vals[0]);
+            cellData.push({ model, x: ds, raw: vals[0], norm: vals[1] });
           }
         });
         if (rawVals.length > 0) {
-          cellData.push({
-            model,
-            x: "global_score",
-            raw: d3.mean(rawVals),
-            norm: null,
-          });
+          cellData.push({ model, x: "global_score", raw: d3.mean(rawVals), norm: null });
         }
       });
 
-      ceilingData = xLabels
-        .filter((ds) => !["murty185", "nsd_1000"].includes(ds))
-        .map((ds) => {
+      ceilingData = allPossibleDatasets
+        .filter(ds => !["murty185", "nsd_1000"].includes(ds))
+        .map(ds => {
           const vals = data[roi]?.ceiling?.[ds];
-          return vals ? { x: ds, raw: vals[0], norm: vals[1] } : {};
-        });
+          return vals ? { x: ds, raw: vals[0], norm: vals[1] } : null;
+        }).filter(d => d !== null);
 
-      const ceilingVals = ceilingData.map((d) => d.raw).filter((v) => v != null);
-      if (ceilingVals.length > 0) {
-        ceilingData.push({
-          x: "global_score",
-          raw: d3.mean(ceilingVals),
-          norm: null,
-        });
-      }
+      const cVals = ceilingData.map(d => d.raw).filter(v => v != null);
+      if (cVals.length > 0) ceilingData.push({ x: "global_score", raw: d3.mean(cVals), norm: null });
+      
+      xLabels = ["global_score", ...allPossibleDatasets.filter(ds => !["murty185", "nsd_1000"].includes(ds))];
 
-      xLabels = ["global_score", ...xLabels.filter((ds) => !["murty185", "nsd_1000"].includes(ds))];
     } else if (dataset) {
-      const rois = Object.keys(data).filter((roiName) => roiName.toLowerCase() !== "overall");
-      models = [];
+      // Case 2: 固定 Dataset -> X轴是 ROI 名
+      const rois = Object.keys(data).filter((n) => n.toLowerCase() !== "overall");
       let validRois = [];
-
+      
       rois.forEach((roiName) => {
         const modelNames = Object.keys(data[roiName] || {}).filter((m) => m !== "ceiling");
         models = Array.from(new Set([...models, ...modelNames]));
 
-        let roiHasData = false;
+        let hasEntry = false;
         modelNames.forEach((model) => {
           const vals = data[roiName]?.[model]?.[dataset];
           if (vals) {
-            roiHasData = true;
+            hasEntry = true;
             cellData.push({ model, x: roiName, raw: vals[0], norm: vals[1] });
           }
         });
 
-        const ceilingVals = data[roiName]?.ceiling?.[dataset];
-        if (ceilingVals) {
-          roiHasData = true;
-          ceilingData.push({
-            x: roiName,
-            raw: ceilingVals[0],
-            norm: ceilingVals[1],
-          });
+        const cVals = data[roiName]?.ceiling?.[dataset];
+        if (cVals) {
+          hasEntry = true;
+          ceilingData.push({ x: roiName, raw: cVals[0], norm: cVals[1] });
         }
-        if (roiHasData) validRois.push(roiName);
+        if (hasEntry) validRois.push(roiName);
       });
 
       models.forEach((model) => {
-        const rawVals = cellData.filter((d) => d.model === model && d.raw != null).map((d) => d.raw);
+        const rawVals = cellData.filter(d => d.model === model && d.raw != null).map(d => d.raw);
         if (rawVals.length > 0) {
-          cellData.push({
-            model,
-            x: "global_score",
-            raw: d3.mean(rawVals),
-            norm: null,
-          });
+          cellData.push({ model, x: "global_score", raw: d3.mean(rawVals), norm: null });
         }
       });
 
-      const ceilingVals = ceilingData.map((d) => d.raw).filter((v) => v != null);
-      if (ceilingVals.length > 0) {
-        ceilingData.push({
-          x: "global_score",
-          raw: d3.mean(ceilingVals),
-          norm: null,
-        });
-      }
+      const cVals = ceilingData.map(d => d.raw).filter(v => v != null);
+      if (cVals.length > 0) ceilingData.push({ x: "global_score", raw: d3.mean(cVals), norm: null });
+      
       xLabels = ["global_score", ...validRois];
     } else {
-      return;
+      return; // 无 ROI 也无 Dataset 则不渲染
     }
 
     if (!models.length) return;

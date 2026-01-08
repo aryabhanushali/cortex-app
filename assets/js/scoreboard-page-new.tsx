@@ -36,7 +36,7 @@ const ScoreboardPageNew: React.FC = () => {
 
   const [pageView, setPageView] = useState('rank');
  
-  const isDatasetDetailMode = pageView === 'rank' && dataset.length > 0;
+  const isDatasetDetailMode = pageView === 'rank' && dataset.length > 0 && !region.includes('Across Regions');
   const [activeQuestion, setActiveQuestion] = useState('q1');
 
   const isVS = pageView === '2' && activeQuestion === 'q1';
@@ -46,6 +46,18 @@ const ScoreboardPageNew: React.FC = () => {
     region: false,
     dataset: false,
   });
+
+  const datasetLabelMap = {
+    murty185: "Murty185",
+    nsd_1000: "NSD1000",
+    bold_5000: "BOLD5000v2",
+    bonner_2021: "Bonner2021",
+    bmd_2024: "BMD2024",
+    kingbaker_2019: "King2019",
+    wardle_2020: "Wardle2020",
+    nsd_syn: "NSD synthetic",
+    global_score: "Global Score",
+  };
 
   
 
@@ -374,7 +386,7 @@ return (
                   width: '100%',
                 }}
               >
-                {dataset.length > 0 ? (
+                {isDatasetDetailMode ? (
                   /* vertical for barchart --- */
                   dataset.map((dsName) => (
                     region.map((roiValue) => (
@@ -601,20 +613,18 @@ return (
                       </React.Fragment>
                     ))}
         
-                
-
+                 {/* heapmap for a fixed region comparing datasets */}
                 {pageView === "rank" &&  training !== 'Murty185 VS NSD1000' &&  dataset.length === 0 && region.map((roiValue, index) => (
                 <div 
                   key={roiValue} 
                   style={{ 
                     display: 'flex', 
                     flexDirection: 'column',
-                    // 如果是第一个（带 Y 轴标签），宽度设宽一点，后面不带标签的设窄一点
                     minWidth: index === 0 ? 450 : 350, 
                     flexShrink: 0 
                   }}
                 >
-                  {/* 区域小标题 */}
+                  {/* subtilte*/}
                   <div style={{ 
                     textAlign: 'center', 
                     fontWeight: 'bold', 
@@ -622,7 +632,7 @@ return (
                     fontSize: '14px', 
                     color: '#555',
                     textTransform: 'uppercase',
-                    background: '#eee',
+                    background: '#b7afafff',
                     padding: '4px 0',
                     borderRadius: '4px'
                   }}>
@@ -637,12 +647,57 @@ return (
                     selectedModel={selectedModel}
                     onModelClick={(m: string) => setSelectedModel(m)}
                     onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
-                    // ✨ 新增 Props：控制是否显示左侧模型名称
                     showYAxis={index === 0} 
                     isMultiRegion={region.length > 1}
                   />
                 </div>
               ))}
+
+            
+              {/* heapmap for a fixed dataset comparing regions */}
+              {pageView === "rank" && training !== 'Murty185 VS NSD1000' && dataset.length > 0 && region.includes('Across Regions') && (
+                <div style={{ display: 'flex', flexDirection: 'row', gap: 20, overflowX: 'auto', paddingBottom: 10 }}>
+                  {dataset.map((datasetValue, index) => (
+                    <div 
+                      key={datasetValue} 
+                      style={{ 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        // bigger for first one as show for label
+                        minWidth: index === 0 ? 450 : 350, 
+                        flexShrink: 0 
+                      }}
+                    >
+                      {/* subtitle */}
+                      <div style={{ 
+                        textAlign: 'center', 
+                        fontWeight: 'bold', 
+                        marginBottom: 12, 
+                        fontSize: '13px', 
+                        color: '#555',
+                        textTransform: 'uppercase',
+                        background: '#b7afafff', 
+                        padding: '4px 0',
+                        borderRadius: '4px'
+                      }}>
+                        Dataset: {datasetLabelMap[datasetValue] || datasetValue}
+                      </div>
+
+                      <HeatmapDetail
+                        data={getDataByTraining(training)} 
+                        roi="Across Regions" 
+                        dataset={datasetValue}
+                        rank={rank}
+                        selectedModel={selectedModel}
+                        onModelClick={(m: string) => setSelectedModel(m)}
+                        onScrollUpdate={(range: {start: number, end: number}) => setVisibleRange(range)}
+                       
+                        showYAxis={index === 0} 
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
               </div>
             </div>
           </div>
