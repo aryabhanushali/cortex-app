@@ -23,7 +23,7 @@ const DatasetSelectNew = ({ dataset, setDataset, training, region, allowToggle, 
   const isEnabled = (option) => {
     if (training === 'Murty185' && !MURTY185_DATASET.includes(option.value)) return false;
     if (training === 'NSD' && !NSD_DATASET.includes(option.value)) return false;
-    if (training === 'VS' && (option.value === 'murty185' || option.value === 'nsd_1000')) return false;
+    if (training === 'Murty185 VS NSD1000' && (option.value === 'murty185' || option.value === 'nsd_1000')) return false;
     // if (
     //   Array.isArray(region) &&
     //   (region.includes('ffa') || region.includes('eba')) &&
