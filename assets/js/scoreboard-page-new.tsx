@@ -509,7 +509,10 @@ return (
                   ? `Performance On Specific Dataset Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'} `
                   : (training === 'Murty185 VS NSD1000' 
                       ? 'Murty185 vs NSD1000 Performance Comparison' 
-                      : `${region[0]?.toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`)
+                  : (region.includes("Across Regions")) 
+                      ? `${region[0]?.toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`
+                
+                  : `Performance  on Specific Region (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`)
                 }
               </h3>
 
