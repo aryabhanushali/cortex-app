@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import * as d3 from "d3";
 
-// 配置常量 (保持不变)
+// color/ name map
 const roiColors = { ppa: "#1f77b4", ffa: "#ff7f0e", eba: "#2ca02c", overall: "#666" };
 const datasetShapes = {
   bold_5000: d3.symbolCircle, bonner_2021: d3.symbolCircle, kingbaker_2019: d3.symbolCircle,
@@ -34,58 +34,7 @@ const ScatterGapCeiling = ({ murtyData, nsdData, ceilingData, roi, dataset, trai
     return () => resizeObserver.disconnect();
   }, []);
 
-  // 1. 数据处理：确保 cRange 始终有值，防止报错
-  // const aggregatedPoints = useMemo(() => {
-  //     if (!murtyData && !nsdData) return [];
-      
-  //     const process = (rawData, sourceLabel) => {
-  //       if (!rawData || typeof rawData !== 'object') return [];
-  //       return Object.entries(rawData).map(([key, stats]) => {
-  //         if (!key || !key.includes("/")) return null;
-  //         const [ds, rName] = key.split("/");
-          
-  //         const ceilingObj = ceilingData?.[key] || ceilingData?.[rName]?.[ds];
-  //         const rawCeilingVals = ceilingObj?.correlation_points || [];
-  //         const cMin = rawCeilingVals.length > 0 ? d3.min(rawCeilingVals) : (stats?.ceiling_mean || 0);
-  //         const cMax = rawCeilingVals.length > 0 ? d3.max(rawCeilingVals) : (stats?.ceiling_mean || 0);
-
-  //         return {
-  //           id: key, dataset: ds, roi: rName.toLowerCase(), train: sourceLabel,
-  //           gap: stats?.normalized_gap ?? 0, ceiling: stats?.ceiling_mean ?? 0, 
-  //           cRange: [cMin, cMax], raw: stats
-  //         };
-  //       }).filter(item => item !== null);
-  //     };
-
-  //     // ✨ 这里的逻辑对应你之前代码中的 training filter
-  //     let all = [];
-  //     if (training === "Murty185") {
-  //       all = process(murtyData, "Murty185");
-  //     } else if (training === "NSD") {
-  //       all = process(nsdData, "NSD1000");
-  //     } else {
-  //       // 当 training 为空或为 "Murty185 VS NSD1000" 时，显示全部
-  //       all = [...process(murtyData, "Murty185"), ...process(nsdData, "NSD1000")];
-  //     }
-
-  //     const targetROI = (roi === "Across Regions" || !roi) ? "" : String(roi).toLowerCase();
-  //     const targetDS = (dataset || "").toLowerCase();
-
-  //     const filtered = all.filter(d => {
-  //       const roiMatch = targetROI === "" || d.roi === targetROI;
-  //       const dsMatch = targetDS === "" || d.dataset.toLowerCase() === targetDS;
-  //       return roiMatch && dsMatch;
-  //     });
-
-  //     return d3.rollups(filtered, v => ({
-  //       ceiling_mean: d3.mean(v, d => d.ceiling) || 0,
-  //       gap_mean: d3.mean(v, d => d.gap) || 0,
-  //       cRange: [d3.min(v, d => d.cRange[0]), d3.max(v, d => d.cRange[1])],
-  //       points: v 
-  //     }), d => `${d.dataset}/${d.roi}`).map(([key, val]) => ({ id: key, ...val }));
-  //   }, [murtyData, nsdData, ceilingData, roi, dataset, training]); // ✨ 确保监听 training
-
- 
+  // data processing
   const aggregatedPoints = useMemo(() => {
     if (!murtyData && !nsdData) return [];
     
@@ -113,7 +62,6 @@ const ScatterGapCeiling = ({ murtyData, nsdData, ceilingData, roi, dataset, trai
       }).filter(item => item !== null);
     };
 
-    // --- 第一步：汇总所有来源点 ---
     let all = [];
     if (training === "Murty185") {
       all = process(murtyData, "Murty185");
@@ -123,29 +71,19 @@ const ScatterGapCeiling = ({ murtyData, nsdData, ceilingData, roi, dataset, trai
       all = [...process(murtyData, "Murty185"), ...process(nsdData, "NSD1000")];
     }
 
-    // --- 第二步：组合过滤逻辑 (修复数组匹配问题) ---
-    // 确保处理的是数组
-    const selectedRegions = Array.isArray(roi) ? roi : [roi];
-    const selectedDatasets = Array.isArray(dataset) ? dataset : (dataset ? [dataset] : []);
+    
+    const selectedRegions = (Array.isArray(roi) ? roi : (roi ? [roi] : [])).filter(r => typeof r === 'string');
+    const selectedDatasets = (Array.isArray(dataset) ? dataset : (dataset ? [dataset] : [])).filter(ds => typeof ds === 'string');
 
-    // 判定是否为“全选”状态
     const isAllROI = selectedRegions.includes("Across Regions") || selectedRegions.length === 0;
     const isAllDS = selectedDatasets.length === 0;
 
     const filtered = all.filter(d => {
-      // 脑区匹配：如果是 "Across Regions" 则全选，否则必须在数组中
-      const roiMatch = isAllROI || 
-                       selectedRegions.some(r => r.toLowerCase() === d.roi.toLowerCase());
-
-      // 数据集匹配：如果数组为空则全选，否则必须在数组中
-      const dsMatch = isAllDS || 
-                      selectedDatasets.some(ds => ds.toLowerCase() === d.dataset.toLowerCase());
-
-      // 只有同时满足条件才显示（实现合并过滤）
+      const roiMatch = isAllROI || selectedRegions.some(r => r && r.toLowerCase() === d.roi.toLowerCase());
+      const dsMatch = isAllDS || selectedDatasets.some(ds => ds && ds.toLowerCase() === d.dataset.toLowerCase());
       return roiMatch && dsMatch;
     });
 
-    // --- 第三步：按 Dataset/ROI 聚合 ---
     return d3.rollups(filtered, v => ({
       ceiling_mean: d3.mean(v, d => d.ceiling) || 0,
       gap_mean: d3.mean(v, d => d.gap) || 0,
@@ -171,15 +109,23 @@ const ScatterGapCeiling = ({ murtyData, nsdData, ceilingData, roi, dataset, trai
     const x = d3.scaleLinear().domain([-0.4, 1.0]).range([0, mainSize]);
     const y = d3.scaleLinear().domain([0, 1.0]).range([mainSize, 0]);
 
-    // --- 图例 (动态堆叠) ---
+
+    const activeROIs = (Array.isArray(roi) ? roi : (roi ? [roi] : [])).filter(r => typeof r === 'string');
+    const isAllROIInLegend = activeROIs.includes("Across Regions") || activeROIs.length === 0;
+
+    const visibleROIs = Object.entries(roiColors).filter(([k]) => {
+      if (k === 'overall') return false;
+      return isAllROIInLegend || activeROIs.some(r => r && r.toLowerCase() === k.toLowerCase());
+    });
+
     const rowHeight = 18;
-    const visibleROIs = Object.entries(roiColors).filter(([k]) => k !== 'overall' && (roi === "Across Regions" || !roi || k === roi.toLowerCase()));
     const legendG = svg.append("g").attr("transform", `translate(20, 20)`);
     visibleROIs.forEach(([k, c], i) => {
       const row = legendG.append("g").attr("transform", `translate(0, ${i * rowHeight})`);
       row.append("circle").attr("r", 5).attr("fill", c);
       row.append("text").attr("x", 12).attr("y", 4).style("font-size", "10px").style("font-weight", "600").text(k.toUpperCase());
     });
+
     const shapeLegend = legendG.append("g").attr("transform", `translate(0, ${visibleROIs.length * rowHeight + 15})`);
     Object.entries(datasetTypeLabels).forEach(([t, l], i) => {
       const row = shapeLegend.append("g").attr("transform", `translate(0, ${i * rowHeight})`);
@@ -188,7 +134,7 @@ const ScatterGapCeiling = ({ murtyData, nsdData, ceilingData, roi, dataset, trai
       row.append("text").attr("x", 12).attr("y", 4).style("font-size", "10px").text(l);
     });
 
-    // --- 绘图区 ---
+    //drawing
     const g = svg.append("g").attr("transform", `translate(${margin.left + centerXOffset},${margin.top})`);
     g.append("g").attr("transform", `translate(0,${mainSize})`).call(d3.axisBottom(x).ticks(6));
     g.append("g").call(d3.axisLeft(y).ticks(6));
@@ -197,7 +143,6 @@ const ScatterGapCeiling = ({ murtyData, nsdData, ceilingData, roi, dataset, trai
     const activeInfo = hoveredData || selectedPoint;
     const hoverLayer = g.append("g").attr("class", "hover-layer");
 
-    // 绘制背景点 (Hover/Select 时变淡)
     g.selectAll(".agg-dot")
       .data(aggregatedPoints)
       .enter()
@@ -213,12 +158,10 @@ const ScatterGapCeiling = ({ murtyData, nsdData, ceilingData, roi, dataset, trai
       .on("mouseout", () => setHoveredData(null))
       .on("click", (e, d) => setSelectedPoint(d.id === selectedPoint?.id ? null : d));
 
-    // --- ✨ 绘制激活层 (横线 + 裂变) ---
     if (activeInfo) {
       const color = roiColors[activeInfo.id.split("/")[1]] || "#999";
       const cy = y(activeInfo.gap_mean);
 
-      // 1. ✨ Ceiling Variability 横线 (带安全检查)
       if (activeInfo.cRange && activeInfo.cRange.length >= 2) {
         hoverLayer.append("line")
           .attr("x1", x(activeInfo.cRange[0]))
@@ -231,7 +174,6 @@ const ScatterGapCeiling = ({ murtyData, nsdData, ceilingData, roi, dataset, trai
           .attr("stroke-linecap", "round");
       }
 
-      // 2. 裂变子点
       activeInfo.points.forEach((pt, i) => {
         const px = x(pt.ceiling);
         const py = y(pt.gap);
@@ -243,9 +185,6 @@ const ScatterGapCeiling = ({ murtyData, nsdData, ceilingData, roi, dataset, trai
           .attr("fill", color)
           .attr("stroke", "black")
           .attr("stroke-width", 1.5)
-          .attr("opacity", 0)
-          .transition()
-        
           .attr("opacity", 0.9);
 
         hoverLayer.append("text")
@@ -257,7 +196,6 @@ const ScatterGapCeiling = ({ murtyData, nsdData, ceilingData, roi, dataset, trai
     }
   }, [dimensions, aggregatedPoints, roi, hoveredData, selectedPoint]);
 
-  // Sidebar 数据源判断
   const displayInfo = hoveredData || selectedPoint;
 
   return (
@@ -267,7 +205,6 @@ const ScatterGapCeiling = ({ murtyData, nsdData, ceilingData, roi, dataset, trai
         <h5 style={{ margin: 0, fontSize: "14px", color: "#333", borderBottom: "2px solid #1890ff", paddingBottom: "8px" }}>ROI/Dataset Insight</h5>
         {displayInfo ? (
           <div style={{ fontSize: "12px", display: "flex", flexDirection: "column", gap: "12px" }}>
-             {/* 此处保持之前的 Sidebar UI 内容不变 ... */}
              <div style={{ background: "#f0f7ff", padding: "10px", borderRadius: "6px" }}>
               <div style={{ fontWeight: "bold", color: "#0050b3" }}>{datasetLabelMap[displayInfo.id.split("/")[0]] || displayInfo.id.split("/")[0]}</div>
               <div style={{ color: "#555", textTransform: "uppercase", fontSize: "10px" }}>Region: {displayInfo.id.split("/")[1]}</div>

@@ -557,10 +557,8 @@ return (
                     nsdData={ROI_DATASET_NSD} 
                     murtyData={ROI_DATASET_Murty} 
                     ceilingData={Ceiling} 
-                    // 确保 region[0] 存在，否则传空字符串
-                    roi={region[0]} 
-                    // 散点图通常显示所有数据集，如果只想看选中的，传 dataset[0]
-                    dataset={dataset[0]} 
+                    roi={region} 
+                    dataset={dataset} 
                     training={training}
                   />
                 )}
