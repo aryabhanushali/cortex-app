@@ -14,9 +14,6 @@ import BarChartDetail from './barchartdetail.jsx';
 import BarChartOverview from './barchartoverview.jsx';
 import QuestionSelect from './questionselect.jsx';
 import ScatterGapCeiling from './roiDatasetScatter.jsx';
-
-
-
 import useLoadDataNew from './loadDataNew.jsx';
 
 const { Title } = Typography;
@@ -41,7 +38,18 @@ const ScoreboardPageNew: React.FC = () => {
   
 
   const isVS = pageView === '2' && activeQuestion === 'q1';
+  const isDatsetROI = pageView === '2' && activeQuestion === 'q2';
   console.log("Parent - pageView:", pageView, "activeQuestion:", activeQuestion, "isVS:", isVS);
+
+  useEffect(() => {
+  console.log("=== Current Filter Selection ===");
+  console.log("Training Source:", training);
+  console.log("Selected Regions (ROI):", region);
+  console.log("Selected Datasets:", dataset);
+  console.log("Active Question:", activeQuestion);
+  console.log("Page View:", pageView);
+  console.log("===============================");
+}, [training, region, dataset, activeQuestion, pageView]);
 
   const [expandedStates, setExpandedStates] = useState({
     training: false,
@@ -477,11 +485,6 @@ return (
         )}
          
       
-         
-            
-
-
-
             {/* chart 2: Detail */}
            
             <div
@@ -555,9 +558,9 @@ return (
                     murtyData={ROI_DATASET_Murty} 
                     ceilingData={Ceiling} 
                     // 确保 region[0] 存在，否则传空字符串
-                    roi={""} 
+                    roi={region[0]} 
                     // 散点图通常显示所有数据集，如果只想看选中的，传 dataset[0]
-                    dataset={""} 
+                    dataset={dataset[0]} 
                     training={training}
                   />
                 )}

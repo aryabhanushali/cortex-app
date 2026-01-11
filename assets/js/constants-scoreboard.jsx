@@ -2,9 +2,7 @@
 export const UNAVAILABILITY = {
   trainingToDataset: {
     NSD:['nsd1000' ],   
-    Murty185: ['murty185'], 
-   
-   
+    Murty185: ['murty185']
   },
 
   datasetToTraining: {
@@ -22,8 +20,6 @@ export const UNAVAILABILITY = {
     eba: ["bold_5000", "bonner_2021","wardle_2020"],
   },
 };
-
-
 
 export const MODEL_OPTIONS = [
   { value: 'adversarial_inceptionv3', label: 'Adv. Inception-v3' },
@@ -174,10 +170,14 @@ export const MODEL_OPTIONS = [
 
   
 export const TRAINING_OPTIONS = [
-   { value: 'NSD', label: 'NSD' },
+  { value: 'NSD', label: 'NSD' },
   { value: 'Murty185', label: 'Murty185' },
-  // { value: 'Murty185 VS NSD1000', label: 'Murty185 VS NSD1000'},
- 
+  // { value: 'Murty185 VS NSD1000', label: 'Murty185 VS NSD1000'}
+];
+export const TRAINING_OPTIONS_ALL = [
+  { value: 'NSD', label: 'NSD' },
+  { value: 'Murty185', label: 'Murty185' },
+  { value: 'Murty185 and NSD1000', label: 'Murty185 and NSD1000'}
 ];
 
 
