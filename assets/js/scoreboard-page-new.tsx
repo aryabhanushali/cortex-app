@@ -89,13 +89,16 @@ const ScoreboardPageNew: React.FC = () => {
   useEffect(() => {
   if (isVS) {
     setTraining('Murty185 VS NSD1000');
+  }
+  else if (isDatasetROI) {
+    setTraining("")
   } else {
     
-    if (training === 'Murty185 VS NSD1000') {
+    if (training === 'Murty185 VS NSD1000' || training === "") {
       setTraining('NSD');
     }
   }
-}, [isVS]);
+}, [isVS, isDatasetROI]);
 
   // pageview logic
   useEffect(() => {
