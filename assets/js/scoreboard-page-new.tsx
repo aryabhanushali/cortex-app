@@ -38,8 +38,10 @@ const ScoreboardPageNew: React.FC = () => {
  
   const isDatasetDetailMode = pageView === 'rank' && dataset.length > 0 && !region.includes('Across Regions');
   const [activeQuestion, setActiveQuestion] = useState('q1');
+  
 
   const isVS = pageView === '2' && activeQuestion === 'q1';
+  console.log("Parent - pageView:", pageView, "activeQuestion:", activeQuestion, "isVS:", isVS);
 
   const [expandedStates, setExpandedStates] = useState({
     training: false,
@@ -316,7 +318,9 @@ return (
               training={training}
               expanded={expandedStates.region} // read property
               onToggle={handleTogglePanel('region')}
+              isVS = {isVS}
             />
+
             <DatasetSelectNew
               dataset={dataset}
               setDataset={setDataset}

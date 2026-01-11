@@ -12,7 +12,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { ROI_OPTIONS } from './constants-scoreboard';
 
-const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mode, training,expanded, onToggle }) => {
+const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mode, training,expanded, onToggle, isVS }) => {
   // button logic group
   const ACROSS_VAL = 'Across Regions';
   const SPECIFIC_ROIS = ['ppa', 'ffa', 'eba'];
@@ -71,6 +71,10 @@ const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mod
       const isSelected = current.includes(value);
       
       let nextState = [];
+
+      if (isVS) {
+        return [value]; 
+      }
 
       // 
       if (value === ACROSS_VAL) {
