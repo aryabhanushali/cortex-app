@@ -162,9 +162,21 @@ const ScoreboardPageNew: React.FC = () => {
     (Array.isArray(region) && region.length > 0);
 
   const clearFilters = () => {
-    setTraining('NSD');
-    setRegion(['Across Regions']);
-    setDataset([]);
+    if (isVS) {
+      setTraining('Murty185 VS NSD1000');
+      setRegion(['Across Regions']);
+      setDataset([]);
+    } else if(isDatasetROI) {
+      setTraining('');
+      setRegion(['Across Regions']);
+      setDataset([]);
+    } else {
+      setTraining('NSD');
+      setRegion(['Across Regions']);
+      setDataset([]);
+
+    }
+    
   };
 
   const clearSingle = (key: string, value: string) => {
