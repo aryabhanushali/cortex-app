@@ -38,8 +38,9 @@ const ScoreboardPageNew: React.FC = () => {
   
 
   const isVS = pageView === '2' && activeQuestion === 'q1';
-  const isDatsetROI = pageView === '2' && activeQuestion === 'q2';
+  const isDatasetROI = pageView === '2' && activeQuestion === 'q2';
   console.log("Parent - pageView:", pageView, "activeQuestion:", activeQuestion, "isVS:", isVS);
+  console.log("Parent - pageView:", pageView, "activeQuestion:", activeQuestion, "isDasetROI:", isDatasetROI);
 
   useEffect(() => {
   console.log("=== Current Filter Selection ===");
@@ -102,16 +103,16 @@ const ScoreboardPageNew: React.FC = () => {
       // 1. rank (Scoreboard)
       setTraining('NSD'); 
     } 
-    else if (pageView === '2') {
+    else if (isVS) {
       // 2.  2 (Comparison)
       // force to comparison
       setTraining('Murty185 VS NSD1000'); 
     } 
-    // else if (pageView === '3') {
-    //   // 3. 
+    else if (isDatasetROI) {
+      // 3. 
  
-    //   setTraining('NSD'); 
-    // }
+      setTraining(''); 
+    }
   }, [pageView]);
 
 
@@ -516,8 +517,11 @@ return (
                   ? `Performance On Specific Dataset Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'} `
                   : (training === 'Murty185 VS NSD1000' 
                       ? 'Murty185 vs NSD1000 Performance Comparison' 
+                  : (isDatasetROI)
+                      ? `Model Performance Gap to Ceiling vs Ceiling (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`
                   : (region.includes("Across Regions")) 
                       ? `${region[0]?.toUpperCase()} Performance (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`
+                  
                 
                   : `Performance  on Specific Region (Trained on ${training === 'NSD' ? 'NSD1000' : 'Murty185'})`)
                 }
