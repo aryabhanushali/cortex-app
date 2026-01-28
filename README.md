@@ -1,6 +1,6 @@
 # cortex-app
 
-fontend for the cortex app
+Fontend for the cortex app
 
 Dev setup:
 
@@ -9,3 +9,4 @@ Dev setup:
 
 
 To update backend url, change the url here: [`assets/js/services/config.js`](https://github.com/murtylab/cortex-app/blob/demo/assets/js/services/config.js)
+
