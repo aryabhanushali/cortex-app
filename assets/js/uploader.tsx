@@ -114,11 +114,11 @@
 
 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../css/main.css";
 import { InboxOutlined } from "@ant-design/icons";
 import type { UploadProps, UploadFile } from "antd";
-import { Upload, Progress, message } from "antd";
+import { Upload, Progress, message, Button, Space } from "antd";
 
 // --- WebKit directory drop type defs (needed for TS) ---
 interface FileSystemEntry {
@@ -127,19 +127,15 @@ interface FileSystemEntry {
   name: string;
   fullPath: string;
 }
-
 interface FileSystemFileEntry extends FileSystemEntry {
   file: (successCallback: (file: File) => void) => void;
 }
-
 interface FileSystemDirectoryEntry extends FileSystemEntry {
   createReader: () => FileSystemDirectoryReader;
 }
-
 interface FileSystemDirectoryReader {
   readEntries: (successCallback: (entries: FileSystemEntry[]) => void) => void;
 }
-// Use a clean union for entries
 type AnyEntry = FileSystemFileEntry | FileSystemDirectoryEntry;
 
 const { Dragger } = Upload;
@@ -149,20 +145,15 @@ interface UploaderProps {
   onFileMappingsUpdate: (fileMappings: { blobURL: string; file: File }[]) => void;
 }
 
-// Recursively traverse a FileSystemEntry (folder or file) and return all Files.
-// Also attaches a webkitRelativePath so you can preserve folder structure if needed.
 async function traverseEntry(entry: AnyEntry): Promise<File[]> {
-  // If it's a file entry
   if ("file" in entry) {
     const file: File = await new Promise((resolve) =>
       (entry as FileSystemFileEntry).file(resolve)
     );
-    // Attach relative path for later use (UI or server)
     (file as any).webkitRelativePath = entry.fullPath.replace(/^\//, "");
     return [file];
   }
 
-  // If it's a directory entry
   if ("createReader" in entry) {
     const dirReader = (entry as FileSystemDirectoryEntry).createReader();
     const entries: AnyEntry[] = await new Promise((resolve) => {
@@ -182,11 +173,9 @@ async function traverseEntry(entry: AnyEntry): Promise<File[]> {
     return nested.flat();
   }
 
-  // If not a file or directory, return empty
   return [];
 }
 
-// Utility to dedupe files if user drops/chooses same folder(s) multiple times
 function dedupeFiles(files: File[]) {
   const seen = new Set<string>();
   const out: File[] = [];
@@ -205,11 +194,11 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
   const [localFileMappings, setLocalFileMappings] = useState<{ blobURL: string; file: File }[]>([]);
   const [completedCount, setCompletedCount] = useState(0);
 
-  // Calculate overall progress
+  const folderInputRef = useRef<HTMLInputElement | null>(null);
+
   const totalFiles = fileList.length;
   const progressPercent = totalFiles > 0 ? Math.round((completedCount / totalFiles) * 100) : 0;
 
-  // Trigger parent callbacks when file mappings update
   useEffect(() => {
     const timerId = setTimeout(() => {
       onFilesUploaded(localFileMappings);
@@ -219,125 +208,90 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
     return () => clearTimeout(timerId);
   }, [localFileMappings, onFilesUploaded, onFileMappingsUpdate]);
 
-  // Simulated upload process
   const simulateUpload = (uploadFile: UploadFile) => {
     uploadFile.status = "uploading";
 
     setTimeout(() => {
       uploadFile.status = "done";
-      setFileList((prev) => [...prev]); // Trigger re-render
+      setFileList((prev) => [...prev]); // trigger re-render
       setCompletedCount((prev) => prev + 1);
       message.success(`${uploadFile.name} uploaded successfully!`);
-    }, 1000);
+    }, 700);
+  };
+
+  // ✅ One shared pipeline for ALL sources (file picker, folder picker, drag-drop)
+  const addFiles = (incoming: File[], sourceLabel?: string) => {
+    if (!incoming.length) return;
+
+    // Filter images
+    const images = incoming.filter((f) => f.type?.startsWith("image/"));
+    if (!images.length) {
+      message.warning("No image files found.");
+      return;
+    }
+
+    // Dedupe against *existing* + within incoming
+    const existingFiles = localFileMappings.map((m) => m.file);
+    const unique = dedupeFiles([...existingFiles, ...images]).slice(existingFiles.length);
+
+    if (!unique.length) {
+      message.info("No new images to add (already added).");
+      return;
+    }
+
+    unique.forEach((file) => {
+      const blobURL = URL.createObjectURL(file);
+      const newFile: UploadFile = {
+        uid: String(Date.now() + Math.random()),
+        name: file.name,
+        status: "uploading",
+        originFileObj: file,
+      };
+
+      setFileList((prev) => [...prev, newFile]);
+      setLocalFileMappings((prev) => [...prev, { blobURL, file }]);
+      simulateUpload(newFile);
+    });
+
+    if (sourceLabel) message.success(`Added ${unique.length} image(s) from ${sourceLabel}.`);
   };
 
   const props: UploadProps = {
     name: "file",
     multiple: true,
-    maxCount: 5000,        // allow big folders
-    directory: true,       // enables picking a folder via dialog
-    accept: "image/*",     // filter in the picker; we'll also check on drop
+    maxCount: 5000,
+    // ✅ IMPORTANT: set directory=false so Chrome click picker supports subset upload
+    directory: false,
+    accept: "image/*",
 
-    // Picker path (unchanged: one folder per selection, but can repeat)
+    // Picker path (now: normal file picker, subset selection works in Chrome)
     beforeUpload: (file) => {
-      // Skip any non-image just in case
-      if (!file.type.startsWith("image/")) {
-        message.warning(`${file.name} skipped (not an image)`);
-        return Upload.LIST_IGNORE;
-      }
-
-      const blobURL = URL.createObjectURL(file as File);
-
-      const newFile: UploadFile = {
-        uid: (file as any).uid || String(Date.now() + Math.random()),
-        name: file.name,
-        status: "uploading",
-        originFileObj: file as File,
-      };
-
-      setFileList((prev) => [...prev, newFile]);
-      setLocalFileMappings((prev) => [...prev, { blobURL, file: file as File }]);
-      simulateUpload(newFile);
-
-      return false; // prevent auto upload
+      // Antd calls beforeUpload per file; we’ll just use addFiles for consistency
+      addFiles([file as File], "file picker");
+      return false;
     },
 
-    // Drag-and-drop path (supports multiple folders at once)
-    async onDrop(e: React.DragEvent<HTMLDivElement>): Promise<void> {
+    // Drag-and-drop path (folders or files)
+    async onDrop(e: React.DragEvent<HTMLDivElement>) {
       e.preventDefault();
-      // Some browsers put directories only in dataTransfer.items (not files)
-      const items = Array.from(e.dataTransfer.items || []);
 
-      // Try to get FileSystemEntries (folders/files) from items
+      const items = Array.from(e.dataTransfer.items || []);
       const entries: AnyEntry[] = items
         .map((i: any) => i.webkitGetAsEntry?.())
         .filter(Boolean);
 
       if (!entries.length) {
-        // fallback: plain files drop (no directories)
+        // fallback: plain files drop
         const directFiles = Array.from(e.dataTransfer.files || []) as File[];
-        if (!directFiles.length) return;
-
-        const images = directFiles.filter(f => f.type.startsWith("image/"));
-        if (!images.length) {
-          message.warning("No image files found in the drop.");
-          return;
-        }
-
-        // Push through the same pipeline
-        images.forEach((file) => {
-          const blobURL = URL.createObjectURL(file);
-          const newFile: UploadFile = {
-            uid: String(Date.now() + Math.random()),
-            name: file.name,
-            status: "uploading",
-            originFileObj: file,
-          };
-
-          setFileList((prev) => [...prev, newFile]);
-          setLocalFileMappings((prev) => [...prev, { blobURL, file }]);
-          simulateUpload(newFile);
-        });
-
+        addFiles(directFiles, "drop");
         return;
       }
 
-      // We have folders and/or files as entries — traverse recursively
       const nestedFiles = (await Promise.all(entries.map(traverseEntry))).flat();
-
-      // Filter to images only
-      const imageFiles = nestedFiles.filter(f => f.type.startsWith("image/"));
-
-      if (!imageFiles.length) {
-        message.warning("No image files found in the dropped folder(s).");
-        return;
-      }
-
-      // Optional: dedupe across repeated drops
-      const uniqueImages = dedupeFiles(imageFiles);
-
-      // Add to UI + mappings
-      uniqueImages.forEach((file) => {
-        const blobURL = URL.createObjectURL(file);
-        const newFile: UploadFile = {
-          uid: String(Date.now() + Math.random()),
-          name: file.name,
-          status: "uploading",
-          originFileObj: file,
-        };
-
-        setFileList((prev) => [...prev, newFile]);
-        setLocalFileMappings((prev) => [...prev, { blobURL, file }]);
-        simulateUpload(newFile);
-      });
-
-      message.success(`Added ${uniqueImages.length} image(s) from dropped folder(s).`);
+      addFiles(nestedFiles, "dropped folder(s)");
     },
 
-    // (Optional) improves drop behavior in some contexts; Dragger already handles preventDefault internally
-    onDragOver: (e) => {
-      e.preventDefault();
-    },
+    onDragOver: (e) => e.preventDefault(),
 
     onRemove: (file) => {
       setFileList((prevList) => {
@@ -348,7 +302,6 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
         return prevList.filter((f) => f.uid !== file.uid);
       });
 
-      // Revoke the blob URL for the removed file
       setLocalFileMappings((prevMappings) =>
         prevMappings.filter((m) => {
           const isMatch = m.file === file.originFileObj;
@@ -363,24 +316,54 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
 
   useEffect(() => {
     return () => {
-      // cleanup all blob URLs on unmount
       localFileMappings.forEach((m) => {
-        try { URL.revokeObjectURL(m.blobURL); } catch {}
+        try {
+          URL.revokeObjectURL(m.blobURL);
+        } catch {}
       });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // ← no deps
+  }, []);
 
+  const onPickFolder = () => folderInputRef.current?.click();
 
+  const onFolderChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const files = Array.from(e.target.files || []) as File[];
+    addFiles(files, "folder picker");
+    // reset value so picking the same folder again still triggers change
+    e.target.value = "";
+  };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {/* Folder picker control (Chrome needs this to enable folder selection) */}
+      <Space size={8} style={{ justifyContent: "flex-end" }}>
+        <Button size="small" onClick={onPickFolder}>
+          Select folder
+        </Button>
+        <input
+          ref={folderInputRef}
+          type="file"
+          multiple
+          // vendor attribute: works in Chrome/Safari
+          webkitdirectory="true"
+          // helps some browsers treat as directory input
+          // @ts-ignore
+          directory=""
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={onFolderChange}
+        />
+      </Space>
+
       <Dragger {...props} fileList={fileList} showUploadList={false}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
         </p>
-        <p className="ant-upload-text">Click or drag file to this area to upload</p>
-        <p className="ant-upload-hint">Upload one or more .jpg/png files</p>
+        <p className="ant-upload-text">Click or drag files/folders here to upload</p>
+        <p className="ant-upload-hint">
+          Click to select images (subset supported). Use “Select folder” to upload a whole folder.
+        </p>
       </Dragger>
 
       <Progress
@@ -395,3 +378,4 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
 };
 
 export default Uploader;
+
