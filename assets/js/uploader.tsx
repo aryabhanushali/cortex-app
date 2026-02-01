@@ -137,7 +137,7 @@ interface FileSystemDirectoryReader {
 type AnyEntry = FileSystemFileEntry | FileSystemDirectoryEntry;
 
 const { Dragger } = Upload;
-const { Text } = Typography;
+const { Text, Link } = Typography;
 
 interface UploaderProps {
   onFilesUploaded: (files: { blobURL: string; file: File }[]) => void;
@@ -178,6 +178,7 @@ async function traverseEntry(entry: AnyEntry): Promise<File[]> {
 // ✅ Stable key for dedupe across picker/drop/folder
 function fileKey(f: File) {
   const rel = (f as any).webkitRelativePath || "";
+  // include rel path when present so same-name files in different subfolders don’t collide
   return `${rel}::${f.name}::${f.size}::${f.lastModified}`;
 }
 
@@ -215,6 +216,7 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
     (incoming: File[], sourceLabel?: string) => {
       if (!incoming.length) return;
 
+      // Filter images only (also handles unknown type by checking extension fallback if you want)
       const images = incoming.filter((f) => f.type?.startsWith("image/"));
       if (!images.length) {
         message.warning("No image files found.");
@@ -223,6 +225,7 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
 
       const existingKeys = new Set(localFileMappings.map((m) => fileKey(m.file)));
 
+      // Keep only truly new files
       const uniqueNew = images.filter((f) => {
         const k = fileKey(f);
         if (existingKeys.has(k)) return false;
@@ -249,7 +252,9 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
         simulateUpload(newFile);
       });
 
-      if (sourceLabel) message.success(`Added ${uniqueNew.length} image(s) from ${sourceLabel}.`);
+      if (sourceLabel) {
+        message.success(`Added ${uniqueNew.length} image(s) from ${sourceLabel}.`);
+      }
     },
     [localFileMappings]
   );
@@ -258,14 +263,18 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
     name: "file",
     multiple: true,
     maxCount: 5000,
-    directory: false, // click = file picker (subset supported)
+
+    // Click picker = files/subset (Chrome & Safari)
+    directory: false,
     accept: "image/*",
 
     beforeUpload: (file) => {
+      // antd calls per file
       addFiles([file as File], "file picker");
       return false;
     },
 
+    // Drag & drop path (folders or files)
     async onDrop(e: React.DragEvent<HTMLDivElement>) {
       e.preventDefault();
 
@@ -323,18 +332,11 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
   const onFolderChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const files = Array.from(e.target.files || []) as File[];
     addFiles(files, "folder picker");
-    e.target.value = "";
-  };
-
-  const onFolderTileKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      openFolderPicker();
-    }
+    e.target.value = ""; // allow picking same folder again
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
       {/* hidden folder input */}
       <input
         ref={folderInputRef}
@@ -349,53 +351,34 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
         onChange={onFolderChange}
       />
 
-      {/* Main Dragger */}
       <Dragger {...props} fileList={fileList} showUploadList={false}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
         </p>
-        <p className="ant-upload-text">Click or drag files/folders here to upload</p>
-        <p className="ant-upload-hint">
-          <Text type="secondary">Click to select images (subset supported).</Text>
-          <br />
-          <Text type="secondary">Drag &amp; drop files or folders here.</Text>
-        </p>
-      </Dragger>
 
-      {/* Folder tile (consistent, not a plain button) */}
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={openFolderPicker}
-        onKeyDown={onFolderTileKeyDown}
-        style={{
-          border: "1px dashed #d9d9d9",
-          borderRadius: 8,
-          padding: "12px 14px",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          background: "#fafafa",
-          userSelect: "none",
-        }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLDivElement).style.borderColor = "#1677ff";
-          (e.currentTarget as HTMLDivElement).style.background = "rgba(22, 119, 255, 0.06)";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLDivElement).style.borderColor = "#d9d9d9";
-          (e.currentTarget as HTMLDivElement).style.background = "#fafafa";
-        }}
-      >
-        <FolderOpenOutlined style={{ fontSize: 18, color: "#1677ff" }} />
-        <div style={{ lineHeight: 1.25 }}>
-          <div style={{ fontWeight: 600 }}>Upload a folder</div>
-          <div style={{ color: "#8c8c8c", fontSize: 12 }}>
-            Upload everything inside the folder (you can repeat to add multiple folders).
-          </div>
+        <p className="ant-upload-text">Drag files to upload</p>
+
+        <div className="ant-upload-hint" style={{ lineHeight: 1.6 }}>
+          <br />
+
+          <Text type="secondary">
+            Or{" "}
+            <Link
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation(); // prevent triggering Dragger click
+                openFolderPicker();
+              }}
+              style={{ fontWeight: 500 }}
+            >
+              <FolderOpenOutlined style={{ marginRight: 6 }} />
+              choose a whole folder here
+            </Link>{" "}
+            to upload everything inside.
+          </Text>
+          <br />
         </div>
-      </div>
+      </Dragger>
 
       <Progress
         className="progress-bar"
