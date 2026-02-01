@@ -356,7 +356,7 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
           <InboxOutlined />
         </p>
 
-        <p className="ant-upload-text">Drag files to upload</p>
+        <p className="ant-upload-text">Click or Drag files to upload</p>
 
         <div className="ant-upload-hint" style={{ lineHeight: 1.6 }}>
           <br />
