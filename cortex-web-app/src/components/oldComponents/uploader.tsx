@@ -1,179 +1,189 @@
-'use client'
-import React, { useState, useEffect } from "react";
+'use client';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface UploaderProps {
   onFilesUploaded: (files: { blobURL: string; file: File }[]) => void;
   onFileMappingsUpdate: (fileMappings: { blobURL: string; file: File }[]) => void;
 }
 
-const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpdate }) => {
+const Uploader: React.FC<UploaderProps> = ({
+  onFilesUploaded,
+  onFileMappingsUpdate,
+}) => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
   const [fileList, setFileList] = useState<File[]>([]);
-  const [localFileMappings, setLocalFileMappings] = useState<{ blobURL: string; file: File }[]>([]);
+  const [localFileMappings, setLocalFileMappings] = useState<
+    { blobURL: string; file: File }[]
+  >([]);
   const [completedCount, setCompletedCount] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Calculate overall progress
   const totalFiles = fileList.length;
-  const progressPercent = totalFiles > 0 ? Math.round((completedCount / totalFiles) * 100) : 0;
+  const progressPercent =
+    totalFiles > 0 ? Math.round((completedCount / totalFiles) * 100) : 0;
 
-  // Trigger parent callbacks when file mappings update
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      onFilesUploaded(localFileMappings);
-      onFileMappingsUpdate(localFileMappings);
-    }, 0);
-
-    return () => clearTimeout(timerId);
+    onFilesUploaded(localFileMappings);
+    onFileMappingsUpdate(localFileMappings);
   }, [localFileMappings, onFilesUploaded, onFileMappingsUpdate]);
 
-  // Simulated upload process
   const simulateUpload = (file: File) => {
     setTimeout(() => {
       setCompletedCount((prev) => prev + 1);
-      // Show success message
-      const alertElement = document.createElement('div');
-      alertElement.className = 'alert alert-success alert-dismissible fade show';
-      alertElement.innerHTML = `
+
+      const alert = document.createElement('div');
+      alert.className = 'alert alert-success alert-dismissible fade show';
+      alert.innerHTML = `
         ${file.name} uploaded successfully!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       `;
-      
+
       const container = document.getElementById('upload-alerts');
       if (container) {
-        container.appendChild(alertElement);
+        container.appendChild(alert);
         setTimeout(() => {
-          alertElement.classList.remove('show');
-          setTimeout(() => container.removeChild(alertElement), 300);
+          alert.classList.remove('show');
+          setTimeout(() => container.removeChild(alert), 300);
         }, 3000);
       }
     }, 1000);
   };
 
+  const processFiles = (files: File[]) => {
+    files.forEach((file) => {
+      const ext = file.name.split('.').pop()?.toLowerCase();
+
+      const isImage =
+        file.type.startsWith('image/') || ext === 'bmp';
+
+      if (!isImage) return;
+
+      const blobURL = URL.createObjectURL(file);
+
+      setFileList((prev) => [...prev, file]);
+      setLocalFileMappings((prev) => [...prev, { blobURL, file }]);
+
+      simulateUpload(file);
+    });
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-      processFiles(newFiles);
+      processFiles(Array.from(e.target.files));
+      // Important for Chrome: allow re-selecting same file
+      e.target.value = '';
     }
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
   };
 
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     if (e.dataTransfer.files) {
-      const newFiles = Array.from(e.dataTransfer.files);
-      processFiles(newFiles);
+      processFiles(Array.from(e.dataTransfer.files));
     }
   };
 
-  const processFiles = (newFiles: File[]) => {
-    newFiles.forEach(file => {
-      if (file.type.match('image.*')) {
-        const blobURL = URL.createObjectURL(file);
-        
-        setFileList(prevList => [...prevList, file]);
-        setLocalFileMappings(prevMappings => [
-          ...prevMappings,
-          { blobURL, file }
-        ]);
-        
-        simulateUpload(file);
-      }
-    });
-  };
-
   const removeFile = (fileName: string) => {
-    setFileList(prevList => {
-      const newList = prevList.filter(f => f.name !== fileName);
-      if (prevList.length !== newList.length) {
-        setCompletedCount(prev => (prev > 0 ? prev - 1 : 0));
-      }
-      return newList;
-    });
-
-    setLocalFileMappings(prevMappings =>
-      prevMappings.filter(f => f.file.name !== fileName)
+    setFileList((prev) => prev.filter((f) => f.name !== fileName));
+    setLocalFileMappings((prev) =>
+      prev.filter((f) => f.file.name !== fileName)
     );
+    setCompletedCount((prev) => (prev > 0 ? prev - 1 : 0));
   };
 
   return (
     <div className="d-flex flex-column gap-2">
-      <div 
+      <label
+        htmlFor="file-upload"
         className={`card p-4 text-center ${isDragging ? 'bg-light' : ''}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        style={{ 
+        style={{
           border: isDragging ? '2px dashed #0d6efd' : '2px dashed #dee2e6',
           cursor: 'pointer',
-          transition: 'all 0.2s ease'
+          transition: 'all 0.2s ease',
         }}
-        onClick={() => document.getElementById('file-upload')?.click()}
       >
         <div className="mb-3">
-          <i className="bi bi-cloud-arrow-up" style={{ fontSize: '2rem', color: '#0d6efd' }}></i>
+          <i
+            className="bi bi-cloud-arrow-up"
+            style={{ fontSize: '2rem', color: '#0d6efd' }}
+          />
         </div>
-        <p className="mb-1 fw-bold">Click or drag files to this area to upload</p>
-        <p className="text-muted small">Upload one or more .jpg/png files</p>
-        <input 
-          id="file-upload" 
-          type="file" 
-          multiple 
-          accept="image/jpeg,image/png" 
+        <p className="mb-1 fw-bold">Click or drag files to upload</p>
+        <p className="text-muted small">JPEG / PNG images</p>
+
+        <input
+          ref={inputRef}
+          id="file-upload"
+          type="file"
+          multiple
+          accept="image/jpeg,image/png,image/bmp,.bmp"
           className="d-none"
           onChange={handleFileChange}
         />
-      </div>
+      </label>
 
       {totalFiles > 0 && (
         <div className="progress mt-2" style={{ height: '20px' }}>
-          <div 
-            className={`progress-bar progress-bar-striped ${progressPercent < 100 ? 'progress-bar-animated' : ''}`}
-            role="progressbar" 
+          <div
+            className={`progress-bar progress-bar-striped ${
+              progressPercent < 100 ? 'progress-bar-animated' : ''
+            }`}
             style={{ width: `${progressPercent}%` }}
-            aria-valuenow={progressPercent} 
-            aria-valuemin={0} 
-            aria-valuemax={100}
           >
             {progressPercent}%
           </div>
         </div>
       )}
 
-      <div id="upload-alerts" className="mt-2"></div>
+      <div id="upload-alerts" className="mt-2" />
 
       {localFileMappings.length > 0 && (
         <div className="mt-3">
-          <h6 className="mb-2">Uploaded Files ({localFileMappings.length})</h6>
+          <h6 className="mb-2">
+            Uploaded Files ({localFileMappings.length})
+          </h6>
           <div className="list-group">
             {localFileMappings.map((mapping, index) => (
-              <div key={index} className="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+              <div
+                key={index}
+                className="list-group-item d-flex justify-content-between align-items-center"
+              >
                 <div className="d-flex align-items-center">
-                  <img 
-                    src={mapping.blobURL} 
-                    alt={mapping.file.name} 
-                    style={{ width: '40px', height: '40px', objectFit: 'cover', marginRight: '10px' }} 
+                  <img
+                    src={mapping.blobURL}
+                    alt={mapping.file.name}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      objectFit: 'cover',
+                      marginRight: 10,
+                    }}
                   />
                   <span>{mapping.file.name}</span>
                 </div>
-                <button 
-                  className="btn btn-sm btn-outline-danger" 
+                <button
+                  className="btn btn-sm btn-outline-danger"
                   onClick={(e) => {
-                    e.stopPropagation();
+                    e.preventDefault();
                     removeFile(mapping.file.name);
                   }}
                 >
-                  <i className="bi bi-x"></i>
+                  <i className="bi bi-x" />
                 </button>
               </div>
             ))}
