@@ -112,7 +112,7 @@
 
 
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import "../css/main.css";
 import { InboxOutlined } from "@ant-design/icons";
 import type { UploadProps, UploadFile } from "antd";
@@ -143,7 +143,6 @@ interface UploaderProps {
   onFileMappingsUpdate: (fileMappings: { blobURL: string; file: File }[]) => void;
 }
 
-// Recursively traverse a FileSystemEntry (folder or file) and return all Files.
 async function traverseEntry(entry: AnyEntry): Promise<File[]> {
   if ("file" in entry) {
     const file: File = await new Promise((resolve) =>
@@ -193,6 +192,9 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
   const [localFileMappings, setLocalFileMappings] = useState<{ blobURL: string; file: File }[]>([]);
   const [completedCount, setCompletedCount] = useState(0);
 
+  // IMPORTANT: attach native listeners to this element
+  const dropRootRef = useRef<HTMLDivElement | null>(null);
+
   const totalFiles = fileList.length;
   const progressPercent = totalFiles > 0 ? Math.round((completedCount / totalFiles) * 100) : 0;
 
@@ -212,10 +214,10 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
       setFileList((prev) => [...prev]);
       setCompletedCount((prev) => prev + 1);
       message.success(`${uploadFile.name} uploaded successfully!`);
-    }, 1000);
+    }, 800);
   };
 
-  // ✅ One pipeline
+  // Single pipeline to add files (picker or drop)
   const addFiles = useCallback(
     (incoming: File[], toast?: string) => {
       if (!incoming.length) return;
@@ -238,7 +240,6 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
 
       uniqueNew.forEach((file) => {
         const blobURL = URL.createObjectURL(file);
-
         const newFile: UploadFile = {
           uid: String(Date.now() + Math.random()),
           name: file.name,
@@ -256,66 +257,92 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
     [localFileMappings]
   );
 
-  /**
-   * ✅ IMPORTANT FIX:
-   * Handle folder drag-drop in CAPTURE phase so antd/rc-upload can't intercept it.
-   */
-  const handleDropCapture = useCallback(
-    async (e: React.DragEvent<HTMLDivElement>) => {
-      // Always prevent browser navigation/opening the dropped file
+  // Extract files from a native DataTransfer (supports folders via webkitGetAsEntry)
+  const extractDroppedFiles = useCallback(async (dt: DataTransfer): Promise<File[]> => {
+    const items = Array.from(dt.items || []);
+
+    // Try folder-aware entries first
+    const entries: AnyEntry[] = items
+      .map((i: any) => i.webkitGetAsEntry?.())
+      .filter(Boolean);
+
+    if (entries.length) {
+      const nested = (await Promise.all(entries.map(traverseEntry))).flat();
+      return nested;
+    }
+
+    // Fallback: plain files
+    return Array.from(dt.files || []) as File[];
+  }, []);
+
+  useEffect(() => {
+    // Prevent the browser from opening dropped files as a navigation
+    const preventWindowDrop = (e: DragEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener("dragover", preventWindowDrop, false);
+    window.addEventListener("drop", preventWindowDrop, false);
+
+    return () => {
+      window.removeEventListener("dragover", preventWindowDrop, false);
+      window.removeEventListener("drop", preventWindowDrop, false);
+    };
+  }, []);
+
+  useEffect(() => {
+    const el = dropRootRef.current;
+    if (!el) return;
+
+    const onDragOver = (e: DragEvent) => {
+      // MUST preventDefault to allow drop
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    const onDrop = async (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
       const dt = e.dataTransfer;
-      const items = Array.from(dt.items || []);
+      if (!dt) return;
 
-      // Try directory entries first (needed for true folder traversal)
-      const entries: AnyEntry[] = items
-        .map((i: any) => i.webkitGetAsEntry?.())
-        .filter(Boolean);
+      const allFiles = await extractDroppedFiles(dt);
+      if (!allFiles.length) return;
 
-      if (entries.length) {
-        const nestedFiles = (await Promise.all(entries.map(traverseEntry))).flat();
-        addFiles(nestedFiles, "Added {n} image(s) from dropped folder(s).");
-        return;
-      }
+      addFiles(allFiles, "Added {n} image(s) from drop.");
+    };
 
-      // Fallback: plain files (some browsers don’t expose entries)
-      const directFiles = Array.from(dt.files || []) as File[];
-      if (directFiles.length) {
-        addFiles(directFiles, "Added {n} image(s) from dropped file(s).");
-      }
-    },
-    [addFiles]
-  );
+    // 🔥 Native capture listeners: run before antd/rc-upload
+    el.addEventListener("dragover", onDragOver, { capture: true });
+    el.addEventListener("drop", onDrop, { capture: true });
 
-  const handleDragOverCapture = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
+    return () => {
+      el.removeEventListener("dragover", onDragOver, true as any);
+      el.removeEventListener("drop", onDrop, true as any);
+    };
+  }, [addFiles, extractDroppedFiles]);
 
   const props: UploadProps = {
     name: "file",
     multiple: true,
     maxCount: 5000,
 
-    // ✅ Option A: click opens file picker (subset supported in Chrome)
+    // Option A: click opens file picker (subset supported)
     directory: false,
     accept: "image/*",
 
+    // File picker path (antd calls this per-file)
     beforeUpload: (file) => {
       if (!file.type.startsWith("image/")) {
         message.warning(`${file.name} skipped (not an image)`);
         return Upload.LIST_IGNORE;
       }
-      // antd calls beforeUpload per file; push through our pipeline
       addFiles([file as File]);
       return false;
     },
 
-    // We intentionally DO NOT rely on antd's onDrop for folders anymore.
+    // We do not rely on antd's onDrop for folders; native listeners handle it.
     onDrop: (e) => {
-      // still prevent default just in case
       e.preventDefault();
     },
 
@@ -353,8 +380,7 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
 
   return (
     <div
-      onDropCapture={handleDropCapture}
-      onDragOverCapture={handleDragOverCapture}
+      ref={dropRootRef}
       style={{ display: "flex", flexDirection: "column", gap: "0px" }}
     >
       <Dragger {...props} fileList={fileList} showUploadList={false}>
@@ -363,8 +389,7 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
         </p>
         <p className="ant-upload-text">Click or drag files/folders here to upload</p>
         <p className="ant-upload-hint">
-          Click to select a subset of images. To upload a whole folder (or multiple folders), drag &amp;
-          drop folder(s) here.
+          Click to select a subset of images. To upload a folder (or multiple folders), drag &amp; drop folder(s) here.
         </p>
       </Dragger>
 
@@ -380,6 +405,7 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
 };
 
 export default Uploader;
+
 
 
 
