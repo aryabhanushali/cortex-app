@@ -43,7 +43,7 @@ function addOverall(content) {
   return { ...content, Overall: overall };
 }
 
-export default function useLoadDataNew() {
+export default function useLoadData() {
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(true);
 

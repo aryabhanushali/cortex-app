@@ -1,6 +1,6 @@
 import React from 'react';
 import { Select, Typography } from 'antd';
-import { ADVANCED_QUESTION } from './constants-scoreboard';
+import { ADVANCED_QUESTION } from '../../constants-scoreboard';
 
 const { Text } = Typography;
 

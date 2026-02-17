@@ -1,4 +1,3 @@
-// import React, { useState, useEffect } from 'react';
 import {
   Accordion,
   AccordionSummary,
@@ -10,31 +9,12 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { ROI_OPTIONS } from './constants-scoreboard';
+import { ROI_OPTIONS } from '../../constants-scoreboard';
 
-const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mode, training,expanded, onToggle, isVS }) => {
+const ROISelect = ({ region, setRegion, dataset, setDataset, allowToggle, mode, training,expanded, onToggle, isVS }) => {
   // button logic group
   const ACROSS_VAL = 'Across Regions';
   const SPECIFIC_ROIS = ['ppa', 'ffa', 'eba'];
-
-  // dataset/roi enabled / disabled logic
-  // const isEnabled = (option) => {
-
-  //    if (
-  //     Array.isArray(dataset) &&
-  //     (dataset.includes('bold_5000') || dataset.includes('bonner_2021')) &&
-  //     (option.value === 'ffa' || option.value === 'eba')
-  //   )
-  //     return false;
-
-  //   if (
-  //     Array.isArray(dataset) &&
-  //     (dataset.includes('kingbaker_2019') || dataset.includes('wardle_2020')) &&
-  //     (option.value === 'eba' )
-  //   )
-  //     return false;
-  //   return true;
-  // };
 
   const isEnabled = (option) => {
     const ds = Array.isArray(dataset) ? dataset : [];
@@ -156,4 +136,4 @@ const ROISelectNew = ({ region, setRegion, dataset, setDataset, allowToggle, mod
   );
 };
 
-export default ROISelectNew;
+export default ROISelect;

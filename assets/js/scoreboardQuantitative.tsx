@@ -1,11 +1,12 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import ScoreboardPage from './scoreboard-page';
+import ScoreboardPageQuantitative from './scoreboard-page-quantitative';
+
 
 function App() {
   return (
     <div>
-      <ScoreboardPage />
+      <ScoreboardPageQuantitative />
     </div>
   );
 }

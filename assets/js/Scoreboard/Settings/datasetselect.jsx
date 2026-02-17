@@ -15,9 +15,9 @@ import {
   DATASET_OPTIONS_LESS,
   MURTY185_DATASET,
   NSD_DATASET,
-} from './constants-scoreboard';
+} from '../../constants-scoreboard';
 
-const DatasetSelectNew = ({ dataset, setDataset, training, region, allowToggle, mode, expanded, onToggle }) => {
+const DatasetSelect = ({ dataset, setDataset, training, region, allowToggle, mode, expanded, onToggle }) => {
   const options = mode === 4 ? DATASET_OPTIONS_LESS : DATASET_OPTIONS;
 
   const isEnabled = (option) => {
@@ -105,4 +105,4 @@ const DatasetSelectNew = ({ dataset, setDataset, training, region, allowToggle, 
   );
 };
 
-export default DatasetSelectNew;
+export default DatasetSelect;

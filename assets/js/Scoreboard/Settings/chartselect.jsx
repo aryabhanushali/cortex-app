@@ -2,7 +2,7 @@
 import React from 'react';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import { CHART_TYPE_OPTIONS, RANK } from './constants-scoreboard';
+import { CHART_TYPE_OPTIONS, RANK } from '../../constants-scoreboard';
 
 const ChartSelect = ({ chartType, setChartType, rank, setRank, enable }) => {
   return (

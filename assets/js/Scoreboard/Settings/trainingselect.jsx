@@ -10,10 +10,10 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { TRAINING_OPTIONS, TRAINING_OPTIONS_VS } from './constants-scoreboard';
+import { TRAINING_OPTIONS, TRAINING_OPTIONS_VS } from '../../constants-scoreboard';
 
 
-const TrainingSelectNew = ({ training, setTraining, dataset, vsOption, expanded, onToggle }) => {
+const TrainingSelect = ({ training, setTraining, dataset, vsOption, expanded, onToggle }) => {
   
   // if vs option
   const isVSMode = !!vsOption;
@@ -74,4 +74,4 @@ const TrainingSelectNew = ({ training, setTraining, dataset, vsOption, expanded,
   );
 };
 
-export default TrainingSelectNew;
+export default TrainingSelect;

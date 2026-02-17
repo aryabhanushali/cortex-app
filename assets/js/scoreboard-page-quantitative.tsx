@@ -2,36 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { Typography, Button, Radio } from 'antd';
 
 // LoadData
-import useLoadDataNew from './loadDataNew.jsx';
+import useLoadData from './DataProcess/loadData.jsx';
 
 //selector
-import TrainingSelectNew from './trainingselectnew.jsx';
-import ROISelectNew from './roiselectnew.jsx';
-import DatasetSelectNew from './datasetselectnew.jsx';
-import SelectedFiltersBar from './selectFiltersBar.jsx';
+import SelectedFiltersBar from './Scoreboard/Settings/selectFiltersBar.jsx';
+import TrainingSelect from './Scoreboard/Settings/trainingselect.jsx';
+import ROISelect from './Scoreboard/Settings/roiselect.jsx';
+import DatasetSelect from './Scoreboard/Settings/datasetselect.jsx';
 
-import ChartSelect from './chartselect.jsx'; 
-import PageSelect from './pageselect.jsx';
-import QuestionSelect from './questionselect.jsx';
+
+import ChartSelect from './Scoreboard/Settings/chartselect.jsx'; 
+import PageSelect from './Scoreboard/Settings/pageselect.jsx';
+import QuestionSelect from './Scoreboard/Settings/questionselect.jsx';
 
 
 //Heatmap
-import HeatmapOverview from './heatmapOverview.jsx';
-import HeatmapDetail from './heatmapDetail.jsx';
+import HeatmapOverview from './Scoreboard/Visualizations/heatmapOverview.jsx';
+import HeatmapDetail from './Scoreboard/Visualizations/heatmapDetail.jsx';
 
 //Barchart
-import BarChartDetail from './barchartdetail.jsx'; 
-import BarChartOverview from './barchartoverview.jsx';
+import BarChartDetail from './Scoreboard/Visualizations/barchartdetail.jsx'; 
+import BarChartOverview from './Scoreboard/Visualizations/barchartoverview.jsx';
 
 //advanced insights
-import ScatterGapCeiling from './roiDatasetScatter.jsx';
-import ScatterMurtyVsNsd from './scatterMurtyVsNsd.jsx';
+import ScatterGapCeiling from './Scoreboard/Visualizations/scatterGapCeiling.jsx';
+import ScatterMurtyVsNsd from './Scoreboard/Visualizations/scatterMurtyVsNsd.jsx';
 
 
 const { Title } = Typography;
 
 
-const ScoreboardPageNew: React.FC = () => {
+const ScoreboardPageQuantitative: React.FC = () => {
   const [training, setTraining] = useState('NSD');
   const [region, setRegion] = useState(['Across Regions']);
   const [dataset, setDataset] = useState([]);
@@ -149,7 +150,7 @@ const ScoreboardPageNew: React.FC = () => {
     roi_dataset_NSD_multi?: Record<string, any>;
   };
   
-    const { data: newData, loading: loadingNew } = useLoadDataNew() as {
+    const { data: newData, loading: loadingNew } = useLoadData() as {
       data: newData;
       loading: boolean;
     };
@@ -332,7 +333,7 @@ return (
           
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <TrainingSelectNew 
+            <TrainingSelect 
               training={training} 
               setTraining={setTraining} 
               dataset={dataset}
@@ -341,7 +342,7 @@ return (
               onToggle={handleTogglePanel('training')}
             />
 
-            <ROISelectNew
+            <ROISelect
               region={region}
               setRegion={setRegion}
               dataset={dataset}
@@ -354,7 +355,7 @@ return (
               isVS = {isVS}
             />
 
-            <DatasetSelectNew
+            <DatasetSelect
               dataset={dataset}
               setDataset={setDataset}
               training={training}
@@ -732,7 +733,7 @@ return (
     </div>
   );
 };
-export default ScoreboardPageNew;
+export default ScoreboardPageQuantitative;
 
 
  

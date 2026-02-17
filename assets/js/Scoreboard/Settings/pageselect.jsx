@@ -1,7 +1,7 @@
 // pageselect.jsx
 import React from 'react';
 import { Radio } from 'antd';
-import { PAGE_VIEW_OPTIONS } from './constants-scoreboard';
+import { PAGE_VIEW_OPTIONS } from '../../constants-scoreboard';
 
 const PageSelect = ({ value, onChange }) => {
   return (
