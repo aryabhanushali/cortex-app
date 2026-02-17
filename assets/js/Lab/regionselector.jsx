@@ -4,8 +4,8 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-import { REGION_OPTIONS } from './constants';
-import { MURTY185_INCLUDED_REGIONS } from './constants';
+import { REGION_OPTIONS } from '../constants';
+import { MURTY185_INCLUDED_REGIONS } from '../constants';
 
 const RegionSelector = ({ region, setRegion, dataset }) => {
   const isEnabled = (option) => {

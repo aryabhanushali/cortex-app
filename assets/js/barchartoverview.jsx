@@ -10,7 +10,7 @@ const BarChartOverview = ({ data, roi, dataset, ceiling, rank, onModelClick, sel
     if (!containerRef.current) return;
     const resizeObserver = new ResizeObserver((entries) => {
       if (!entries || entries.length === 0) return;
-      // 获取容器实际占用的宽高
+      
       setDimensions({ 
         width: entries[0].contentRect.width, 
         height: entries[0].contentRect.height 

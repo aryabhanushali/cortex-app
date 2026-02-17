@@ -1,131 +1,129 @@
-import React, { useState, useEffect } from 'react';
-import { Button, message, Steps, theme } from 'antd';
-import { SmileOutlined } from '@ant-design/icons';
+// import React, { useState, useEffect } from 'react';
+// import { Button, message, Steps, theme } from 'antd';
+// import { SmileOutlined } from '@ant-design/icons';
 
-import ROISelect from './roiselect.jsx';
-import TrainingSelect from './trainingselect.jsx';
-import DatasetSelect from './datasetselect.jsx';
-import useLoadData from './loaddata.jsx';
-import useLoadDataNew from './loadDataNew.jsx';
+// // load Data
+// import useLoadData from './loaddata.jsx';
+// import useLoadDataNew from './loadDataNew.jsx';
+
+// //selector
+// import ROISelect from './roiselect.jsx';
+// import TrainingSelect from './trainingselect.jsx';
+// import DatasetSelect from './datasetselect.jsx';
+// import ChartSelect from './chartselect.jsx';
 
 
-//  new this time
-import ScatterMurtyVsNsd from './scatterplot.jsx';
-import HeatmapByROI from './heatMapRoi.jsx';
-import RoiBarChart from './roiDatasetBarChart.jsx';
 
-import ChartSelect from './chartselect.jsx';
-import ScatterGapCeiling from './roiDatasetanalysis.jsx';
-import ROICard from './roicard.jsx';
-import DatasetCard from './datasetcard.jsx';
+// //  new this time
+// import ScatterMurtyVsNsd from './scatterplot.jsx';
+// import HeatmapByROI from './heatMapRoi.jsx';
+// import RoiBarChart from './roiDatasetBarChart.jsx';
+// import ScatterGapCeiling from './roiDatasetanalysis.jsx';
+// import ROICard from './roicard.jsx';
+// import DatasetCard from './datasetcard.jsx';
+// import ModelCardNew from './modelcard-scoreboard.jsx';
 
-import ModelCardNew from './modelcard-scoreboard.jsx';
+// import JSZip from "jszip";
+// import { saveAs } from "file-saver";
 
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
-
-const ScoreboardPageQualitative: React.FC = () => {
-  const { token } = theme.useToken();
-  const [current, setCurrent] = useState(0);
-  const { data, loading } = useLoadData();
+// const ScoreboardPageQualitative: React.FC = () => {
+//   const { token } = theme.useToken();
+//   const [current, setCurrent] = useState(0);
+//   const { data, loading } = useLoadData();
   
-  const [manualStepChange, setManualStepChange] = useState(false);
+//   const [manualStepChange, setManualStepChange] = useState(false);
 
-  const DEFAULT_TRAINING = "NSD"
-  const DEFAULT_REGION = "";
-  const DEFAULT_DATASET = "";
-  const EMPTY_TRAINING = ""
-
-  
-
-
-  const [dataset, setDataset] = useState(DEFAULT_DATASET);
-  const [training, setTraining] = useState(DEFAULT_TRAINING);
-  const [region, setRegion] = useState(DEFAULT_REGION);
-  const [emptyTraining, setEmptyTraining] = useState(EMPTY_TRAINING);
+//   const DEFAULT_TRAINING = "NSD"
+//   const DEFAULT_REGION = "";
+//   const DEFAULT_DATASET = "";
+//   const EMPTY_TRAINING = ""
+//   const [dataset, setDataset] = useState(DEFAULT_DATASET);
+//   const [training, setTraining] = useState(DEFAULT_TRAINING);
+//   const [region, setRegion] = useState(DEFAULT_REGION);
+//   const [emptyTraining, setEmptyTraining] = useState(EMPTY_TRAINING);
 
 
-  const [chartType, setChartType] = useState("uni");   
-  const [rank, setRank] = useState("rank");
-  const [selectedModel, setSelectedModel] = useState<string | null>(null);
+//   const [chartType, setChartType] = useState("uni");   
+//   const [rank, setRank] = useState("rank");
+//   const [selectedModel, setSelectedModel] = useState<string | null>(null);
 
-  const DATASET_LABEL_MAP: Record<string, string> = {
-    murty185: "Murty185",
-    nsd_1000: "NSD1000",
-    bold_5000: "BOLD5000v2",
-    bonner_2021: "Bonner2021",
-    bmd_2024: "BMD2024",
-    kingbaker_2019: "King2019",
-    wardle_2020: "Wardle2020",
-    nsd_syn: "NSD synthetic",
-};
+//   const DATASET_LABEL_MAP: Record<string, string> = {
+//     murty185: "Murty185",
+//     nsd_1000: "NSD1000",
+//     bold_5000: "BOLD5000v2",
+//     bonner_2021: "Bonner2021",
+//     bmd_2024: "BMD2024",
+//     kingbaker_2019: "King2019",
+//     wardle_2020: "Wardle2020",
+//     nsd_syn: "NSD synthetic",
+// };
 
 
-  const getEnable = (current: number, training: string, dataset: string, region: string) => {
+//   const getEnable = (current: number, training: string, dataset: string, region: string) => {
 
-    if (current === 0) {
+//     if (current === 0) {
    
-      return training !== "";
-    }
-    if (current === 1) {
-      // ROI 页：当 region 选中且 dataset 已经选定时才启用
-      return false
-    }
-    if (current === 2) {
-      // Dataset 页：当 dataset 已选择时才启用
-      return false
-    }
-    return false;
-  };
+//       return training !== "";
+//     }
+//     if (current === 1) {
+//       // ROI 页：当 region 选中且 dataset 已经选定时才启用
+//       return false
+//     }
+//     if (current === 2) {
+//       // Dataset 页：当 dataset 已选择时才启用
+//       return false
+//     }
+//     return false;
+//   };
 
 
 
-    const handleDownloadZip = async () => {
-    if (!newData) {
-      message.error("No raw data available to download.");
-      return;
-    }
+//     const handleDownloadZip = async () => {
+//     if (!newData) {
+//       message.error("No raw data available to download.");
+//       return;
+//     }
 
-    const zip = new JSZip();
+//     const zip = new JSZip();
 
-    // 遍历 newData 的 key，把每个 JSON 存进去
-    Object.entries(newData).forEach(([key, value]) => {
-      const jsonString = JSON.stringify(value, null, 2);
-      zip.file(`${key}.json`, jsonString);
-    });
+//     // 遍历 newData 的 key，把每个 JSON 存进去
+//     Object.entries(newData).forEach(([key, value]) => {
+//       const jsonString = JSON.stringify(value, null, 2);
+//       zip.file(`${key}.json`, jsonString);
+//     });
 
-    try {
-      const blob = await zip.generateAsync({ type: "blob" });
-      saveAs(blob, "raw_data.zip");
-      message.success("Raw data downloaded as raw_data.zip!");
-    } catch (err) {
-      console.error("ZIP generation error:", err);
-      message.error("Failed to generate ZIP file.");
-    }
-  };
+//     try {
+//       const blob = await zip.generateAsync({ type: "blob" });
+//       saveAs(blob, "raw_data.zip");
+//       message.success("Raw data downloaded as raw_data.zip!");
+//     } catch (err) {
+//       console.error("ZIP generation error:", err);
+//       message.error("Failed to generate ZIP file.");
+//     }
+//   };
 
 
-  // step 0 clear value logic
-  // useEffect(() => {
-  //   if (current === 0 && region) {
-  //     setDataset("");
-  //     setRegion("");
-  //   } 
-  //   if (current === 0 && dataset === ""){
-  //     setRegion("");
-  //   } 
-  // }, [current, training,dataset])
+//   // step 0 clear value logic
+//   // useEffect(() => {
+//   //   if (current === 0 && region) {
+//   //     setDataset("");
+//   //     setRegion("");
+//   //   } 
+//   //   if (current === 0 && dataset === ""){
+//   //     setRegion("");
+//   //   } 
+//   // }, [current, training,dataset])
 
-  //step 1 clear value logic
-  // useEffect(() => {
-  //   if (current === 1 && region === "") {
-  //     setTraining("");
-  //     setDataset("");
-  //   } 
-  //   if (current === 1 && training === "") {
-  //     setDataset("");
-  //   }
-  // }, [current, region,training]);
+//   //step 1 clear value logic
+//   // useEffect(() => {
+//   //   if (current === 1 && region === "") {
+//   //     setTraining("");
+//   //     setDataset("");
+//   //   } 
+//   //   if (current === 1 && training === "") {
+//   //     setDataset("");
+//   //   }
+//   // }, [current, region,training]);
   
 
 
@@ -133,564 +131,623 @@ const ScoreboardPageQualitative: React.FC = () => {
   
 
 
- type newData = {
-  //group by ppa
-  murty_uni?: Record<string, any>;
-  nsd_uni?: Record<string, any>;
-  murty_multi?: Record<string, any>;
-  nsd_multi?: Record<string, any>;
+//  type newData = {
+//   //group by ppa
+//   murty_uni?: Record<string, any>;
+//   nsd_uni?: Record<string, any>;
+//   murty_multi?: Record<string, any>;
+//   nsd_multi?: Record<string, any>;
 
-  // 
-  ceiling_uni?: Record<string, any>;
-  ceiling_multi?: Record<string, any>;
+//   // 
+//   ceiling_uni?: Record<string, any>;
+//   ceiling_multi?: Record<string, any>;
 
     
-  roi_dataset_Murty185_uni?: Record<string, any>;
-  roi_dataset_Murty185_multi?: Record<string, any>;
-  roi_dataset_NSD_uni?: Record<string, any>;
-  roi_dataset_NSD_multi?: Record<string, any>;
-};
+//   roi_dataset_Murty185_uni?: Record<string, any>;
+//   roi_dataset_Murty185_multi?: Record<string, any>;
+//   roi_dataset_NSD_uni?: Record<string, any>;
+//   roi_dataset_NSD_multi?: Record<string, any>;
+// };
 
-  const { data: newData, loading: loadingNew } = useLoadDataNew() as {
-    data: newData;
-    loading: boolean;
-  };
+//   const { data: newData, loading: loadingNew } = useLoadDataNew() as {
+//     data: newData;
+//     loading: boolean;
+//   };
 
 
-  const murtyData = chartType === "uni" ? newData?.murty_uni : newData?.murty_multi;
-  const nsdData   = chartType === "uni" ? newData?.nsd_uni   : newData?.nsd_multi;
-  const ROI_DATASET_Murty = chartType === "uni" ? newData?.roi_dataset_Murty185_uni : newData?.roi_dataset_Murty185_multi;
-  const ROI_DATASET_NSD = chartType === "uni" ? newData?.roi_dataset_NSD_uni : newData?.roi_dataset_NSD_multi;
-  const Ceiling = chartType === "uni" ? newData?.ceiling_uni : newData?.ceiling_multi;
-  const yLabel = chartType === "uni" ? "Pearson Correlation" : "Spearman Correlation";
+//   const murtyData = chartType === "uni" ? newData?.murty_uni : newData?.murty_multi;
+//   const nsdData   = chartType === "uni" ? newData?.nsd_uni   : newData?.nsd_multi;
+//   const ROI_DATASET_Murty = chartType === "uni" ? newData?.roi_dataset_Murty185_uni : newData?.roi_dataset_Murty185_multi;
+//   const ROI_DATASET_NSD = chartType === "uni" ? newData?.roi_dataset_NSD_uni : newData?.roi_dataset_NSD_multi;
+//   const Ceiling = chartType === "uni" ? newData?.ceiling_uni : newData?.ceiling_multi;
+//   const yLabel = chartType === "uni" ? "Pearson Correlation" : "Spearman Correlation";
 
 
  
 
-  const contentStyle: React.CSSProperties = {
+//   const contentStyle: React.CSSProperties = {
 
-    textAlign: 'center',
-    color: token.colorTextTertiary,
-    backgroundColor: 'transparent',
-    borderRadius: 0,
-    border: 'none',
-    marginTop: 16,
-  };
+//     textAlign: 'center',
+//     color: token.colorTextTertiary,
+//     backgroundColor: 'transparent',
+//     borderRadius: 0,
+//     border: 'none',
+//     marginTop: 16,
+//   };
 
   
-  useEffect(() => {
-    if (manualStepChange) {
-      setManualStepChange(false); 
-    }
-  }, [manualStepChange]);
+//   useEffect(() => {
+//     if (manualStepChange) {
+//       setManualStepChange(false); 
+//     }
+//   }, [manualStepChange]);
   
 
 
-  const steps = [
-    {
-      title: 'Models',
-      content: (
-        <div style={{ display: 'flex', flexDirection: 'column'}}>
+//   const steps = [
+//     {
+//       title: 'Models',
+//       content: (
+//         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
-          {/* panel display logic */}
-          <TrainingSelect training={training} setTraining={setTraining} dataset={dataset} mode = {1} allowToggle={false}/> 
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} setDataset={setDataset} allowToggle={true} mode={1} training={training}/>
-          <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} region = {region} allowToggle={true} mode = {1}/>
+//           {/* panel display logic */}
+//           <TrainingSelect training={training} setTraining={setTraining} dataset={dataset} mode = {1} allowToggle={false}/> 
+//           <ROISelect region={region} setRegion={setRegion} dataset={dataset} setDataset={setDataset} allowToggle={true} mode={1} training={training}/>
+//           <DatasetSelect dataset={dataset} setDataset={setDataset} training={training} region = {region} allowToggle={true} mode = {1}/>
           
           
           
-          {/* title display logic */}
-          {!loadingNew && (
-            <div className="chart-title">
-              {
+//           {/* title display logic */}
+//           {!loadingNew && (
+//             <div className="chart-title">
+//               {
                 
-                training === "Murty185" && dataset === "" && region === ""
-                ? "Across-ROIs Performance (Trained on Murty185)"
-                : training === "NSD" && dataset === ""  && region === ""
-                ? "Across-ROIs Performance (Trained on NSD1000)"
+//                 training === "Murty185" && dataset === "" && region === ""
+//                 ? "Across-ROIs Performance (Trained on Murty185)"
+//                 : training === "NSD" && dataset === ""  && region === ""
+//                 ? "Across-ROIs Performance (Trained on NSD1000)"
 
-                : training === "Murty185" && dataset !== "" && region === ""
-                ? `Across-ROIs Performance on ${DATASET_LABEL_MAP[dataset]} (Trained on Murty185)`
-                : training === "NSD" && dataset !== "" && region === ""
-                ? `Across-ROIs Performance on ${DATASET_LABEL_MAP[dataset]} (Trained on NSD1000)`
+//                 : training === "Murty185" && dataset !== "" && region === ""
+//                 ? `Across-ROIs Performance on ${DATASET_LABEL_MAP[dataset]} (Trained on Murty185)`
+//                 : training === "NSD" && dataset !== "" && region === ""
+//                 ? `Across-ROIs Performance on ${DATASET_LABEL_MAP[dataset]} (Trained on NSD1000)`
 
-                : training === "Murty185" && dataset === "" && region !== ""
-                ? `${region.toUpperCase()}  Performance on (Trained on Murty185)`
-                : training === "NSD" && dataset === "" && region !== ""
-                ? `${region.toUpperCase()}  Performance on (Trained on NSD1000)`
+//                 : training === "Murty185" && dataset === "" && region !== ""
+//                 ? `${region.toUpperCase()}  Performance on (Trained on Murty185)`
+//                 : training === "NSD" && dataset === "" && region !== ""
+//                 ? `${region.toUpperCase()}  Performance on (Trained on NSD1000)`
 
-                : training === "Murty185" && dataset !== "" && region !== ""
-                ? `${region.toUpperCase()}  Performance on ${DATASET_LABEL_MAP[dataset]} (Trained on Murty185)`
-                : training === "NSD" && dataset !== "" && region !== ""
-                ? `${region.toUpperCase()}  Performance on ${DATASET_LABEL_MAP[dataset]} (Trained on NSD1000)`
-                : ""}
-            </div>
-          )}
+//                 : training === "Murty185" && dataset !== "" && region !== ""
+//                 ? `${region.toUpperCase()}  Performance on ${DATASET_LABEL_MAP[dataset]} (Trained on Murty185)`
+//                 : training === "NSD" && dataset !== "" && region !== ""
+//                 ? `${region.toUpperCase()}  Performance on ${DATASET_LABEL_MAP[dataset]} (Trained on NSD1000)`
+//                 : ""}
+//             </div>
+//           )}
 
-          <ChartSelect chartType={chartType} setChartType={setChartType} rank={rank} setRank={setRank} enable={getEnable(current, training, dataset, region)}/>
-
-
-          {/* heatmap */}
-          {!loadingNew && dataset === "" && training === "Murty185" &&  region === "" &&(
-            <HeatmapByROI
-              data={murtyData}
-              roi ={"Overall"}
-              dataset = {dataset}
-              rank = {rank}
-              onModelClick={(model: string) => setSelectedModel(model)} 
-            />
-          )}
-
-          {!loadingNew && dataset === "" && training === "NSD" &&  region === "" && (
-            <HeatmapByROI
-              data={nsdData}
-              roi ={"Overall"}
-              dataset = {dataset}
-              rank = {rank}
-              onModelClick={(model: string) => setSelectedModel(model)} 
-            />
-          )}
-
-            {!loadingNew && dataset === "" && training === "NSD" &&  region !== "" && (
-            <HeatmapByROI
-              data={nsdData}
-              roi ={region}
-              dataset = {dataset}
-              rank = {rank}
-              onModelClick={(model: string) => setSelectedModel(model)} 
-            />
-          )}
+//           <ChartSelect chartType={chartType} setChartType={setChartType} rank={rank} setRank={setRank} enable={getEnable(current, training, dataset, region)}/>
 
 
-            {!loadingNew && dataset === "" && training === "Murty185" &&  region !== "" && (
-            <HeatmapByROI
-              data={murtyData}
-              roi ={region}
-              dataset = {dataset}
-              rank = {rank}
-              onModelClick={(model: string) => setSelectedModel(model)} 
-            />
-          )}
+//           {/* heatmap */}
+//           {!loadingNew && dataset === "" && training === "Murty185" &&  region === "" &&(
+//             <HeatmapByROI
+//               data={murtyData}
+//               roi ={"Overall"}
+//               dataset = {dataset}
+//               rank = {rank}
+//               onModelClick={(model: string) => setSelectedModel(model)} 
+//             />
+//           )}
+
+//           {!loadingNew && dataset === "" && training === "NSD" &&  region === "" && (
+//             <HeatmapByROI
+//               data={nsdData}
+//               roi ={"Overall"}
+//               dataset = {dataset}
+//               rank = {rank}
+//               onModelClick={(model: string) => setSelectedModel(model)} 
+//             />
+//           )}
+
+//             {!loadingNew && dataset === "" && training === "NSD" &&  region !== "" && (
+//             <HeatmapByROI
+//               data={nsdData}
+//               roi ={region}
+//               dataset = {dataset}
+//               rank = {rank}
+//               onModelClick={(model: string) => setSelectedModel(model)} 
+//             />
+//           )}
+
+
+//             {!loadingNew && dataset === "" && training === "Murty185" &&  region !== "" && (
+//             <HeatmapByROI
+//               data={murtyData}
+//               roi ={region}
+//               dataset = {dataset}
+//               rank = {rank}
+//               onModelClick={(model: string) => setSelectedModel(model)} 
+//             />
+//           )}
           
-           {!loadingNew && dataset !== "" && training === "NSD" &&  region === "" && (
-            <HeatmapByROI
-              data={nsdData}
-              roi ={region}
-              dataset = {dataset}
-              rank = {rank}
-              onModelClick={(model: string) => setSelectedModel(model)} 
-            />
-          )}
+//            {!loadingNew && dataset !== "" && training === "NSD" &&  region === "" && (
+//             <HeatmapByROI
+//               data={nsdData}
+//               roi ={region}
+//               dataset = {dataset}
+//               rank = {rank}
+//               onModelClick={(model: string) => setSelectedModel(model)} 
+//             />
+//           )}
 
 
-            {!loadingNew && dataset !== "" && training === "Murty185" &&  region === "" && (
-            <HeatmapByROI
-              data={murtyData}
-              roi ={region}
-              dataset = {dataset}
-              rank = {rank}
-              onModelClick={(model: string) => setSelectedModel(model)} 
-            />
-          )}
+//             {!loadingNew && dataset !== "" && training === "Murty185" &&  region === "" && (
+//             <HeatmapByROI
+//               data={murtyData}
+//               roi ={region}
+//               dataset = {dataset}
+//               rank = {rank}
+//               onModelClick={(model: string) => setSelectedModel(model)} 
+//             />
+//           )}
 
 
 
-          {/* BarChart */}
+//           {/* BarChart */}
 
-          {!loadingNew && dataset !== "" && training === "NSD" && region !== "" && (
-            <RoiBarChart
-              data={nsdData}
-              roi={region === "" ? "Overall" : region.toLowerCase()}   // ✅ region为空 → overall
-              dataset={dataset}
-              ceiling = {Ceiling}
-              rank = {rank}
-              yLabel={yLabel}
-              onModelClick={(model: string) => setSelectedModel(model)} 
-            />
-          )}
+//           {!loadingNew && dataset !== "" && training === "NSD" && region !== "" && (
+//             <RoiBarChart
+//               data={nsdData}
+//               roi={region === "" ? "Overall" : region.toLowerCase()}   // ✅ region为空 → overall
+//               dataset={dataset}
+//               ceiling = {Ceiling}
+//               rank = {rank}
+//               yLabel={yLabel}
+//               onModelClick={(model: string) => setSelectedModel(model)} 
+//             />
+//           )}
 
-          {!loadingNew && dataset !== "" && training === "Murty185" && region !== "" && (
-            <RoiBarChart
-              data={murtyData}
-              roi={region === "" ? "Overall" : region.toLowerCase()}   // ✅ 同理
-              dataset={dataset}
-              ceiling = {Ceiling}
-              rank = {rank}
-              yLabel={yLabel}
-              onModelClick={(model: string) => setSelectedModel(model)} 
-            />
-          )}
+//           {!loadingNew && dataset !== "" && training === "Murty185" && region !== "" && (
+//             <RoiBarChart
+//               data={murtyData}
+//               roi={region === "" ? "Overall" : region.toLowerCase()}   // ✅ 同理
+//               dataset={dataset}
+//               ceiling = {Ceiling}
+//               rank = {rank}
+//               yLabel={yLabel}
+//               onModelClick={(model: string) => setSelectedModel(model)} 
+//             />
+//           )}
 
-          {selectedModel  && (
-             <ModelCardNew  region={region} dataset={training} model={selectedModel} evalDataset={dataset}/>
-          )
-          }
+//           {selectedModel  && (
+//              <ModelCardNew  region={region} dataset={training} model={selectedModel} evalDataset={dataset}/>
+//           )
+//           }
 
-          {training === "Murty185" && (
-            <DatasetCard dataset={"murty185"}/>
-          )
-          }
-          {training === "NSD" && (
-            <DatasetCard dataset={"nsd_1000"}/>
-          )
-          }
+//           {training === "Murty185" && (
+//             <DatasetCard dataset={"murty185"}/>
+//           )
+//           }
+//           {training === "NSD" && (
+//             <DatasetCard dataset={"nsd_1000"}/>
+//           )
+//           }
 
-          {dataset !== "" && (
-            <DatasetCard dataset={dataset}/>
-          )
-          }
-          {region !== "" && (
-            <ROICard region={region}/>
-          )
-          }
+//           {dataset !== "" && (
+//             <DatasetCard dataset={dataset}/>
+//           )
+//           }
+//           {region !== "" && (
+//             <ROICard region={region}/>
+//           )
+//           }
 
           
-          <div style={{ textAlign: "right" }}>
-            <Button
-              type="primary"
-              style={{ marginTop: 16, width: "150px" }}
-              onClick={handleDownloadZip}
-            >
-              Download Raw Data
-            </Button>
-        </div>
+//           <div style={{ textAlign: "right" }}>
+//             <Button
+//               type="primary"
+//               style={{ marginTop: 16, width: "150px" }}
+//               onClick={handleDownloadZip}
+//             >
+//               Download Raw Data
+//             </Button>
+//         </div>
           
-        </div>
-      ),
-      icon: <SmileOutlined />,
-    },
-    {
-      title: 'ROI',
-      content: (
-        <div style={{ display: 'flex', flexDirection: 'column'}}>
+//         </div>
+//       ),
+//       icon: <SmileOutlined />,
+//     },
+//     {
+//       title: 'ROI',
+//       content: (
+//         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
-          {/* panel display logic */}
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} setDataset={setDataset} allowToggle={true} mode={2} training={emptyTraining}/>
-          <TrainingSelect training={emptyTraining} setTraining={setEmptyTraining} dataset={dataset} mode = {2} allowToggle={true}/> 
+//           {/* panel display logic */}
+//           <ROISelect region={region} setRegion={setRegion} dataset={dataset} setDataset={setDataset} allowToggle={true} mode={2} training={emptyTraining}/>
+//           <TrainingSelect training={emptyTraining} setTraining={setEmptyTraining} dataset={dataset} mode = {2} allowToggle={true}/> 
           
 
-          {/* title display logic */}
-          {!loadingNew && (
-            <div className="chart-title">
-              { region === "" && emptyTraining === "" && newData
-                ? `Model Performance Gap to Ceiling vs Ceiling`
-                : emptyTraining === "" && region !== ""
-                ? `${region.toUpperCase()} : Model Performance Gap to Ceiling vs Ceiling`
+//           {/* title display logic */}
+//           {!loadingNew && (
+//             <div className="chart-title">
+//               { region === "" && emptyTraining === "" && newData
+//                 ? `Model Performance Gap to Ceiling vs Ceiling`
+//                 : emptyTraining === "" && region !== ""
+//                 ? `${region.toUpperCase()} : Model Performance Gap to Ceiling vs Ceiling`
 
-                : emptyTraining === "Murty185" && region === ""
-                ? `Model Performance Gap to Ceiling vs Ceiling (Trained on Murty185)`
+//                 : emptyTraining === "Murty185" && region === ""
+//                 ? `Model Performance Gap to Ceiling vs Ceiling (Trained on Murty185)`
 
-                : emptyTraining === "NSD" && region === ""
-                ? `Model Performance Gap to Ceiling vs Ceiling (Trained on NSD1000)`
+//                 : emptyTraining === "NSD" && region === ""
+//                 ? `Model Performance Gap to Ceiling vs Ceiling (Trained on NSD1000)`
 
-                : emptyTraining === "NSD" && region !== ""
-                ? `${region.toUpperCase()} : Model Performance Gap to Ceiling vs Ceiling (Trained on NSD1000)`
+//                 : emptyTraining === "NSD" && region !== ""
+//                 ? `${region.toUpperCase()} : Model Performance Gap to Ceiling vs Ceiling (Trained on NSD1000)`
 
-                 : emptyTraining === "Murty185" && region !== ""
-                ? `${region.toUpperCase()} : Model Performance Gap to Ceiling vs Ceiling (Trained on Murty185)`
+//                  : emptyTraining === "Murty185" && region !== ""
+//                 ? `${region.toUpperCase()} : Model Performance Gap to Ceiling vs Ceiling (Trained on Murty185)`
              
                 
-                : ""}
-            </div>
-          )}
+//                 : ""}
+//             </div>
+//           )}
 
-         <ChartSelect chartType={chartType} setChartType={setChartType} rank={rank} setRank={setRank} enable={getEnable(current, training, dataset, region)}/>
+//          <ChartSelect chartType={chartType} setChartType={setChartType} rank={rank} setRank={setRank} enable={getEnable(current, training, dataset, region)}/>
 
-          {/* ScatterGapCeiling */}
-          {!loadingNew && emptyTraining === ""  && region === "" && (
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
-          )}
-          {!loadingNew && emptyTraining === ""  && region !== "" &&(
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
-          )}
+//           {/* ScatterGapCeiling */}
+//           {!loadingNew && emptyTraining === ""  && region === "" && (
+//             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
+//           )}
+//           {!loadingNew && emptyTraining === ""  && region !== "" &&(
+//             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
+//           )}
 
-           {!loadingNew && emptyTraining !== ""  && region === "" &&(
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
-          )}
+//            {!loadingNew && emptyTraining !== ""  && region === "" &&(
+//             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
+//           )}
 
-           {!loadingNew && emptyTraining !== ""  && region !== "" &&(
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
-          )}
+//            {!loadingNew && emptyTraining !== ""  && region !== "" &&(
+//             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
+//           )}
 
 
-           {region !== "" && (
-            <ROICard region={region}/>
-          )
-          }
-          {emptyTraining === "Murty185" && (
-            <DatasetCard dataset={"murty185"}/>
-          )
-          }
-          {emptyTraining === "NSD" && (
-            <DatasetCard dataset={"nsd_1000"}/>
-          )
-          }
+//            {region !== "" && (
+//             <ROICard region={region}/>
+//           )
+//           }
+//           {emptyTraining === "Murty185" && (
+//             <DatasetCard dataset={"murty185"}/>
+//           )
+//           }
+//           {emptyTraining === "NSD" && (
+//             <DatasetCard dataset={"nsd_1000"}/>
+//           )
+//           }
     
 
-             <div style={{ textAlign: "right" }}>
-            <Button
-              type="primary"
-              style={{ marginTop: 16, width: "150px" }}
-              onClick={handleDownloadZip}
-            >
-              Download Raw Data
-            </Button>
-        </div>
+//              <div style={{ textAlign: "right" }}>
+//             <Button
+//               type="primary"
+//               style={{ marginTop: 16, width: "150px" }}
+//               onClick={handleDownloadZip}
+//             >
+//               Download Raw Data
+//             </Button>
+//         </div>
          
 
           
-        </div>
-      ),
-      icon: <SmileOutlined />,
-    },
-    {
-      title: 'Papers',
-      content: (
-        <div style={{ display: 'flex', flexDirection: 'column'}}>
+//         </div>
+//       ),
+//       icon: <SmileOutlined />,
+//     },
+//     {
+//       title: 'Papers',
+//       content: (
+//         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
-          {/* panel display logic */}
-          <DatasetSelect dataset={dataset} setDataset={setDataset} training={emptyTraining} region = {region} allowToggle={true} mode ={3}/>
-          <TrainingSelect training={emptyTraining} setTraining={setEmptyTraining} dataset={dataset} mode = {3} allowToggle={true}/>
+//           {/* panel display logic */}
+//           <DatasetSelect dataset={dataset} setDataset={setDataset} training={emptyTraining} region = {region} allowToggle={true} mode ={3}/>
+//           <TrainingSelect training={emptyTraining} setTraining={setEmptyTraining} dataset={dataset} mode = {3} allowToggle={true}/>
      
-                    {/* title display logic */}
-          {!loadingNew && (
-            <div className="chart-title">
-              { dataset === "" && emptyTraining === "" && newData
-                ? `Model Performance Gap to Ceiling vs Ceiling`
-                : emptyTraining === "" && dataset !== ""
-                ? `${DATASET_LABEL_MAP[dataset]} : Model Performance Gap to Ceiling vs Ceiling`
+//                     {/* title display logic */}
+//           {!loadingNew && (
+//             <div className="chart-title">
+//               { dataset === "" && emptyTraining === "" && newData
+//                 ? `Model Performance Gap to Ceiling vs Ceiling`
+//                 : emptyTraining === "" && dataset !== ""
+//                 ? `${DATASET_LABEL_MAP[dataset]} : Model Performance Gap to Ceiling vs Ceiling`
 
-                : emptyTraining === "Murty185" && dataset === ""
-                ? `Model Performance Gap to Ceiling vs Ceiling (Trained on Murty185)`
+//                 : emptyTraining === "Murty185" && dataset === ""
+//                 ? `Model Performance Gap to Ceiling vs Ceiling (Trained on Murty185)`
 
-                : emptyTraining === "NSD" && dataset === ""
-                ? `Model Performance Gap to Ceiling vs Ceiling (Trained on NSD1000)`
+//                 : emptyTraining === "NSD" && dataset === ""
+//                 ? `Model Performance Gap to Ceiling vs Ceiling (Trained on NSD1000)`
 
-                : emptyTraining === "NSD" && dataset !== ""
-                ? `${DATASET_LABEL_MAP[dataset]} : Model Performance Gap to Ceiling vs Ceiling (Trained on NSD1000)`
+//                 : emptyTraining === "NSD" && dataset !== ""
+//                 ? `${DATASET_LABEL_MAP[dataset]} : Model Performance Gap to Ceiling vs Ceiling (Trained on NSD1000)`
 
-                 : emptyTraining === "Murty185" && dataset !== ""
-                ? `${DATASET_LABEL_MAP[dataset]} : Model Performance Gap to Ceiling vs Ceiling (Trained on Murty185)`
+//                  : emptyTraining === "Murty185" && dataset !== ""
+//                 ? `${DATASET_LABEL_MAP[dataset]} : Model Performance Gap to Ceiling vs Ceiling (Trained on Murty185)`
              
                 
-                : ""}
-            </div>
-          )}
+//                 : ""}
+//             </div>
+//           )}
          
-          <ChartSelect chartType={chartType} setChartType={setChartType} rank={rank} setRank={setRank} enable={getEnable(current, training, dataset, region)}/>
+//           <ChartSelect chartType={chartType} setChartType={setChartType} rank={rank} setRank={setRank} enable={getEnable(current, training, dataset, region)}/>
           
   
 
-          {/* ScatterGapCeiling */}
-          {!loadingNew && dataset === "" && emptyTraining === ""   && (
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
-          )}
-           {!loadingNew && dataset === "" && emptyTraining !== ""   && (
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
-          )}
+//           {/* ScatterGapCeiling */}
+//           {!loadingNew && dataset === "" && emptyTraining === ""   && (
+//             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
+//           )}
+//            {!loadingNew && dataset === "" && emptyTraining !== ""   && (
+//             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
+//           )}
 
-          {!loadingNew && dataset !== "" && emptyTraining === ""  && (
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
-          )}
+//           {!loadingNew && dataset !== "" && emptyTraining === ""  && (
+//             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
+//           )}
 
-           {!loadingNew && dataset !== "" && emptyTraining !== ""  && (
-            <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
-          )}
+//            {!loadingNew && dataset !== "" && emptyTraining !== ""  && (
+//             <ScatterGapCeiling nsdData={ROI_DATASET_NSD} murtyData={ROI_DATASET_Murty} ceilingData={Ceiling} roi = {region} dataset={dataset} training={emptyTraining}/>
+//           )}
 
 
     
 
-           {dataset !== "" && (
-            <DatasetCard dataset={dataset}/>
-          )
-          }
+//            {dataset !== "" && (
+//             <DatasetCard dataset={dataset}/>
+//           )
+//           }
          
-          {emptyTraining === "Murty185" && (
-            <DatasetCard dataset={"murty185"}/>
-          )
-          }
-          {emptyTraining === "NSD" && (
-            <DatasetCard dataset={"nsd_1000"}/>
-          )
-          }
+//           {emptyTraining === "Murty185" && (
+//             <DatasetCard dataset={"murty185"}/>
+//           )
+//           }
+//           {emptyTraining === "NSD" && (
+//             <DatasetCard dataset={"nsd_1000"}/>
+//           )
+//           }
           
-           {region !== "" && (
-            <ROICard region={region}/>
-          )
-          }
-            <div style={{ textAlign: "right" }}>
-            <Button
-              type="primary"
-              style={{ marginTop: 16, width: "150px" }}
-              onClick={handleDownloadZip}
-            >
-              Download Raw Data
-            </Button>
-        </div>
+//            {region !== "" && (
+//             <ROICard region={region}/>
+//           )
+//           }
+//             <div style={{ textAlign: "right" }}>
+//             <Button
+//               type="primary"
+//               style={{ marginTop: 16, width: "150px" }}
+//               onClick={handleDownloadZip}
+//             >
+//               Download Raw Data
+//             </Button>
+//         </div>
          
        
-        </div>
-      ),
-      icon: <SmileOutlined />,
-    },
-    {
-      title: 'Training Sources',
+//         </div>
+//       ),
+//       icon: <SmileOutlined />,
+//     },
+//     {
+//       title: 'Training Sources',
 
-      content: (
+//       content: (
 
-        <div style={{ display: 'flex', flexDirection: 'column'}}>
+//         <div style={{ display: 'flex', flexDirection: 'column'}}>
 
-          {/* panel display logic */}
-          <ROISelect region={region} setRegion={setRegion} dataset={dataset} setDataset={setDataset} allowToggle={true} mode={2} training={training}/>
-          <DatasetSelect dataset={dataset} setDataset={setDataset} training={setTraining} region = {region} allowToggle={true} mode ={4}/>
+//           {/* panel display logic */}
+//           <ROISelect region={region} setRegion={setRegion} dataset={dataset} setDataset={setDataset} allowToggle={true} mode={2} training={training}/>
+//           <DatasetSelect dataset={dataset} setDataset={setDataset} training={setTraining} region = {region} allowToggle={true} mode ={4}/>
          
      
-          {/* title display logic */}
-          {!loadingNew && (
-            <div className="chart-title">
-              { region === "" && dataset === "" && newData
-                ? `Across-Regions: Models Performence (Trained on Murty vs Trained on NSD1000)`
-                :region !== "" && dataset === "" && newData
-                ? `${region.toUpperCase()}: Models Performence (Trained on Murty vs Trained on NSD1000)`
-                :region === "" && dataset !== "" && newData
-                ? `${DATASET_LABEL_MAP[dataset]}: Models Performence (Trained on Murty vs Trained on NSD1000)`
+//           {/* title display logic */}
+//           {!loadingNew && (
+//             <div className="chart-title">
+//               { region === "" && dataset === "" && newData
+//                 ? `Across-Regions: Models Performence (Trained on Murty vs Trained on NSD1000)`
+//                 :region !== "" && dataset === "" && newData
+//                 ? `${region.toUpperCase()}: Models Performence (Trained on Murty vs Trained on NSD1000)`
+//                 :region === "" && dataset !== "" && newData
+//                 ? `${DATASET_LABEL_MAP[dataset]}: Models Performence (Trained on Murty vs Trained on NSD1000)`
 
-                :region !== "" && dataset !== "" && newData
-                ? `${region.toUpperCase()}/${DATASET_LABEL_MAP[dataset]}: Models Performence (Trained on Murty vs Trained on NSD1000)`
+//                 :region !== "" && dataset !== "" && newData
+//                 ? `${region.toUpperCase()}/${DATASET_LABEL_MAP[dataset]}: Models Performence (Trained on Murty vs Trained on NSD1000)`
 
 
-                : ""}
+//                 : ""}
 
-            </div>
-          )}
+//             </div>
+//           )}
          
-          <ChartSelect chartType={chartType} setChartType={setChartType} rank={rank} setRank={setRank} enable={getEnable(current, training, dataset, region)}/>
+//           <ChartSelect chartType={chartType} setChartType={setChartType} rank={rank} setRank={setRank} enable={getEnable(current, training, dataset, region)}/>
           
   
 
-          {/* Scatter */}
-          {!loadingNew && dataset === "" && region === ""   && (
-            <ScatterMurtyVsNsd 
-              nsdData={nsdData} 
-              murtyData={murtyData} 
-              roi={"Overall"} 
-              dataset={dataset} 
-              chartType={chartType} 
-              showOverlay={true}
-               onModelClick={(model: string) => setSelectedModel(model)} />
+//           {/* Scatter */}
+//           {!loadingNew && dataset === "" && region === ""   && (
+//             <ScatterMurtyVsNsd 
+//               nsdData={nsdData} 
+//               murtyData={murtyData} 
+//               roi={"Overall"} 
+//               dataset={dataset} 
+//               chartType={chartType} 
+//               showOverlay={true}
+//                onModelClick={(model: string) => setSelectedModel(model)} />
               
 
-          )}
+//           )}
 
 
-          {!loadingNew && dataset !== "" && region === ""   && (
-            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={"Overall"} dataset={dataset} chartType={chartType} showOverlay={false}  onModelClick={(model: string) => setSelectedModel(model)} />
-          )}
+//           {!loadingNew && dataset !== "" && region === ""   && (
+//             <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={"Overall"} dataset={dataset} chartType={chartType} showOverlay={false}  onModelClick={(model: string) => setSelectedModel(model)} />
+//           )}
 
-          {!loadingNew && dataset === "" && region !== ""   && (
-            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={false}  onModelClick={(model: string) => setSelectedModel(model)} />
-          )}
+//           {!loadingNew && dataset === "" && region !== ""   && (
+//             <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={false}  onModelClick={(model: string) => setSelectedModel(model)} />
+//           )}
 
-           {!loadingNew && dataset !== "" && region !== ""   && (
-            <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={false}  onModelClick={(model: string) => setSelectedModel(model)} />
-          )}
+//            {!loadingNew && dataset !== "" && region !== ""   && (
+//             <ScatterMurtyVsNsd nsdData={nsdData} murtyData={murtyData} roi={region} dataset={dataset} chartType={chartType} showOverlay={false}  onModelClick={(model: string) => setSelectedModel(model)} />
+//           )}
 
-          {/* {
-            selectedModel && 
-            <ModelCard region={region} dataset={training} model={selectedModel}/>
-          } */}
+//           {/* {
+//             selectedModel && 
+//             <ModelCard region={region} dataset={training} model={selectedModel}/>
+//           } */}
 
-           {dataset !== "" && (
-            <DatasetCard dataset={dataset}/>
-          )
-          }
+//            {dataset !== "" && (
+//             <DatasetCard dataset={dataset}/>
+//           )
+//           }
          
-          {emptyTraining === "Murty185" && (
-            <DatasetCard dataset={"murty185"}/>
-          )
-          }
-          {emptyTraining === "NSD" && (
-            <DatasetCard dataset={"nsd_1000"}/>
-          )
-          }
+//           {emptyTraining === "Murty185" && (
+//             <DatasetCard dataset={"murty185"}/>
+//           )
+//           }
+//           {emptyTraining === "NSD" && (
+//             <DatasetCard dataset={"nsd_1000"}/>
+//           )
+//           }
           
-           {region !== "" && (
-            <ROICard region={region}/>
-          )
-          }
-            <div style={{ textAlign: "right" }}>
-            <Button
-              type="primary"
-              style={{ marginTop: 16, width: "150px" }}
-              onClick={handleDownloadZip}
-            >
-              Download Raw Data
-            </Button>
-        </div>
+//            {region !== "" && (
+//             <ROICard region={region}/>
+//           )
+//           }
+//             <div style={{ textAlign: "right" }}>
+//             <Button
+//               type="primary"
+//               style={{ marginTop: 16, width: "150px" }}
+//               onClick={handleDownloadZip}
+//             >
+//               Download Raw Data
+//             </Button>
+//         </div>
          
        
-        </div>
+//         </div>
 
-      ),
-      icon: <SmileOutlined />,
+//       ),
+//       icon: <SmileOutlined />,
 
-    }
+//     }
     
     
 
-  ];
+//   ];
 
-  return (
-    <>
-    <Steps>
-        {steps.map((item, index) => (
-            <Steps.Step
-            key={item.title}
-            title={item.title}
-            icon={item.icon}
-            status={current === index ? 'process' : 'wait'}
-            onClick={() => {
-                setManualStepChange(true); 
-                setCurrent(index);
-                if (index === 0) {
-                    setRegion("");
-                    setDataset("");
-                    setTraining("NSD");
-                    setChartType("uni")
-                    setRank("rank");
-                } else if (index === 1) {
-                    setRegion("");
-                    setEmptyTraining("");
-                    setDataset("");
-                    setChartType("uni");
-                    setRank("rank");
-                } else if(index == 2) {
+//   return (
+//     <>
+//     <Steps>
+//         {steps.map((item, index) => (
+//             <Steps.Step
+//             key={item.title}
+//             title={item.title}
+//             icon={item.icon}
+//             status={current === index ? 'process' : 'wait'}
+//             onClick={() => {
+//                 setManualStepChange(true); 
+//                 setCurrent(index);
+//                 if (index === 0) {
+//                     setRegion("");
+//                     setDataset("");
+//                     setTraining("NSD");
+//                     setChartType("uni")
+//                     setRank("rank");
+//                 } else if (index === 1) {
+//                     setRegion("");
+//                     setEmptyTraining("");
+//                     setDataset("");
+//                     setChartType("uni");
+//                     setRank("rank");
+//                 } else if(index == 2) {
       
-                    setDataset("");
-                    setEmptyTraining("");
-                    setRegion("");
-                    setChartType("uni");
-                    setRank("rank");
-                } else if(index == 3) {
-                    setDataset("");
-                    setRegion("");
-                    setTraining("");
-                    setEmptyTraining("");
-                    setChartType("uni");
-                    setRank("rank");
-                }
+//                     setDataset("");
+//                     setEmptyTraining("");
+//                     setRegion("");
+//                     setChartType("uni");
+//                     setRank("rank");
+//                 } else if(index == 3) {
+//                     setDataset("");
+//                     setRegion("");
+//                     setTraining("");
+//                     setEmptyTraining("");
+//                     setChartType("uni");
+//                     setRank("rank");
+//                 }
                 
                 
-            }
-        }
-            style={{ cursor: 'pointer' }}
-            />
-        ))}
-    </Steps>
+//             }
+//         }
+//             style={{ cursor: 'pointer' }}
+//             />
+//         ))}
+//     </Steps>
 
-      <div style={contentStyle}>{steps[current].content}</div>
+//       <div style={contentStyle}>{steps[current].content}</div>
 
-    </>
+//     </>
+//   );
+// };
+
+// export default ScoreboardPageQualitative;
+import React from "react";
+import { Typography, Card, Row, Col } from "antd";
+
+const { Title, Paragraph, Text } = Typography;
+
+const ScoreboardPageQualitative: React.FC = () => {
+  return (
+    <div style={{ padding: "24px" }}>
+      {/* Page Title */}
+      <Title level={2}>Qualitative Analysis</Title>
+      <Paragraph type="secondary">
+        Explore qualitative insights, observations, and interpretation of model behavior.
+      </Paragraph>
+
+      {/* Content Area */}
+      <Row gutter={[16, 16]}>
+        {/* Example Section 1 */}
+        <Col span={24}>
+          <Card title="Key Observations" bordered>
+            <Paragraph>
+              Add your qualitative findings here.
+              <br />
+              Example:
+            </Paragraph>
+
+            <ul>
+              <li>Model A shows stronger alignment with PPA semantics.</li>
+              <li>Model B captures structure but misses fine-grained texture.</li>
+              <li>Training dataset influences representational bias.</li>
+            </ul>
+          </Card>
+        </Col>
+
+        {/* Example Section 2 */}
+        <Col span={12}>
+          <Card title="Interpretation">
+            <Text>
+              Use this area to describe why certain models behave differently.
+              You can connect this to neuroscience hypotheses or dataset differences.
+            </Text>
+          </Card>
+        </Col>
+
+        {/* Example Section 3 */}
+        <Col span={12}>
+          <Card title="Notes / Future Questions">
+            <ul>
+              <li>Does scaling improve ROI specificity?</li>
+              <li>Are failures due to architecture or supervision signal?</li>
+              <li>What qualitative trends match quantitative scores?</li>
+            </ul>
+          </Card>
+        </Col>
+      </Row>
+    </div>
   );
 };
 

@@ -5,7 +5,7 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import { Typography, Link } from '@mui/material';
-import { MODEL_OPTIONS, MODELCARD_INFO_LOOKUP } from './constants';
+import { MODEL_OPTIONS, MODELCARD_INFO_LOOKUP } from '../constants';
 
 const ModelCard = ({ region, dataset, model }) => {
   console.log("ModelCard: model:", model, "region:", region, "dataset:", dataset);

@@ -1,19 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import axios from 'axios';
 import { Button, message, Steps, theme } from 'antd';
 import { SmileOutlined } from '@ant-design/icons';
-import Uploader from './uploader.tsx';
-import BarChart from './barchart.jsx';
-import Settings from './settings.jsx';
-import Heatmap from './heatmap.jsx';
-import { useMemo } from "react";
-import axios from 'axios';
-
-import RegionSelector from './regionselector.jsx';
-import PaperSelector from './paperselector.jsx';
-import ModelCard from './modelcard.jsx';
-import LinearIndeterminate from './linearprogessor.jsx';
 import { uploadImages } from './services/imageUploader.js';
 import { SERVER_URL } from './services/config';
+
+//main component
+import LinearIndeterminate from './Lab/linearprogessor.jsx';
+import Uploader from './Lab/uploader.tsx';
+import RegionSelector from './Lab/regionselector.jsx';
+import Settings from './Lab/settings.jsx';
+import ModelCard from './Lab/modelcard.jsx';
+// import PaperSelector from './paperselector.jsx'; 
+
+// visualization graphics
+import BarChart from './Lab/barchart.jsx';
+import Heatmap from './Lab/heatmap.jsx';
+
+
 
 const { Step } = Steps;
 const SERVER_BASE_URL = SERVER_URL;
@@ -133,16 +137,6 @@ const Stepper: React.FC = () => {
     setFileMappings(newFileMappings);
   };
 
-  // useEffect(() => {
-  //   console.log("📁 Updated files state:", files);
-  // }, [files]);
-
-  // Trigger prediction when settings change or files are uploaded
-  // useEffect(() => {
-  //   setPredictionResult(null); // Clear previous results
-  //   setPredictstep(1); // Reset button
-  //   handlePrediction();
-  // }, [model, dataset, region, voxelOption, voxelNumber, paper, participantName]);
 
   useEffect(() => {
     // Only auto-trigger prediction if we're on Step 3 (index 2)
@@ -216,35 +210,6 @@ const Stepper: React.FC = () => {
     border: 'none',
     marginTop: 16,
   };
-
-  // const downloadData = () => {
-  //   if (predictionResult) {
-  //     // Extract only the 'voxels' part of the prediction result
-  //     const voxelsData = predictionResult[0]?.voxels; // Access the first element and then the voxels property
-
-  //     if (voxelsData) {
-  //       const jsonString = JSON.stringify(voxelsData, null, 2);
-  //       const blob = new Blob([jsonString], { type: "application/json" });
-  //       const url = URL.createObjectURL(blob);
-  //       const a = document.createElement("a");
-  //       a.href = url;
-
-  //       // Construct the filename using the state variables and a timestamp
-  //       const timestamp = new Date().toISOString().replace(/[:\-T.]/g, ""); // Create a timestamp string
-  //       const filename = `murtylab_${model}_${dataset}_${region}_${timestamp}.json`;
-  //       a.download = filename;
-  //       document.body.appendChild(a);
-  //       a.click();
-  //       document.body.removeChild(a);
-  //       URL.revokeObjectURL(url);
-  //       message.success("Voxels data downloading complete!");
-  //     } else {
-  //       message.error("No voxels data available to download.");
-  //     }
-  //   } else {
-  //     message.error("No prediction result available to download.");
-  //   }
-  // };
 
   //support csv download
   const downloadData = () => {

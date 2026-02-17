@@ -14,7 +14,7 @@ import {
   MODEL_OPTIONS,
   DATASET_OPTIONS,
   VOXEL_OPTIONS,
-} from './constants';
+} from '../constants';
 
 const Settings = ({
   model,

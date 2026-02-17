@@ -1,20 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Button, Radio } from 'antd';
 
+// LoadData
+import useLoadDataNew from './loadDataNew.jsx';
+
+//selector
 import TrainingSelectNew from './trainingselectnew.jsx';
 import ROISelectNew from './roiselectnew.jsx';
 import DatasetSelectNew from './datasetselectnew.jsx';
 import SelectedFiltersBar from './selectFiltersBar.jsx';
+
 import ChartSelect from './chartselect.jsx'; 
+import PageSelect from './pageselect.jsx';
+import QuestionSelect from './questionselect.jsx';
+
+
+//Heatmap
 import HeatmapOverview from './heatmapOverview.jsx';
 import HeatmapDetail from './heatmapDetail.jsx';
-import ScatterMurtyVsNsd from './scatterMurtyVsNsd.jsx';
-import PageSelect from './pageselect.jsx';
+
+//Barchart
 import BarChartDetail from './barchartdetail.jsx'; 
 import BarChartOverview from './barchartoverview.jsx';
-import QuestionSelect from './questionselect.jsx';
+
+//advanced insights
 import ScatterGapCeiling from './roiDatasetScatter.jsx';
-import useLoadDataNew from './loadDataNew.jsx';
+import ScatterMurtyVsNsd from './scatterMurtyVsNsd.jsx';
+
 
 const { Title } = Typography;
 
@@ -117,9 +129,6 @@ const ScoreboardPageNew: React.FC = () => {
       setTraining(''); 
     }
   }, [pageView]);
-
-
-
 
 
   type newData = {
