@@ -272,7 +272,7 @@ const Uploader: React.FC<UploaderProps> = ({ onFilesUploaded, onFileMappingsUpda
         percent={progressPercent}
         status={progressPercent === 100 ? "success" : "active"}
         style={{ marginTop: 0 }}
-        strokeColor="#1890ff"
+        strokeColor="var(--highlight-color-button)"
       />
     </div>
   );

@@ -30,7 +30,13 @@ const ModelCard = ({ region, dataset, model }) => {
             Model Card
           </Typography>
           <Typography variant="h5" component="div">
-            <Link href={cardUrl} underline="hover">
+            <Link href={cardUrl} underline="hover"
+            sx={{
+              background: "var(--highlight-color)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+           >
               {modelName}
             </Link>
           </Typography>

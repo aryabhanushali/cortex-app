@@ -42,28 +42,31 @@
     .landing-left h1 {
       font-size: 3rem;
       font-weight: bold;
-      color: #012970;
+      /* color: #012970; */
+       color: var(--tungsten);
     }
 
     .try-btn {
-  display: inline-block;
-  margin-top: 2rem;
-  padding: 1rem 2rem;
-  border-radius: 9999px;
-  background: linear-gradient(to bottom, #4154f1, #4154f1);
-  color: #ffffff; /* white text */
-  font-weight: 600;
-  font-size: 1.2rem;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  text-decoration: none;
-  transition: all 0.2s ease-in-out;
-}
+      display: inline-block;
+      margin-top: 2rem;
+      padding: 1rem 2rem;
+      border-radius: 9999px;
+      /* background: linear-gradient(to bottom, #4154f1, #4154f1); */
+      background: var(--tungsten);
+      color: #ffffff; /* white text */
+      font-weight: 600;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      text-decoration: none;
+      transition: all 0.2s ease-in-out;
+    }
 
-.try-btn:hover {
-  background: linear-gradient(to bottom, #2d367f, #2d367f);
-  color: #ffffff; /* keep text white */
-  transform: translateY(-2px);
-}
+    .try-btn:hover {
+      background: linear-gradient(135deg, #c98d9a 0%, #b8a4bc 50%, #c4b4cc 100%); 
+      /* linear-gradient(to bottom, #2d367f, #2d367f); */
+      color: #ffffff; /* keep text white */
+      transform: translateY(-2px);
+    }
 
 
 .landing-right {
@@ -89,7 +92,7 @@
   padding: 0.8rem 1rem;
   margin: 0.5rem 0;
   border-radius: 10px;
-
+  color: var(--tungsten);
   font-weight: 600;
   position: relative;
 }
@@ -100,7 +103,7 @@
   display: block;
   font-size: 0.9rem;
   font-weight: 400;
-  color: #555;
+  color: var(--text-sub);
   margin-top: 0.2rem;
 }
 

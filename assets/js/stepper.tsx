@@ -4,6 +4,7 @@ import { Button, message, Steps, theme } from 'antd';
 import { SmileOutlined } from '@ant-design/icons';
 import { uploadImages } from './services/imageUploader.js';
 import { SERVER_URL } from './services/config';
+import { ConfigProvider } from 'antd'; 
 
 //main component
 import LinearIndeterminate from './Lab/linearprogessor.jsx';
@@ -339,8 +340,25 @@ const Stepper: React.FC = () => {
     },
   ];
 
-  return (
-    <>
+ return (
+  <>
+    <ConfigProvider
+      theme={{
+        components: {
+          Steps: {
+            colorPrimary: "var(--tungsten)", // Customize the primary color for Steps
+          },
+          Button: {
+            colorPrimary: "var(--tungsten)",                 // 正常状态
+            colorPrimaryHover: "var(--highlight-color-button)", // hover
+            colorPrimaryActive: "var(--highlight-color-button)", // 点击时
+          },
+           Progress: {
+            colorPrimary: "var(--highlight-color-button)",
+          },
+        },
+      }}
+    >
       <Steps current={current} onChange={onChange}>
         {steps.map((item) => (
           <Step key={item.title} title={item.title} icon={item.icon} />
@@ -350,13 +368,11 @@ const Stepper: React.FC = () => {
       <div style={contentStyle}>{steps[current].content}</div>
 
       <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end", gap: "8px" }}>
-
         {current === 0 && (
           <Button
             type="primary"
             onClick={() => {
               message.success("Image Upload complete!");
-
               next();
             }}
             disabled={loading || files.length === 0}
@@ -378,17 +394,14 @@ const Stepper: React.FC = () => {
         )}
 
         {current === steps.length - 1 && (
-          <Button
-            type="primary"
-            onClick={downloadData}
-            disabled={!predictionResult} // Disable if no prediction result
-          >
+          <Button type="primary" onClick={downloadData} disabled={!predictionResult}>
             Download Data
           </Button>
         )}
       </div>
-    </>
-  );
+    </ConfigProvider>
+  </>
+);
 };
 
 export default Stepper;
