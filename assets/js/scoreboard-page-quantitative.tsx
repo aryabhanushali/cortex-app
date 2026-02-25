@@ -217,7 +217,7 @@ return (
         overflow: 'hidden', 
         padding: '16px',    
         boxSizing: 'border-box',
-        background: '#fff' 
+        background: 'var(--background-color)', 
       }}
     >
       {/* 2. SelectedFiltersBar */}
@@ -301,8 +301,8 @@ return (
               style={{
                 borderRadius: 6,
                 fontWeight: 500,
-                color: hasFilters ? '#1890ff' : '#aaa',
-                borderColor: hasFilters ? '#1890ff' : '#ccc',
+                color: hasFilters ? 'var(--tungsten)' : '#aaa',
+                borderColor: hasFilters ? 'var(--tungsten)' : '#ccc',
               }}
             >
               Default

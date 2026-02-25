@@ -90,7 +90,7 @@ const DatasetSelect = ({ dataset, setDataset, training, region, allowToggle, mod
                     onChange={() => handleChange(option.value)}
                     disabled={!isEnabled(option)}
                     sx={{
-                      '&.Mui-checked': { color: '#55d6cdff' },
+                      '&.Mui-checked': { color: 'rgb(111, 126, 121)' },
                       '&.Mui-disabled': { color: '#b0b0b0' },
                     }}
                   />

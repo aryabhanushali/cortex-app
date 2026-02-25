@@ -5,17 +5,17 @@ const SelectedFiltersBar = ({ training, region, dataset, clearSingle, onTagClick
   const selected = [];
 
   // order: training region dataset
-  if (training) selected.push({ key: 'training', label: training, color: '#b8c4de' });
+  if (training) selected.push({ key: 'training', label: training, color: 'rgb(118, 128, 145)' });
 
   if (Array.isArray(region) && region.length > 0) {
     region.forEach((r) => {
-      selected.push({ key: `region-${r}`, label: r.toUpperCase(), color: '#e5cf98' });
+      selected.push({ key: `region-${r}`, label: r.toUpperCase(), color: '#615841' });
     });
   }
 
   if (Array.isArray(dataset) && dataset.length > 0) {
     dataset.forEach((r) => {
-      selected.push({ key: `dataset-${r}`, label: r.toUpperCase(), color: '#9bbfc4ff' });
+      selected.push({ key: `dataset-${r}`, label: r.toUpperCase(), color: 'rgb(111, 126, 121)' });
     });
   }
  

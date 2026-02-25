@@ -56,9 +56,9 @@ const TrainingSelect = ({ training, setTraining, dataset, vsOption, expanded, on
                     // if VS, selected and blackout
                     disabled={isVSMode}
                     sx={{
-                      '&.Mui-checked': { color: '#5562d6ff' },
+                      '&.Mui-checked': { color: 'rgb(118, 128, 145)' },
                       '&.Mui-disabled': { 
-                        color: isVSMode ? '#5562d6ff' : 'inherit',
+                        color: isVSMode ? 'rgb(118, 128, 145)' : 'inherit',
                         opacity: isVSMode ? 0.8 : 1 
                       },
                     }}

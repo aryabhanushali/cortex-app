@@ -121,7 +121,7 @@ const ROISelect = ({ region, setRegion, dataset, setDataset, allowToggle, mode, 
                     onChange={() => handleChange(option.value)}
                     disabled={!isEnabled(option)}
                     sx={{
-                      '&.Mui-checked': { color: '#e8de70ff' },
+                      '&.Mui-checked': { color: '#615841' },
                       '&.Mui-disabled': { color: '#b0b0b0' },
                     }}
                   />

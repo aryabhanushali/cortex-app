@@ -19,17 +19,31 @@ const ChartSelect = ({ chartType, setChartType, rank, setRank, enable }) => {
         <ButtonGroup size="small" fullWidth variant="outlined">
           {CHART_TYPE_OPTIONS.map((option) => (
             <Button
-              key={option.value}
-              onClick={() => setChartType(option.value)}
-              variant={chartType === option.value ? "contained" : "outlined"}
-              style={{ 
-                fontSize: '12px',      
-                padding: '4px 2px',   
-                textTransform: 'none'  
-              }}
-            >
-              {option.label}
-            </Button>
+                key={option.value}
+                onClick={() => setChartType(option.value)}
+                variant={chartType === option.value ? "contained" : "outlined"}
+                sx={{
+                  fontSize: '12px',
+                  padding: '4px 2px',
+                  textTransform: 'none',
+
+                  borderColor: "var(--tungsten)",
+                  color: chartType === option.value
+                    ? "white"
+                    : "var(--tungsten)",
+
+                  backgroundColor: chartType === option.value
+                    ? "var(--tungsten)"
+                    : "transparent",
+
+                  // "&:hover": {
+                  //   backgroundColor: "var(--accent-color)",
+                  //   borderColor: "var(--tungsten)",
+                  // }
+                }}
+              >
+                 {option.label}
+              </Button>
           ))}
         </ButtonGroup>
       </div>
@@ -44,10 +58,29 @@ const ChartSelect = ({ chartType, setChartType, rank, setRank, enable }) => {
                 key={option.value}
                 onClick={() => setRank(prev => prev === option.value ? "" : option.value)}
                 variant={rank === option.value ? "contained" : "outlined"}
-                style={{ 
-                  fontSize: '10px', 
+                // style={{ 
+                //   fontSize: '12px', 
+                //   padding: '4px 2px',
+                //   textTransform: 'none'
+                // }}
+                sx={{
+                  fontSize: '12px',
                   padding: '4px 2px',
-                  textTransform: 'none'
+                  textTransform: 'none',
+
+                  borderColor: "var(--tungsten)",
+                  color: rank === option.value
+                    ? "white"
+                    : "var(--tungsten)",
+
+                  backgroundColor: rank === option.value
+                    ? "var(--tungsten)"
+                    : "transparent",
+
+                  // "&:hover": {
+                  //   backgroundColor: "var(--accent-color)",
+                  //   borderColor: "var(--tungsten)",
+                  // }
                 }}
               >
                 {option.label}
