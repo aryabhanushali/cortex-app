@@ -20,6 +20,7 @@
   --contrast-color: #ffffff; /* Contrast color for text, ensuring readability against backgrounds of accent, heading, or default colors. */
   --highlight-color: linear-gradient(135deg, #b66072 0%, #875e8f 50%, #8b669f 100%); /* Highlight color for important elements, such as active navigation links, call-to-action buttons, or other elements that require extra emphasis. */
   --highlight-color-button: linear-gradient(135deg, #c98d9a 0%, #b8a4bc 50%, #c4b4cc 100%);
+  --highlight-color-background: linear-gradient(135deg, #c98d9a30 0%, #b8a4bc30 50%, #c4b4cc30 100%);
 }
 
 /* Nav Menu Colors - The following color variables are used specifically for the navigation menu. They are separate from the global colors to allow for more customization options */
@@ -65,7 +66,7 @@
 
 
 .gradient-text {
-  background: var(--highlight-color-button); 
+  background: var(--highlight-color); 
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

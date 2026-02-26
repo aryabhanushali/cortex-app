@@ -37,6 +37,7 @@
       align-items: center;
       gap: 4rem;
       flex-wrap: wrap;
+      
     }
 
     .landing-left h1 {
@@ -48,7 +49,6 @@
 
     .try-btn {
       display: inline-block;
-      margin-top: 2rem;
       padding: 1rem 2rem;
       border-radius: 9999px;
       /* background: linear-gradient(to bottom, #4154f1, #4154f1); */
@@ -70,10 +70,9 @@
 
 
 .landing-right {
-  background: linear-gradient(to bottom right, #f5f9fc, #e9f0f7);
+  background: var(--highlight-color-background);
   border-radius: 20px;
   padding: 2rem;
-  color: #012970;
   font-size: 1rem;
   box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.1);
   min-width: 300px;
@@ -107,6 +106,25 @@
   margin-top: 0.2rem;
 }
 
+.scoreboard-group {
+  display: flex;
+  align-items: center;       
+  justify-content: flex-start;
+  gap: 3rem;
+  margin-top: 3rem;
+}
+
+.scoreboard-group h3 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  width: 150px;     
+}
+
+.scoreboard-buttons {
+  display: flex;
+  gap: 1.5rem;
+}
 
 
   </style>
@@ -147,8 +165,23 @@
           <strong>datasets</strong>. Explore how different models generalize across tasks,
           and customize comparisons to fit your research needs.
         </p>
-        <a href="/scoreboardQuantitative/" class="try-btn">Quantitative</a>
-        <a href="/scoreboardQualitative/" class="try-btn">Qualitative</a>
+        <!-- <a href="/scoreboardQuantitative/" class="try-btn">Quantitative</a>
+        <a href="/scoreboardQualitative/" class="try-btn">Qualitative</a> -->
+
+        <div class="scoreboard-group">
+          <h3 >Quantitative</h3>
+          <div >
+            <a href="/scoreboardQuantitative/" class="try-btn">Leaderboard</a>
+            <a href="/scoreboardAdvanced/" class="try-btn">Advanced Insight</a>
+          </div>
+        </div>
+
+        <div class="scoreboard-group" style="margin-top: 2rem;">
+          <h3>Qualitative</h3>
+          <div >
+            <a href="/scoreboardQualitative/" class="try-btn">Leaderboard</a>
+          </div>
+        </div>
       </div>
 
       <!-- Right Side -->
