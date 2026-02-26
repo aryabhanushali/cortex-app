@@ -11,8 +11,28 @@
     window.scrollY > 100 ? selectBody.classList.add('scrolled') : selectBody.classList.remove('scrolled');
   }
 
+
   document.addEventListener('scroll', toggleScrolled);
   window.addEventListener('load', toggleScrolled);
+
+  /**
+   * Sync header height to CSS var --header-h
+   */
+  function syncHeaderHeightVar() {
+    const header = document.querySelector('#header');
+    const h = header ? header.offsetHeight : 0;
+    document.documentElement.style.setProperty('--header-h', `${h}px`);
+  }
+
+  window.addEventListener('load', syncHeaderHeightVar);
+  window.addEventListener('resize', syncHeaderHeightVar);
+
+  
+  document.addEventListener('click', (e) => {
+    if (e.target && e.target.closest && e.target.closest('.mobile-nav-toggle')) {
+      requestAnimationFrame(syncHeaderHeightVar);
+    }
+  });
 
   /**
    * Mobile nav toggle

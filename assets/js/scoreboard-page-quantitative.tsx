@@ -12,7 +12,7 @@ import DatasetSelect from './Scoreboard/Settings/datasetselect.jsx';
 
 
 import ChartSelect from './Scoreboard/Settings/chartselect.jsx'; 
-import PageSelect from './Scoreboard/Settings/pageselect.jsx';
+// import PageSelect from './Scoreboard/Settings/pageselect.jsx';
 import QuestionSelect from './Scoreboard/Settings/questionselect.jsx';
 
 
@@ -44,7 +44,12 @@ const ScoreboardPageQuantitative: React.FC = () => {
   // interaction variable for overview and details
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 0 });
 
-  const [pageView, setPageView] = useState('rank');
+  // const [pageView, setPageView] = useState('rank');
+  const initialView = (() => {
+    const v = new URLSearchParams(window.location.search).get("view");
+    return v === "2" ? "2" : "rank";
+  })();
+  const [pageView, setPageView] = useState(initialView);
  
   const isDatasetDetailMode = pageView === 'rank' && dataset.length > 0 && !region.includes('Across Regions');
   const [activeQuestion, setActiveQuestion] = useState('q1');
@@ -210,61 +215,28 @@ return (
     <div
       style={{
         // 1. restrict to screen's height
-        height: '100vh', 
+        height: 'calc(100vh - var(--header-h, 0px))', 
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden', 
-        padding: '16px',    
+        padding: '2px 16px',    
         boxSizing: 'border-box',
         background: 'var(--background-color)', 
       }}
     >
       {/* 2. SelectedFiltersBar */}
       {/* flex: 0 0 auto  */}
-      {/* <div style={{ flex: '0 0 auto', marginBottom: 16 }}>
+      <div style={{ flex: '0 0 auto', marginBottom: 16 }}>
         <SelectedFiltersBar
           training={training}
-          region={region}
-          dataset={dataset}
-          clearSingle={clearSingle}
-        />
-      </div> */}
-
-      {/* --- 顶部工具栏：SelectedFiltersBar 在左(自动换行)，PageSelect 在右(固定) --- */}
-      <div style={{ 
-        flex: '0 0 auto', 
-        marginBottom: 16, 
-        display: 'flex', 
-        flexDirection: 'row',          
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start',      
-        width: '100%',
-        gap: '10px'                    
-      }}>
-        
-        {/* left：auto warp*/}
-        <div style={{ 
-          flex: '1 1 auto', 
-          minWidth: 0 
-        }}>
-          <SelectedFiltersBar
-            training={training}
             region={region}
             dataset={dataset}
             clearSingle={clearSingle}
             onTagClick={handleTagClick}
-          />
-        </div>
-
-        {/* right page setting */}
-        <div style={{ 
-          flex: '0 0 auto',
-          whiteSpace: 'nowrap' 
-        }}>
-          <PageSelect value={pageView} onChange={setPageView} />
-        </div>
+        />
       </div>
+
       {/* 3. body part（left: Filter + right: Charts） */}
       {/* flex: 1 fit all space */}
    
@@ -370,8 +342,6 @@ return (
         </div>
 
         {/* --- right（ChartSelect + overview + details） --- */}
-
-      
         <div
           style={{
             display: 'flex',
@@ -489,7 +459,7 @@ return (
                         flex: 1, 
                         minHeight: 0, 
                         display: 'flex', 
-                        flexDirection: 'column',
+                        flexDirection: 'column'
                         
                       }}>
                         <HeatmapOverview

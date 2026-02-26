@@ -288,7 +288,7 @@ const HeatmapDetail = ({ data, roi, dataset, rank, selectedModel, onModelClick, 
     // ======= Dimensions =======
     const chartWidth = xLabels.length * (columnWidth + columnGap);
     const headerHeight = headerMargin.top + rowHeight;
-    const bodyHeight = models.length * (rowHeight + rowGap) + 50;
+    const bodyHeight = models.length * (rowHeight + rowGap) + 15;
     const width = chartWidth + headerMargin.left + headerMargin.right;
 
     // ======= Header =======

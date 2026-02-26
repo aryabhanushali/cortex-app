@@ -23,45 +23,7 @@ const HeatmapOverview = ({ data, roi, dataset, rank, onModelClick, selectedModel
     const container = d3.select(chartRef.current);
     container.select("svg").remove();
 
-    // --- 1. 数据处理 (保持你原来的逻辑) ---
-    // let xLabels = [];
-    // let models = [];
-    // let cellData = [];
-
-    // if (roi && data[roi]) {
-    //   models = Object.keys(data[roi]).filter((m) => m !== "ceiling");
-    //   xLabels = Array.from(new Set(models.flatMap((m) => Object.keys(data[roi][m] || {}))));
-    //   models.forEach((model) => {
-    //     xLabels.forEach((x) => {
-    //       const vals = data[roi][model]?.[x];
-    //       if (vals) cellData.push({ model, x, raw: vals[0], norm: vals[1] });
-    //     });
-    //   });
-    // } else if (dataset) {
-    //   const rois = Object.keys(data).filter((r) => r !== "overall");
-    //   const seen = new Set();
-    //   rois.forEach((r) => {
-    //     const modelNames = Object.keys(data[r] || {}).filter((m) => m !== "ceiling");
-    //     modelNames.forEach((model) => {
-    //       const vals = data[r][model]?.[dataset];
-    //       if (vals) cellData.push({ model, x: r, raw: vals[0], norm: vals[1] });
-    //       seen.add(model);
-    //     });
-    //   });
-    //   models = Array.from(seen);
-    //   xLabels = rois;
-    // }
-
-    // if (!cellData.length) return;
-
-    // if (rank === "rank") {
-    //   const avg = {};
-    //   models.forEach((m) => {
-    //     const vals = cellData.filter((d) => d.model === m).map((d) => d.raw);
-    //     avg[m] = d3.mean(vals);
-    //   });
-    //   models.sort((a, b) => (avg[b] || 0) - (avg[a] || 0));
-    // }
+   
 
     // --- 1. 数据处理 ---
     let cellData = [];
@@ -113,11 +75,16 @@ const HeatmapOverview = ({ data, roi, dataset, rank, onModelClick, selectedModel
     }
 
     // --- 2. 绘图准备 ---
+    // const sw = 3;   
     const totalWidth = dimensions.width;
-    const totalHeight = dimensions.height;
+    const totalHeight = dimensions.height ;
     const rowHeight = totalHeight / models.length;
     const colWidth = totalWidth / xLabels.length;
     const colorScale = d3.scaleLinear().domain([0, 1]).range(["#D3D3D3", "#9CC9FF"]);
+
+               
+    // const extra = sw;          
+    // const svgHeight = totalHeight + extra;
 
     const svg = container
       .append("svg")
@@ -170,7 +137,7 @@ const HeatmapOverview = ({ data, roi, dataset, rank, onModelClick, selectedModel
   }, [data, roi, dataset, rank, dimensions, onModelClick, selectedModel, visibleRange]); 
 
   return (
-    <div ref={chartRef} style={{ width: "100%", height: "100%", overflow: "hidden", background: "white" }} />
+    <div ref={chartRef} style={{ width: "100%", height: "100%", overflow: "hidden", background: "white", marginBottom:"10px"}} />
   );
 };
 
