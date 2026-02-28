@@ -28,18 +28,20 @@ type PreviewFile = {
   serverKey?: string; 
 };
 
-type ImagePreviewGroupedDnDProps = {
-  files: PreviewFile[];
-  title?: string;
-  groupDepth?: number;
-  showPathDebug?: boolean;
-  onRemove?: (uid: string) => void;
-  onClear?: () => void;
-  onClearGroup?: (groupKey: string, uidsToRemove: string[]) => void;
-  onGroupOrderChange?: (order: string[]) => void;
-};
+
 
 type FileWithPath = File & { webkitRelativePath?: string };
+
+type VoxelsData = Record<
+  string, // imageName
+  Record<
+    string, // subject
+    Record<
+      string, // regionName
+      number[] // voxelArray
+    >
+  >
+>;
 
 const normalizePath = (p: string) =>
   (p || "").replaceAll("\\", "/").replace(/\/+/g, "/");
@@ -401,31 +403,37 @@ const clearAll = () => {
   //support csv download
   const downloadData = () => {
     if (predictionResult) {
-      const voxelsData = predictionResult[0]?.voxels;
+     const voxelsData = predictionResult?.[0]?.voxels as VoxelsData | undefined;
+
+    if (!voxelsData) {
+      message.error("No voxels data available to download.");
+      return;
+    }
   
       if (voxelsData && typeof voxelsData === "object") {
         const csvRows = [];
   
         // Step 1: Collect all headers dynamically
-        const headers = new Set();
+        const headers = new Set<string>();
         const imageRows = [];
   
-        for (const [imageName, subjects] of Object.entries(voxelsData)) {
-          const row = { image: imageName };
-  
-          for (const [subject, regions] of Object.entries(subjects)) {
-            for (const [regionName, voxelArray] of Object.entries(regions)) {
-              voxelArray.forEach((val, i) => {
-                const key = `${subject}_${i}`;
-                row[key] = val;
-                headers.add(key);
-              });
-            }
+        for (const [imageName, subjects] of Object.entries(voxelsData) as [string, VoxelsData[string]][]) {
+        const row: Record<string, number | string> = { image: imageName };
+
+        for (const [subject, regions] of Object.entries(subjects) as [string, VoxelsData[string][string]][]) {
+          for (const [_, voxelArray] of Object.entries(regions) as [string, number[]][]) {
+            voxelArray.forEach((val: number, i: number) => {
+              const key = `${subject}_${i}`;
+              row[key] = val;
+              headers.add(key);
+            });
           }
-          imageRows.push(row);
         }
+
+        imageRows.push(row);
+      }
   
-        const orderedHeaders = ["image", ...Array.from(headers)];
+        const orderedHeaders: string[] = ["image", ...Array.from(headers)];
         csvRows.push(orderedHeaders.join(","));
   
         // Step 2: Write rows based on headers
