@@ -13,11 +13,10 @@ import RegionSelector from './Lab/regionselector.jsx';
 import Settings from './Lab/settings.jsx';
 import ModelCard from './Lab/modelcard.jsx';
 // import PaperSelector from './paperselector.jsx'; 
-
 // visualization graphics
 import BarChart from './Lab/barchart.jsx';
 import Heatmap from './Lab/heatmap.jsx';
-
+import ImagePreviewGroupedDnD from './Lab/imagePreviewGrid.jsx';
 
 
 const { Step } = Steps;
@@ -38,7 +37,6 @@ const useBarchartData = (predictionResult: any) => {
       console.log("❌ predictionResult is missing required fields:", data);
       return [];
     }
-
     const processedData = Object.keys(data.mean).map((filename) => ({
       filename,
       mean: +data.mean[filename], // Convert to number
@@ -57,17 +55,14 @@ const useHeatmapData = (predictionResult: any) => {
       console.log("❌ predictionResult is invalid or empty:", predictionResult);
       return { heatmapData: [], originalFilenames: [], sortedFilenames: [] };
     }
-
     const data = predictionResult[0];
 
     if (!data.rdm || !Array.isArray(data.rdm)) {
       console.log("❌ RDM data is missing or invalid:", data);
       return { heatmapData: [], originalFilenames: [], sortedFilenames: [] };
     }
-
     const rdm = data.rdm;
     const n = rdm.length;
-
     // Extract filenames from the mean or sem object
     const originalFilenames = Object.keys(data.mean || data.sem || {});
 
@@ -112,8 +107,12 @@ const Stepper: React.FC = () => {
   const [paper, setPaper] = useState("");
   const [participantName, setParticipantName] = useState("");
 
-  const [files, setFiles] = useState<{ blobURL: string; file: File }[]>([]);
-  const [fileMappings, setFileMappings] = useState<{ blobURL: string; file: File }[]>([]);
+  const [uploaderKey, setUploaderKey] = useState(0);
+
+  // const [files, setFiles] = useState<{ blobURL: string; file: File }[]>([]);
+  // const [fileMappings, setFileMappings] = useState<{ blobURL: string; file: File }[]>([]);
+  const [files, setFiles] = useState<{ uid: string; blobURL: string; file: File }[]>([]);
+  const [fileMappings, setFileMappings] = useState<{ uid: string; blobURL: string; file: File }[]>([]);
 
   const [predictionResult, setPredictionResult] = useState<any>(null);
 
@@ -129,14 +128,119 @@ const Stepper: React.FC = () => {
   };
 
   const handleFilesUploaded = (uploadedFiles: { blobURL: string; file: File }[]) => {
-    setFiles(uploadedFiles);
+    // setFiles(uploadedFiles);
+    const withUid = uploadedFiles.map((f) => ({
+      ...f,
+      uid: (globalThis.crypto?.randomUUID?.() ?? `${f.file.name}-${f.file.size}-${f.file.lastModified}-${Math.random()}`)
+    }));
+    setFiles(withUid);
     setPredictionResult(null);
     setPredictstep(1);
   };
 
   const handleFileMappingsUpdate = (newFileMappings: { blobURL: string; file: File }[]) => {
-    setFileMappings(newFileMappings);
-  };
+    // setFileMappings(newFileMappings);
+     const withUid = newFileMappings.map((f) => ({
+        ...f,
+        uid: (globalThis.crypto?.randomUUID?.() ?? `${f.file.name}-${f.file.size}-${f.file.lastModified}-${Math.random()}`)
+        }));
+        setFileMappings(withUid);
+      };
+
+  // ✅ stable key (must match uploader's fileKey)
+const fileKey = (f: File) => {
+  const rel = (f as any).webkitRelativePath || "";
+  return `${rel}::${f.name}::${f.size}::${f.lastModified}`;
+};
+
+// ✅ addIncomingFiles 保持你的版本即可（我只加了 try/catch 保险）
+const addIncomingFiles = (newFiles: File[]) => {
+  if (!newFiles?.length) return;
+
+  setFiles((prev) => {
+    const existing = new Set(prev.map((x) => x.uid));
+
+    const nextAdd = newFiles
+      .filter((f) => f.type?.startsWith("image/"))
+      .map((f) => {
+        const uid = fileKey(f);
+        return { uid, file: f, blobURL: URL.createObjectURL(f) };
+      })
+      .filter((x) => !existing.has(x.uid));
+
+    if (!nextAdd.length) return prev;
+
+    const next = [...prev, ...nextAdd];
+    setFileMappings(next);
+    setPredictionResult(null);
+    setPredictstep(1);
+
+    return next;
+  });
+};
+
+// ✅ 单个删除：一定要 revoke + 同步 fileMappings + 如果删空就 reset uploader
+const removeOne = (uid: string) => {
+  setFiles((prev) => {
+    const target = prev.find((x) => x.uid === uid);
+    if (target) {
+      try { URL.revokeObjectURL(target.blobURL); } catch {}
+    }
+
+    const next = prev.filter((x) => x.uid !== uid);
+
+    setFileMappings(next);
+    setPredictionResult(null);
+    setPredictstep(1);
+
+    if (next.length === 0) {
+      setUploaderKey((k) => k + 1); // ✅ 删空了就重置 uploader 内部状态
+    }
+
+    return next;
+  });
+};
+
+// ✅ 清一个 group：revoke 所有被删的 blobURL；如果删空就 reset uploader
+const clearGroup = (uidsToRemove: string[]) => {
+  const removeSet = new Set(uidsToRemove);
+
+  setFiles((prev) => {
+    prev.forEach((x) => {
+      if (removeSet.has(x.uid)) {
+        try { URL.revokeObjectURL(x.blobURL); } catch {}
+      }
+    });
+
+    const next = prev.filter((x) => !removeSet.has(x.uid));
+
+    setFileMappings(next);
+    setPredictionResult(null);
+    setPredictstep(1);
+
+    if (next.length === 0) {
+      setUploaderKey((k) => k + 1); // ✅ 删空了就重置 uploader
+    }
+
+    return next;
+  });
+};
+
+// ✅ clear all：revoke 全部 + 清空 + reset uploader
+const clearAll = () => {
+  setFiles((prev) => {
+    prev.forEach((x) => {
+      try { URL.revokeObjectURL(x.blobURL); } catch {}
+    });
+    return [];
+  });
+
+  setFileMappings([]);
+  setPredictionResult(null);
+  setPredictstep(1);
+  setUploaderKey((k) => k + 1); // ✅ 不管怎样都重置
+};
+
 
 
   useEffect(() => {
@@ -202,14 +306,23 @@ const Stepper: React.FC = () => {
 
   console.log("Extract Heatmap Data from predictionResult:", heatmapData);
 
+  // const contentStyle: React.CSSProperties = {
+  //   lineHeight: '260px',
+  //   textAlign: 'center',
+  //   color: token.colorTextTertiary,
+  //   backgroundColor: 'transparent',
+  //   borderRadius: 0,
+  //   border: 'none',
+  //   marginTop: 16,
+  // };
   const contentStyle: React.CSSProperties = {
-    lineHeight: '260px',
     textAlign: 'center',
     color: token.colorTextTertiary,
     backgroundColor: 'transparent',
     borderRadius: 0,
     border: 'none',
     marginTop: 16,
+    padding: 0,
   };
 
   //support csv download
@@ -236,7 +349,6 @@ const Stepper: React.FC = () => {
               });
             }
           }
-  
           imageRows.push(row);
         }
   
@@ -270,15 +382,37 @@ const Stepper: React.FC = () => {
       message.error("No prediction result available to download.");
     }
   };
+
+  const getGroupKey = (file) => {
+          const rel = file?.webkitRelativePath || "";
+          if (!rel) return "Ungrouped";
+          const parts = rel.split("/").filter(Boolean);
+          // groupDepth=1: inputFolder / subfolder / filename  -> subfolder
+          return parts[1] || "Ungrouped";
+        };
   
   const steps = [
     {
       title: 'Upload Stimuli',
       // content: <Uploader onFilesUploaded={handleFilesUploaded} onFileMappingsUpdate={handleFileMappingsUpdate} />,
-      content: (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0px', marginBottom: '-100px' }}>
-          <Uploader onFilesUploaded={handleFilesUploaded} onFileMappingsUpdate={handleFileMappingsUpdate} />
-          <div style={{ textAlign: 'right', color: 'black', marginTop: '-100px', fontWeight: 500 }}>
+          content: (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <Uploader  key={uploaderKey} onAddFiles={(newFiles) => addIncomingFiles(newFiles)} />
+
+        
+
+          <ImagePreviewGroupedDnD
+            files={files}
+            title="Uploaded Images Preview (Grouped)"
+            groupDepth={1}
+            showPathDebug={false}
+            onRemove={(uid) => removeOne(uid)}
+            onClear={() => clearAll()}
+            onClearGroup={(groupKey, uidsToRemove) => clearGroup(uidsToRemove)}
+            onGroupOrderChange={(order) => console.log("Group order:", order)}
+          />
+
+          <div style={{ textAlign: 'right', color: 'black', fontWeight: 500 }}>
             📸 {files.length} images uploaded
           </div>
         </div>
@@ -302,10 +436,6 @@ const Stepper: React.FC = () => {
             setParticipantName={setParticipantName}
           />
           {predictionLoading && <LinearIndeterminate />}
-
-
-
-
         </div>
       ),
     },
