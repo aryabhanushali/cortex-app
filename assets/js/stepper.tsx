@@ -12,11 +12,67 @@ import Uploader from './Lab/uploader.tsx';
 import RegionSelector from './Lab/regionselector.jsx';
 import Settings from './Lab/settings.jsx';
 import ModelCard from './Lab/modelcard.jsx';
-// import PaperSelector from './paperselector.jsx'; 
+
 // visualization graphics
 import BarChart from './Lab/barchart.jsx';
 import Heatmap from './Lab/heatmap.jsx';
-import ImagePreviewGroupedDnD from './Lab/imagePreviewGrid.jsx';
+import ImagePreviewGroupedDnD from './Lab/imagePreviewGrid.tsx';
+
+type PreviewFile = {
+  uid: string;       
+  blobURL: string;
+  file: FileWithPath;
+
+  label: string;     
+  groupKey: string;  
+  serverKey?: string; 
+};
+
+type ImagePreviewGroupedDnDProps = {
+  files: PreviewFile[];
+  title?: string;
+  groupDepth?: number;
+  showPathDebug?: boolean;
+  onRemove?: (uid: string) => void;
+  onClear?: () => void;
+  onClearGroup?: (groupKey: string, uidsToRemove: string[]) => void;
+  onGroupOrderChange?: (order: string[]) => void;
+};
+
+type FileWithPath = File & { webkitRelativePath?: string };
+
+const normalizePath = (p: string) =>
+  (p || "").replaceAll("\\", "/").replace(/\/+/g, "/");
+
+const buildOrgName = (f: FileWithPath) => {
+  const rel = normalizePath(f.webkitRelativePath || f.name);
+  const meta = `${f.size}-${f.lastModified}`;
+  const safeRel = rel.replaceAll("/", "__");
+  return `${safeRel}__${meta}`;
+};
+
+const buildGroupKey = (f: FileWithPath, depth = 1) => {
+  const rel = normalizePath(f.webkitRelativePath || "");
+  if (!rel) return "Ungrouped";
+  const parts = rel.split("/").filter(Boolean);
+  // 例：root/sub/file.jpg, depth=1 -> sub
+  return parts[depth] || "Ungrouped";
+};
+
+const getExt = (name: string) => {
+  const i = name.lastIndexOf(".");
+  return i >= 0 ? name.slice(i) : "";
+};
+
+const safe = (s: string) =>
+  s.replaceAll("\\", "/").replaceAll("/", "__").replaceAll(" ", "_");
+
+const toRenamedUploadFile = (orig: FileWithPath, uniqueId: string) => {
+  const ext = getExt(orig.name);                  
+  const newName = `${safe(uniqueId)}${ext}`;     
+  return new File([orig], newName, { type: orig.type });
+};
+
 
 
 const { Step } = Steps;
@@ -61,7 +117,7 @@ const useHeatmapData = (predictionResult: any) => {
       console.log("❌ RDM data is missing or invalid:", data);
       return { heatmapData: [], originalFilenames: [], sortedFilenames: [] };
     }
-    const rdm = data.rdm;
+    const rdm = data.rdm as number[][];
     const n = rdm.length;
     // Extract filenames from the mean or sem object
     const originalFilenames = Object.keys(data.mean || data.sem || {});
@@ -109,10 +165,9 @@ const Stepper: React.FC = () => {
 
   const [uploaderKey, setUploaderKey] = useState(0);
 
-  // const [files, setFiles] = useState<{ blobURL: string; file: File }[]>([]);
-  // const [fileMappings, setFileMappings] = useState<{ blobURL: string; file: File }[]>([]);
-  const [files, setFiles] = useState<{ uid: string; blobURL: string; file: File }[]>([]);
-  const [fileMappings, setFileMappings] = useState<{ uid: string; blobURL: string; file: File }[]>([]);
+
+  const [files, setFiles] = useState<PreviewFile[]>([]);
+  const [fileMappings, setFileMappings] = useState<PreviewFile[]>([]);
 
   const [predictionResult, setPredictionResult] = useState<any>(null);
 
@@ -127,59 +182,68 @@ const Stepper: React.FC = () => {
     setCurrent(value);
   };
 
-  const handleFilesUploaded = (uploadedFiles: { blobURL: string; file: File }[]) => {
-    // setFiles(uploadedFiles);
-    const withUid = uploadedFiles.map((f) => ({
-      ...f,
-      uid: (globalThis.crypto?.randomUUID?.() ?? `${f.file.name}-${f.file.size}-${f.file.lastModified}-${Math.random()}`)
-    }));
-    setFiles(withUid);
-    setPredictionResult(null);
-    setPredictstep(1);
-  };
+  // const handleFilesUploaded = (uploadedFiles: { blobURL: string; file: File }[]) => {
+  //   // setFiles(uploadedFiles);
+  //   const withUid = uploadedFiles.map((f) => ({
+  //     ...f,
+  //     uid: (globalThis.crypto?.randomUUID?.() ?? `${f.file.name}-${f.file.size}-${f.file.lastModified}-${Math.random()}`)
+  //   }));
+  //   setFiles(withUid);
+  //   setPredictionResult(null);
+  //   setPredictstep(1);
+  // };
 
-  const handleFileMappingsUpdate = (newFileMappings: { blobURL: string; file: File }[]) => {
-    // setFileMappings(newFileMappings);
-     const withUid = newFileMappings.map((f) => ({
-        ...f,
-        uid: (globalThis.crypto?.randomUUID?.() ?? `${f.file.name}-${f.file.size}-${f.file.lastModified}-${Math.random()}`)
-        }));
-        setFileMappings(withUid);
-      };
+  // const handleFileMappingsUpdate = (newFileMappings: { blobURL: string; file: File }[]) => {
+  //   // setFileMappings(newFileMappings);
+  //    const withUid = newFileMappings.map((f) => ({
+  //       ...f,
+  //       uid: (globalThis.crypto?.randomUUID?.() ?? `${f.file.name}-${f.file.size}-${f.file.lastModified}-${Math.random()}`)
+  //       }));
+  //       setFileMappings(withUid);
+  //     };
 
-  // ✅ stable key (must match uploader's fileKey)
-const fileKey = (f: File) => {
-  const rel = (f as any).webkitRelativePath || "";
+  // 
+type FileWithPath = File & { webkitRelativePath?: string };
+
+const identityKey = (f: FileWithPath) => {
+  const rel = f.webkitRelativePath || "";
   return `${rel}::${f.name}::${f.size}::${f.lastModified}`;
 };
 
-// ✅ addIncomingFiles 保持你的版本即可（我只加了 try/catch 保险）
+// 
 const addIncomingFiles = (newFiles: File[]) => {
   if (!newFiles?.length) return;
 
   setFiles((prev) => {
     const existing = new Set(prev.map((x) => x.uid));
 
-    const nextAdd = newFiles
+    const nextAdd: PreviewFile[] = newFiles
       .filter((f) => f.type?.startsWith("image/"))
       .map((f) => {
-        const uid = fileKey(f);
-        return { uid, file: f, blobURL: URL.createObjectURL(f) };
+        const ff = f as FileWithPath;
+        const uid = buildOrgName(ff); // 你已有的唯一 uid（含 folder/size/lastModified）
+        const label = ff.webkitRelativePath || ff.name;
+        const groupKey = buildGroupKey(ff, 1);
+
+        return {
+          uid,
+          label,
+          groupKey,
+          file: ff,
+          blobURL: URL.createObjectURL(ff),
+        };
       })
       .filter((x) => !existing.has(x.uid));
-
-    if (!nextAdd.length) return prev;
 
     const next = [...prev, ...nextAdd];
     setFileMappings(next);
     setPredictionResult(null);
     setPredictstep(1);
-
     return next;
   });
 };
 
-// ✅ 单个删除：一定要 revoke + 同步 fileMappings + 如果删空就 reset uploader
+// 
 const removeOne = (uid: string) => {
   setFiles((prev) => {
     const target = prev.find((x) => x.uid === uid);
@@ -194,14 +258,14 @@ const removeOne = (uid: string) => {
     setPredictstep(1);
 
     if (next.length === 0) {
-      setUploaderKey((k) => k + 1); // ✅ 删空了就重置 uploader 内部状态
+      setUploaderKey((k) => k + 1); 
     }
 
     return next;
   });
 };
 
-// ✅ 清一个 group：revoke 所有被删的 blobURL；如果删空就 reset uploader
+// 
 const clearGroup = (uidsToRemove: string[]) => {
   const removeSet = new Set(uidsToRemove);
 
@@ -219,14 +283,14 @@ const clearGroup = (uidsToRemove: string[]) => {
     setPredictstep(1);
 
     if (next.length === 0) {
-      setUploaderKey((k) => k + 1); // ✅ 删空了就重置 uploader
+      setUploaderKey((k) => k + 1); 
     }
 
     return next;
   });
 };
 
-// ✅ clear all：revoke 全部 + 清空 + reset uploader
+
 const clearAll = () => {
   setFiles((prev) => {
     prev.forEach((x) => {
@@ -238,7 +302,7 @@ const clearAll = () => {
   setFileMappings([]);
   setPredictionResult(null);
   setPredictstep(1);
-  setUploaderKey((k) => k + 1); // ✅ 不管怎样都重置
+  setUploaderKey((k) => k + 1); 
 };
 
 
@@ -263,42 +327,51 @@ const clearAll = () => {
 
   // ✅ Ensure only the actual file is sent to Gradio
   const handlePrediction = async () => {
-    if (files.length === 0) {
-      message.error("No files uploaded. Please upload files first.");
-      return;
-    }
+  if (files.length === 0) {
+    message.error("No files uploaded. Please upload files first.");
+    return;
+  }
 
-    setPredictionLoading(true); // set true when prediction start
-    try {
-      // Upload images to the server
-      const uploadResult = await uploadImages(files.map(f => f.file));
-      
-      // predict via http method
-      const result = await axios.post(`${SERVER_BASE_URL}/api/predict`, {
-        data: [
-          uploadResult.map((f: string) => ({ path: `${f}`, org_name: f.split('/').pop() })),
-          region || "ffa",
-          dataset || "murty185",
-          model || "clip_rn50",
-          true, // rdm
-          true, // mean
-          true, // sem
-        ],
-      });
+  setPredictionLoading(true);
 
-      setPredictionResult(result.data.data);
-      console.log("Full predictionResult:", JSON.stringify(result.data, null, 2));
+  try {
+    
+    const uploadFiles = files.map((x) => {
+      const ext = getExt(x.file.name);
+      const newName = `${safe(x.uid)}${ext}`;          
+      return new File([x.file], newName, { type: x.file.type });
+    });
 
-      message.success("Prediction complete!");
-    } catch (error) {
-      message.error("Prediction failed. Check server connection.");
-      console.error("Error in prediction:", error);
-    }
+    const serverKeys = uploadFiles.map((f) => f.name);
 
-    setPredictionLoading(false); // set false when prediction finish
+   
+    setFiles((prev) => prev.map((x, i) => ({ ...x, serverKey: serverKeys[i] })));
+    setFileMappings((prev) => prev.map((x, i) => ({ ...x, serverKey: serverKeys[i] })));
+
+
+    const paths: string[] = await uploadImages(uploadFiles);
+
+  
+    const items = paths.map((path, i) => ({
+      path,
+      org_name: serverKeys[i],
+    }));
+
+    const result = await axios.post(`${SERVER_BASE_URL}/api/predict`, {
+      data: [items, region, dataset, model, true, true, true],
+    });
+
+    setPredictionResult(result.data.data);
+    message.success("Prediction complete!");
+  } catch (e) {
+    console.error(e);
+    message.error("Prediction failed. Check server connection.");
+  } finally {
+    setPredictionLoading(false);
     setLoading(false);
     setPredictstep(2);
-  };
+  }
+};
 
   const barchartData = useBarchartData(predictionResult);
 
@@ -383,7 +456,7 @@ const clearAll = () => {
     }
   };
 
-  const getGroupKey = (file) => {
+  const getGroupKey = (file: File) => {
           const rel = file?.webkitRelativePath || "";
           if (!rel) return "Ungrouped";
           const parts = rel.split("/").filter(Boolean);
@@ -406,10 +479,10 @@ const clearAll = () => {
             title="Uploaded Images Preview (Grouped)"
             groupDepth={1}
             showPathDebug={false}
-            onRemove={(uid) => removeOne(uid)}
+            onRemove={(uid: string) => removeOne(uid)}
             onClear={() => clearAll()}
-            onClearGroup={(groupKey, uidsToRemove) => clearGroup(uidsToRemove)}
-            onGroupOrderChange={(order) => console.log("Group order:", order)}
+            onClearGroup={(groupKey: string, uidsToRemove: string[]) => clearGroup(uidsToRemove)}
+            onGroupOrderChange={(order: string[]) => console.log("Group order:", order)}
           />
 
           <div style={{ textAlign: 'right', color: 'black', fontWeight: 500 }}>

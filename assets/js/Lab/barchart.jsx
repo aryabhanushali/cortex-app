@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import * as d3 from 'd3';
 import { interpolateRdBu } from "d3-scale-chromatic";
 import { barchartStyles, createXScale, createYScale, styleTooltip } from './barchartstyles';
@@ -8,6 +8,13 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
   const containerRef = useRef();
   const [containerWidth, setContainerWidth] = useState(0);
   const [order, setOrder] = useState("filename");
+  const fileMap = useMemo(() => {
+    const m = new Map();
+    (fileMappings || []).forEach((f) => {
+      if (f.serverKey) m.set(f.serverKey, f);
+    });
+    return m;
+  }, [fileMappings]);
 
   // Update container width dynamically
   useEffect(() => {
@@ -55,20 +62,17 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
     return barChartData;
   };
 
-  const getFileInfo = (filename) => {
-    const mapping = fileMappings?.find(m => m.file.name === filename);
-    if (!mapping) return { blobURL: null, folder: null };
+  const getFileInfo = (serverKey) => {
+    const mapping = fileMap.get(serverKey);
+    if (!mapping) return { blobURL: null, folder: null, label: null, groupKey: null };
 
-    // webkitRelativePath is non-standard, so just access it directly
-    const relPath = mapping.file.webkitRelativePath || "";
-    const folder =
-      relPath && relPath.includes("/")
-        ? relPath.split("/").slice(0, -1).join("/") // everything except the filename
-        : null;
-
-    return { blobURL: mapping.blobURL, folder };
+    return {
+      blobURL: mapping.blobURL,
+      folder: mapping.groupKey || null,   
+      label: mapping.label || null,
+      groupKey: mapping.groupKey || null,
+    };
   };
-
   const getFolderForFilename = (filename) => {
     const mapping = fileMappings?.find(m => m.file.name === filename);
     if (!mapping) return "";
@@ -158,12 +162,12 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       .on("mouseover", (event, d) => {
         d3.select(event.currentTarget).attr("fill", d3.color(colorScale(d.mean)).darker(0.5));
 
-        const { blobURL, folder } = getFileInfo(d.filename);
+        const { blobURL, folder, label, groupKey } = getFileInfo(d.filename);
 
         tooltip
           .html(
             `<div>
-              <p><strong>Filename:</strong> ${d.filename}</p>
+              <p><strong>Filename:</strong> ${label ?? d.filename}</p>
               <p><strong>Folder:</strong> ${folder ?? "(none)"}</p>
               <p><strong>Mean:</strong> ${d.mean.toFixed(4)}</p>
               <p><strong>SEM:</strong> ${d.sem.toFixed(4)}</p>

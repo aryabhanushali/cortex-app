@@ -1,19 +1,45 @@
 import React, { useEffect, useMemo, useState } from "react";
 
+
+type FileWithPath = File & { webkitRelativePath?: string };
+
+type PreviewFile = {
+  uid: string;
+  blobURL: string;
+  file: FileWithPath;
+};
+
+type GroupedItem = PreviewFile & { idx: number; id: string };
+type GroupedMap = Record<string, GroupedItem[]>;
+
+type ImagePreviewGroupedDnDProps = {
+  files: PreviewFile[];
+  title?: string;
+  groupDepth?: number;
+  maxThumbsPerGroup?: number;
+  showPathDebug?: boolean;
+
+  onRemove?: (uid: string) => void;
+  onClear?: () => void;
+  onClearGroup?: (groupKey: string, uidsToRemove: string[]) => void;
+  onGroupOrderChange?: (order: string[]) => void;
+  onRenameGroup?: (groupKey: string, newDisplayName: string) => void;
+};
+
 export default function ImagePreviewGroupedDnD({
   files = [],
   title = "Uploaded Images Preview (Grouped)",
-  onRemove, // (globalIndex) => void
-  onClear, // () => void
-  onClearGroup, // (groupKey, idsToRemove:number[]) => void
-  onGroupOrderChange, // (groupKeys: string[]) => void
-  onRenameGroup, // (groupKey, newDisplayName) => void
+  onRemove,
+  onClear,
+  onClearGroup,
+  onGroupOrderChange,
+  onRenameGroup,
   groupDepth = 1,
-  maxThumbsPerGroup = 80,
+  maxThumbsPerGroup = 100,
   showPathDebug = false,
-}) {
-  const getGroupKey = (file) => {
-    const rel = file?.webkitRelativePath || "";
+}: ImagePreviewGroupedDnDProps) {
+  const getGroupKey = (file?: FileWithPath) => {
+    const rel = file?.webkitRelativePath ?? "";
     if (!rel) return "Ungrouped";
 
     const parts = rel.split("/").filter(Boolean);
@@ -21,56 +47,51 @@ export default function ImagePreviewGroupedDnD({
     return parts[groupDepth] || "Ungrouped";
   };
 
-  const [itemGroupMap, setItemGroupMap] = useState({}); // { [uid]: groupKey }
-  const [dragItem, setDragItem] = useState(null); // { uid, fromKey }
+  const [itemGroupMap, setItemGroupMap] = useState<Record<string, string>>({}); // { [uid]: groupKey }
+  const [dragItem, setDragItem] = useState<{ uid: string; fromKey: string } | null>(null);
 
   useEffect(() => {
     setItemGroupMap((prev) => {
-        const next = { ...prev };
-        files.forEach((item) => {
+      const next: Record<string, string> = { ...prev };
+
+      files.forEach((item) => {
         const uid = item.uid;
         if (!(uid in next)) {
-            // default group from path
-            next[uid] = getGroupKey(item.file);
+          next[uid] = getGroupKey(item.file);
         }
-        });
+      });
 
-        // 清理已不存在的 uid
-        Object.keys(next).forEach((uid) => {
+      Object.keys(next).forEach((uid) => {
         if (!files.some((f) => f.uid === uid)) delete next[uid];
-        });
+      });
 
-        return next;
+      return next;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [files, groupDepth]);
+  }, [files, groupDepth]);
 
-  const grouped = useMemo(() => {
-    const map = new Map();
+  const grouped: GroupedMap = useMemo(() => {
+    const map = new Map<string, GroupedItem[]>();
 
     files.forEach((item, idx) => {
       const key = itemGroupMap[item.uid] ?? getGroupKey(item.file);
       if (!map.has(key)) map.set(key, []);
 
-      // ⚠️ id 可能会撞（例如 webkitRelativePath 为空 or 文件名/时间戳重复）
-      // 所以我们渲染时的 key 一定要带 idx 来保证唯一性
-     
-
-      map.get(key).push({
+      map.get(key)!.push({
         ...item,
         idx,
         id: item.uid,
       });
     });
 
-    const obj = {};
+    const obj: GroupedMap = {};
     for (const [k, v] of map.entries()) obj[k] = v;
     return obj;
   }, [files, groupDepth, itemGroupMap]);
 
-  const [groupOrder, setGroupOrder] = useState([]);
+  const [groupOrder, setGroupOrder] = useState<string[]>([]);
   useEffect(() => {
     const keys = Object.keys(grouped);
+
     setGroupOrder((prev) => {
       const keep = prev.filter((k) => keys.includes(k));
       const add = keys.filter((k) => !keep.includes(k));
@@ -78,15 +99,14 @@ export default function ImagePreviewGroupedDnD({
       onGroupOrderChange?.(next);
       return next;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grouped]);
+  }, [grouped, onGroupOrderChange]);
 
-  // group display names (rename only affects display)
-  const [groupNameMap, setGroupNameMap] = useState({});
+  const [groupNameMap, setGroupNameMap] = useState<Record<string, string>>({});
   useEffect(() => {
     const keys = Object.keys(grouped);
+
     setGroupNameMap((prev) => {
-      const next = { ...prev };
+      const next: Record<string, string> = { ...prev };
       keys.forEach((k) => {
         if (!(k in next)) next[k] = k;
       });
@@ -97,18 +117,17 @@ export default function ImagePreviewGroupedDnD({
     });
   }, [grouped]);
 
-  const displayName = (k) => groupNameMap[k] ?? k;
+  const displayName = (k: string) => groupNameMap[k] ?? k;
 
-  const [dragKey, setDragKey] = useState(null);
-  const [overKey, setOverKey] = useState(null);
+  const [dragKey, setDragKey] = useState<string | null>(null);
+  const [overKey, setOverKey] = useState<string | null>(null);
 
-  // rename UI state
-  const [editingKey, setEditingKey] = useState(null);
-  const [draftName, setDraftName] = useState("");
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [draftName, setDraftName] = useState<string>("");
 
   const orderedKeys = groupOrder.length ? groupOrder : Object.keys(grouped);
 
-  const move = (fromKey, toKey) => {
+  const move = (fromKey: string | null, toKey: string) => {
     if (!fromKey || !toKey || fromKey === toKey) return;
 
     setGroupOrder((prev) => {
@@ -124,12 +143,12 @@ export default function ImagePreviewGroupedDnD({
     });
   };
 
-  const startRename = (k) => {
+  const startRename = (k: string) => {
     setEditingKey(k);
     setDraftName(displayName(k));
   };
 
-  const commitRename = (k) => {
+  const commitRename = (k: string) => {
     const name = (draftName || "").trim();
     if (!name) {
       setEditingKey(null);
@@ -145,7 +164,7 @@ export default function ImagePreviewGroupedDnD({
     setDraftName("");
   };
 
-  if (!files?.length) {
+  if (!files.length) {
     return (
       <div style={{ border: "1px dashed rgba(0,0,0,0.25)", borderRadius: 12, padding: 16 }}>
         <div style={{ fontWeight: 700, color: "black" }}>{title}</div>
@@ -187,15 +206,14 @@ export default function ImagePreviewGroupedDnD({
 
       <div style={{ height: 12 }} />
 
-      {/* <div style={{ display: "flex", flexDirection: "column", gap: 12 }}> */}
       <div
         style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-            gap: 12,
-            alignItems: "start",
+          display: "grid",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gap: 12,
+          alignItems: "start",
         }}
-        >
+      >
         {orderedKeys.map((k) => {
           const items = grouped[k] || [];
           if (!items.length) return null;
@@ -203,30 +221,28 @@ export default function ImagePreviewGroupedDnD({
           const isOver = overKey === k && dragKey && dragKey !== k;
 
           return (
-          <div
-            key={`${k}::${displayName(k)}`}
-            onDragOver={(e) => {
-                // 允许 drop
+            <div
+              key={`${k}::${displayName(k)}`}
+              onDragOver={(e: React.DragEvent<HTMLDivElement>) => {
                 if (dragItem) e.preventDefault();
-            }}
-            onDrop={(e) => {
+              }}
+              onDrop={(e: React.DragEvent<HTMLDivElement>) => {
                 e.preventDefault();
                 if (!dragItem?.uid) return;
 
-                // ✅ move thumbnail into this group
                 setItemGroupMap((prev) => ({ ...prev, [dragItem.uid]: k }));
 
                 setDragItem(null);
                 setOverKey(null);
-            }}
-            style={{
+              }}
+              style={{
                 border: isOver ? "2px solid var(--highlight-color-button, #7aa7ff)" : "1px solid rgba(0,0,0,0.10)",
                 borderRadius: 12,
                 padding: 10,
                 background: "white",
-            }}
+              }}
             >
-              <div
+                          <div
                 draggable
                 onDragStart={(e) => {
                   setDragKey(k);
@@ -414,7 +430,7 @@ export default function ImagePreviewGroupedDnD({
   );
 }
 
-function btnStyle() {
+function btnStyle(): React.CSSProperties {
   return {
     border: "1px solid rgba(0,0,0,0.15)",
     background: "white",
@@ -427,3 +443,9 @@ function btnStyle() {
     whiteSpace: "nowrap",
   };
 }
+
+
+
+
+
+

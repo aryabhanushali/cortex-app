@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import * as d3 from 'd3';
 import { heatmapStyles, styleTooltip } from './heatmapstyles';
 
@@ -35,9 +35,22 @@ const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, heigh
       };
     }, []);
   
-    const getBlobURL = (filename) => {
-      const mapping = fileMappings?.find(mapping => mapping.file.name === filename);
-      return mapping ? mapping.blobURL : null;
+    const fileMap = useMemo(() => {
+      const m = new Map();
+      (fileMappings || []).forEach((f) => {
+        if (f.serverKey) m.set(f.serverKey, f);
+      });
+      return m;
+    }, [fileMappings]);
+
+    const getFileInfo = (serverKey) => {
+      const m = fileMap.get(serverKey);
+      if (!m) return { blobURL: null, label: null, groupKey: null };
+      return {
+        blobURL: m.blobURL,
+        label: m.label,
+        groupKey: m.groupKey,
+      };
     };
 
   useEffect(() => {
@@ -91,33 +104,107 @@ const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, heigh
             .attr("height", Math.min(xScale.bandwidth(), yScale.bandwidth()))
             .attr("fill", d => colorScale(d.value))
             .on("mouseover", (event, d) => {
-              const blobURL_imageX = getBlobURL(d.x);
-              const blobURL_imageY = getBlobURL(d.y);
+              const fx = getFileInfo(d.x);
+              const fy = getFileInfo(d.y);
+
+              const blobURL_imageX = fx.blobURL;
+              const blobURL_imageY = fy.blobURL;
+
+              const labelX = fx.label ?? d.x;
+              const labelY = fy.label ?? d.y;
 
               const cellColor = colorScale(d.value);
 
               let imageHtml, labelHtml;
               if (d.x === d.y) {
-                imageHtml = `<img src="${blobURL_imageX}" alt="Thumbnail" style="width: 140px; height: 140px; border-radius: 5px; object-fit: cover; border: 1px solid #ccc;" onerror="this.style.display='none'">`;
-                labelHtml = `<p><strong>x & y:</strong> ${d.x}</p>`;
+  imageHtml = blobURL_imageX
+    ? `<img src="${blobURL_imageX}" ...>`
+    : "";
+  labelHtml = `<p><strong>x & y:</strong> ${labelX}</p>`;
               } else {
-                imageHtml = `<img src="${blobURL_imageX}" alt="Thumbnail" style="width: 140px; height: 140px; border-radius: 5px; object-fit: cover; border: 1px solid #ccc;" onerror="this.style.display='none'">
-                             <img src="${blobURL_imageY}" alt="Thumbnail" style="width: 140px; height: 140px; border-radius: 5px; object-fit: cover; border: 1px solid #ccc;" onerror="this.style.display='none'">`;
-                labelHtml = `<div style="display: flex; justify-content: center; gap: 10px;">
-                               <p><strong>x:</strong> ${d.x}</p>
-                               <p><strong>y:</strong> ${d.y}</p>
-                             </div>`;
+                imageHtml = `
+                  ${blobURL_imageX ? `<img src="${blobURL_imageX}" ...>` : ""}
+                  ${blobURL_imageY ? `<img src="${blobURL_imageY}" ...>` : ""}
+                `;
+                labelHtml = `
+                  <div style="display: flex; justify-content: center; gap: 10px;">
+                    <p><strong>x:</strong> ${labelX}</p>
+                    <p><strong>y:</strong> ${labelY}</p>
+                  </div>
+                `;
               }
 
-              tooltip.html(`
-                  <div style="text-align: center;">
-                    <div style="display: flex; justify-content: center; gap: 2px;">${imageHtml}</div>
-                    ${labelHtml}
-                    <p style="margin: 0;"><strong>Euclidean distance:</strong> ${d.value.toFixed(4)}
-                      <span style="display: inline-block; width: 20px; height: 20px; background-color: ${cellColor}; border-radius: 50%; border: 1px solid #555;"></span>
-                    </p>
+            tooltip.html(`
+                <div style="
+                  padding: 12px;
+                  background: rgba(255,255,255,0.95);
+                  border-radius: 12px;
+                  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+                  backdrop-filter: blur(6px);
+                  min-width: 280px;
+                  font-family: Inter, sans-serif;
+                ">
+
+                  <div style="
+                    display: flex;
+                    gap: 10px;
+                    justify-content: center;
+                    margin-bottom: 10px;
+                  ">
+                    ${blobURL_imageX ? `
+                      <img src="${blobURL_imageX}"
+                        style="
+                          width: 110px;
+                          height: 110px;
+                          object-fit: cover;
+                          border-radius: 10px;
+                        ">
+                    ` : ""}
+
+                    ${blobURL_imageY && d.x !== d.y ? `
+                      <img src="${blobURL_imageY}"
+                        style="
+                          width: 110px;
+                          height: 110px;
+                          object-fit: cover;
+                          border-radius: 10px;
+                        ">
+                    ` : ""}
                   </div>
-                `).style("display", "block");
+
+                  <div style="text-align:center; font-size: 13px; color: #444;">
+                    ${d.x === d.y
+                      ? `<div>${labelX}</div>`
+                      : `
+                        <div><strong>x:</strong> ${labelX}</div>
+                        <div><strong>y:</strong> ${labelY}</div>
+                      `
+                    }
+                  </div>
+
+                  <div style="
+                    margin-top: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    font-size: 13px;
+                    font-weight: 500;
+                    color: #333;
+                  ">
+                    Euclidean: ${d.value.toFixed(4)}
+                    <span style="
+                      width: 14px;
+                      height: 14px;
+                      border-radius: 50%;
+                      background: ${cellColor};
+                      border: 1px solid rgba(0,0,0,0.2);
+                    "></span>
+                  </div>
+
+                </div>
+              `)
+              .style("display", "block");
             })
             .on("mousemove", event => {
               const containerRect = containerRef.current.getBoundingClientRect(); 
