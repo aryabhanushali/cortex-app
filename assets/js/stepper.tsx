@@ -307,6 +307,16 @@ const clearAll = () => {
   setUploaderKey((k) => k + 1); 
 };
 
+const moveItemToGroup = (uid: string, toGroupKey: string) => {
+  setFiles(prev => prev.map(f => (f.uid === uid ? { ...f, groupKey: toGroupKey } : f)));
+  setFileMappings(prev => prev.map(f => (f.uid === uid ? { ...f, groupKey: toGroupKey } : f)));
+};
+
+const renameGroupKey = (oldKey: string, newKey: string) => {
+  setFiles(prev => prev.map(f => (f.groupKey === oldKey ? { ...f, groupKey: newKey } : f)));
+  setFileMappings(prev => prev.map(f => (f.groupKey === oldKey ? { ...f, groupKey: newKey } : f)));
+};
+
 
 
   useEffect(() => {
@@ -486,10 +496,11 @@ const clearAll = () => {
             files={files}
             title="Uploaded Images Preview (Grouped)"
             groupDepth={1}
-            showPathDebug={false}
+            onMoveItemToGroup={moveItemToGroup}
+            onRenameGroupKey={renameGroupKey}
             onRemove={(uid: string) => removeOne(uid)}
             onClear={() => clearAll()}
-            onClearGroup={(groupKey: string, uidsToRemove: string[]) => clearGroup(uidsToRemove)}
+            onClearGroup={(groupKey, uids) => clearGroup(uids)}
             onGroupOrderChange={(order: string[]) => console.log("Group order:", order)}
           />
 

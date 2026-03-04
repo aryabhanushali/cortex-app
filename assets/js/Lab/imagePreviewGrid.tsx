@@ -4,9 +4,14 @@ import React, { useEffect, useMemo, useState } from "react";
 type FileWithPath = File & { webkitRelativePath?: string };
 
 type PreviewFile = {
-  uid: string;
+  uid: string;       
   blobURL: string;
   file: FileWithPath;
+
+  label: string;     
+  groupKey: string;  
+  serverKey?: string; 
+
 };
 
 type GroupedItem = PreviewFile & { idx: number; id: string };
@@ -24,6 +29,9 @@ type ImagePreviewGroupedDnDProps = {
   onClearGroup?: (groupKey: string, uidsToRemove: string[]) => void;
   onGroupOrderChange?: (order: string[]) => void;
   onRenameGroup?: (groupKey: string, newDisplayName: string) => void;
+
+  onMoveItemToGroup?: (uid: string, toGroupKey: string) => void;
+  onRenameGroupKey?: (oldKey: string, newKey: string) => void;
 };
 
 export default function ImagePreviewGroupedDnD({
@@ -34,6 +42,8 @@ export default function ImagePreviewGroupedDnD({
   onClearGroup,
   onGroupOrderChange,
   onRenameGroup,
+  onMoveItemToGroup,
+  onRenameGroupKey,
   groupDepth = 1,
   maxThumbsPerGroup = 100,
   showPathDebug = false,
@@ -73,7 +83,7 @@ export default function ImagePreviewGroupedDnD({
     const map = new Map<string, GroupedItem[]>();
 
     files.forEach((item, idx) => {
-      const key = itemGroupMap[item.uid] ?? getGroupKey(item.file);
+      const key = item.groupKey || "Ungrouped";
       if (!map.has(key)) map.set(key, []);
 
       map.get(key)!.push({
@@ -150,12 +160,11 @@ export default function ImagePreviewGroupedDnD({
 
   const commitRename = (k: string) => {
     const name = (draftName || "").trim();
-    if (!name) {
+    if (!name || name === k) {
       setEditingKey(null);
       return;
     }
-    setGroupNameMap((prev) => ({ ...prev, [k]: name }));
-    onRenameGroup?.(k, name);
+    onRenameGroupKey?.(k, name);
     setEditingKey(null);
   };
 
@@ -230,7 +239,8 @@ export default function ImagePreviewGroupedDnD({
                 e.preventDefault();
                 if (!dragItem?.uid) return;
 
-                setItemGroupMap((prev) => ({ ...prev, [dragItem.uid]: k }));
+                // setItemGroupMap((prev) => ({ ...prev, [dragItem.uid]: k }));
+                onMoveItemToGroup?.(dragItem.uid, k);
 
                 setDragItem(null);
                 setOverKey(null);
@@ -302,7 +312,6 @@ export default function ImagePreviewGroupedDnD({
                   ) : (
                     <div style={{ fontWeight: 800, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {displayName(k)} <span style={{ fontWeight: 500, opacity: 0.6 }}>{items.length}</span>
-                      <span style={{ marginLeft: 8, fontWeight: 600, opacity: 0.35, fontSize: 12 }}>({k})</span>
                     </div>
                   )}
                 </div>

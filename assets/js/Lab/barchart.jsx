@@ -171,6 +171,7 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
               <p><strong>Folder:</strong> ${folder ?? "(none)"}</p>
               <p><strong>Mean:</strong> ${d.mean.toFixed(4)}</p>
               <p><strong>SEM:</strong> ${d.sem.toFixed(4)}</p>
+              <p><strong>Group:</strong> ${groupKey ?? "(none)"}</p>
               ${blobURL ? `
                 <img src="${blobURL}" alt="Thumbnail"
                     style="width: 140px; height: 140px; object-fit: cover; margin-bottom: 5px; border: 1px solid #ccc;">
