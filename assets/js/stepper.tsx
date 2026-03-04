@@ -291,7 +291,10 @@ const renameGroupKey = (oldKey: string, newKey: string) => {
   setFileMappings(prev => prev.map(f => (f.groupKey === oldKey ? { ...f, groupKey: newKey } : f)));
 };
 
-
+  useEffect(() => {
+    setPredictionResult(null); // Clear previous results
+    setPredictstep(1); // Reset button
+  }, [model, dataset, region, voxelOption, voxelNumber, paper, participantName]);
 
   useEffect(() => {
     // Only auto-trigger prediction if we're on Step 3 (index 2)
