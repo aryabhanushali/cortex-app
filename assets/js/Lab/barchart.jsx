@@ -64,13 +64,12 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
 
   const getFileInfo = (serverKey) => {
     const mapping = fileMap.get(serverKey);
-    if (!mapping) return { blobURL: null, folder: null, label: null, groupKey: null };
+    if (!mapping) return { blobURL: null, group: null, label: null };
 
     return {
       blobURL: mapping.blobURL,
-      folder: mapping.groupKey || null,   
+      group: mapping.groupKey || null,   
       label: mapping.label || null,
-      groupKey: mapping.groupKey || null,
     };
   };
   const getFolderForFilename = (filename) => {
@@ -162,16 +161,15 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       .on("mouseover", (event, d) => {
         d3.select(event.currentTarget).attr("fill", d3.color(colorScale(d.mean)).darker(0.5));
 
-        const { blobURL, folder, label, groupKey } = getFileInfo(d.filename);
+        const { blobURL, group, label } = getFileInfo(d.filename);
 
         tooltip
           .html(
             `<div>
               <p><strong>Filename:</strong> ${label ?? d.filename}</p>
-              <p><strong>Folder:</strong> ${folder ?? "(none)"}</p>
+              <p><strong>Group:</strong> ${group ?? "(none)"}</p>
               <p><strong>Mean:</strong> ${d.mean.toFixed(4)}</p>
               <p><strong>SEM:</strong> ${d.sem.toFixed(4)}</p>
-              <p><strong>Group:</strong> ${groupKey ?? "(none)"}</p>
               ${blobURL ? `
                 <img src="${blobURL}" alt="Thumbnail"
                     style="width: 140px; height: 140px; object-fit: cover; margin-bottom: 5px; border: 1px solid #ccc;">
@@ -276,11 +274,11 @@ const BarChart = ({ barChartData, height, fileMappings}) => {
       paddingTop: '10px', // Add extra space for the dropdown
     }}
     >
-    <div className="controls" style={{ position: 'absolute', top: -150, left: 10 }}>
+    <div className="controls" style={{ position: 'absolute', top: 0, left: 10 }}>
       <label htmlFor="order">Order by: </label>
       <select id="order" value={order} onChange={e => setOrder(e.target.value)}>
         <option value="name">Image Name</option>
-        <option value="folder">Folder</option>
+        <option value="group">Group</option>
         <option value="ranking">Rank</option>
       </select>
     </div>
