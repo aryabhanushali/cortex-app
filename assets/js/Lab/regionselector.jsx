@@ -36,7 +36,7 @@ const RegionSelector = ({ region, setRegion, dataset }) => {
                 color: selected ? "#fff" : "var(--tungsten)",
                 boxShadow: "none",
                 "&:active": { boxShadow: "none" },
-                border: "1px solid var(--tungsten)",
+                border: "1px solid var(--solid-pink)",
 
                 "&:hover": {
                   background: "var(--highlight-color-button)",

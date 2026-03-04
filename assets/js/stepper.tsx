@@ -184,35 +184,9 @@ const Stepper: React.FC = () => {
     setCurrent(value);
   };
 
-  // const handleFilesUploaded = (uploadedFiles: { blobURL: string; file: File }[]) => {
-  //   // setFiles(uploadedFiles);
-  //   const withUid = uploadedFiles.map((f) => ({
-  //     ...f,
-  //     uid: (globalThis.crypto?.randomUUID?.() ?? `${f.file.name}-${f.file.size}-${f.file.lastModified}-${Math.random()}`)
-  //   }));
-  //   setFiles(withUid);
-  //   setPredictionResult(null);
-  //   setPredictstep(1);
-  // };
-
-  // const handleFileMappingsUpdate = (newFileMappings: { blobURL: string; file: File }[]) => {
-  //   // setFileMappings(newFileMappings);
-  //    const withUid = newFileMappings.map((f) => ({
-  //       ...f,
-  //       uid: (globalThis.crypto?.randomUUID?.() ?? `${f.file.name}-${f.file.size}-${f.file.lastModified}-${Math.random()}`)
-  //       }));
-  //       setFileMappings(withUid);
-  //     };
-
-  // 
 type FileWithPath = File & { webkitRelativePath?: string };
 
-const identityKey = (f: FileWithPath) => {
-  const rel = f.webkitRelativePath || "";
-  return `${rel}::${f.name}::${f.size}::${f.lastModified}`;
-};
-
-// 
+ 
 const addIncomingFiles = (newFiles: File[]) => {
   if (!newFiles?.length) return;
 
@@ -223,7 +197,7 @@ const addIncomingFiles = (newFiles: File[]) => {
       .filter((f) => f.type?.startsWith("image/"))
       .map((f) => {
         const ff = f as FileWithPath;
-        const uid = buildOrgName(ff); // 你已有的唯一 uid（含 folder/size/lastModified）
+        const uid = buildOrgName(ff); 
         const label = ff.webkitRelativePath || ff.name;
         const groupKey = buildGroupKey(ff, 1);
 
@@ -391,15 +365,6 @@ const renameGroupKey = (oldKey: string, newKey: string) => {
 
   console.log("Extract Heatmap Data from predictionResult:", heatmapData);
 
-  // const contentStyle: React.CSSProperties = {
-  //   lineHeight: '260px',
-  //   textAlign: 'center',
-  //   color: token.colorTextTertiary,
-  //   backgroundColor: 'transparent',
-  //   borderRadius: 0,
-  //   border: 'none',
-  //   marginTop: 16,
-  // };
   const contentStyle: React.CSSProperties = {
     textAlign: 'center',
     color: token.colorTextTertiary,
