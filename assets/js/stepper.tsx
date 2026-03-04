@@ -141,7 +141,6 @@ const Stepper: React.FC = () => {
   useEffect(() => {
     setPredictionResult(null); // Clear previous results
     setPredictstep(1); // Reset button
-    handlePrediction();
   }, [model, dataset, region, voxelOption, voxelNumber, paper, participantName]);
 
   useEffect(() => {
