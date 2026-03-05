@@ -137,10 +137,8 @@ const Heatmap = ({ heatmapData, originalFilenames, sortedFilenames, width, heigh
             tooltip.html(`
                 <div style="
                   padding: 12px;
-                  background: rgba(255,255,255,0.95);
+                  background: transparent;
                   border-radius: 12px;
-                  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-                  backdrop-filter: blur(6px);
                   min-width: 280px;
                   font-family: Inter, sans-serif;
                 ">
