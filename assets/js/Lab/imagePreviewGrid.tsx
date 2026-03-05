@@ -36,7 +36,7 @@ type ImagePreviewGroupedDnDProps = {
 
 export default function ImagePreviewGroupedDnD({
   files = [],
-  title = "Uploaded Images Preview (Grouped)",
+  title = "Uploaded Images Preview",
   onRemove,
   onClear,
   onClearGroup,
@@ -99,8 +99,24 @@ export default function ImagePreviewGroupedDnD({
   }, [files, groupDepth, itemGroupMap]);
 
   const [groupOrder, setGroupOrder] = useState<string[]>([]);
+  const [customGroups, setCustomGroups] = useState<string[]>([]);
+
   useEffect(() => {
-    const keys = Object.keys(grouped);
+    if (files.length === 0) {
+      setCustomGroups([]);
+      setGroupError("");
+      setIsAddingGroup(false);
+      setNewGroupName("");
+    }
+  }, [files.length]);
+
+  const allGroupKeys = useMemo(() => {
+    const keys = [...Object.keys(grouped), ...customGroups];
+    return Array.from(new Set(keys));
+  }, [grouped, customGroups]);
+
+  useEffect(() => {
+    const keys = allGroupKeys;
 
     setGroupOrder((prev) => {
       const keep = prev.filter((k) => keys.includes(k));
@@ -109,11 +125,11 @@ export default function ImagePreviewGroupedDnD({
       onGroupOrderChange?.(next);
       return next;
     });
-  }, [grouped, onGroupOrderChange]);
+  }, [allGroupKeys, onGroupOrderChange]);
 
   const [groupNameMap, setGroupNameMap] = useState<Record<string, string>>({});
   useEffect(() => {
-    const keys = Object.keys(grouped);
+    const keys = allGroupKeys;
 
     setGroupNameMap((prev) => {
       const next: Record<string, string> = { ...prev };
@@ -125,7 +141,7 @@ export default function ImagePreviewGroupedDnD({
       });
       return next;
     });
-  }, [grouped]);
+  }, [allGroupKeys]);
 
   const displayName = (k: string) => groupNameMap[k] ?? k;
 
@@ -134,8 +150,42 @@ export default function ImagePreviewGroupedDnD({
 
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [draftName, setDraftName] = useState<string>("");
+  const [isAddingGroup, setIsAddingGroup] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+  const [groupError, setGroupError] = useState("");
 
-  const orderedKeys = groupOrder.length ? groupOrder : Object.keys(grouped);
+  const orderedKeys = groupOrder.length ? groupOrder : allGroupKeys;
+
+  const startAddGroup = () => {
+    setGroupError("");
+    setNewGroupName("");
+    setIsAddingGroup(true);
+  };
+
+  const cancelAddGroup = () => {
+    setIsAddingGroup(false);
+    setNewGroupName("");
+    setGroupError("");
+  };
+
+  const confirmAddGroup = () => {
+    const name = newGroupName.trim();
+    if (!name) {
+      setGroupError("Group name is required.");
+      return;
+    }
+
+    const exists = new Set(allGroupKeys);
+    if (exists.has(name)) {
+      setGroupError("Group name already exists.");
+      return;
+    }
+
+    setCustomGroups((prev) => [...prev, name]);
+    setIsAddingGroup(false);
+    setNewGroupName("");
+    setGroupError("");
+  };
 
   const move = (fromKey: string | null, toKey: string) => {
     if (!fromKey || !toKey || fromKey === toKey) return;
@@ -164,6 +214,16 @@ export default function ImagePreviewGroupedDnD({
       setEditingKey(null);
       return;
     }
+
+    const exists = new Set(allGroupKeys.filter((key) => key !== k));
+    if (exists.has(name)) {
+      setGroupError("Group name already exists.");
+      return;
+    }
+
+    setCustomGroups((prev) => prev.map((g) => (g === k ? name : g)));
+    setGroupOrder((prev) => prev.map((g) => (g === k ? name : g)));
+
     onRenameGroupKey?.(k, name);
     setEditingKey(null);
   };
@@ -189,18 +249,82 @@ export default function ImagePreviewGroupedDnD({
           {title} <span style={{ fontWeight: 500, color: "rgba(0,0,0,0.55)" }}>({files.length})</span>
         </div>
 
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onClear?.();
-          }}
-          style={btnStyle()}
-        >
-          Clear All
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              startAddGroup();
+            }}
+            style={btnStyle()}
+          >
+            Add Group
+          </button>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClear?.();
+              setCustomGroups([]);
+            }}
+            style={btnStyle()}
+          >
+            Clear All
+          </button>
+        </div>
       </div>
+
+      {isAddingGroup && (
+        <div
+          style={{
+            marginTop: 10,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            flexWrap: "wrap",
+          }}
+        >
+          <input
+            autoFocus
+            value={newGroupName}
+            onChange={(e) => {
+              setNewGroupName(e.target.value);
+              if (groupError) setGroupError("");
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") confirmAddGroup();
+              if (e.key === "Escape") cancelAddGroup();
+            }}
+            placeholder="New group name"
+            style={{
+              width: 260,
+              maxWidth: "100%",
+              borderRadius: 10,
+              border: "1px solid rgba(0,0,0,0.25)",
+              padding: "6px 10px",
+              fontWeight: 600,
+              outline: "none",
+              background: "white",
+            }}
+          />
+
+          <button type="button" onClick={confirmAddGroup} style={btnStyle()}>
+            Confirm
+          </button>
+          <button type="button" onClick={cancelAddGroup} style={btnStyle()}>
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {groupError && (
+        <div style={{ marginTop: 8, color: "#b42318", fontSize: 12, fontWeight: 600 }}>
+          {groupError}
+        </div>
+      )}
 
       {showPathDebug && (
         <div style={{ marginTop: 10, padding: 10, borderRadius: 10, background: "white", color: "black", fontSize: 12 }}>
@@ -225,7 +349,6 @@ export default function ImagePreviewGroupedDnD({
       >
         {orderedKeys.map((k) => {
           const items = grouped[k] || [];
-          if (!items.length) return null;
 
           const isOver = overKey === k && dragKey && dragKey !== k;
 
@@ -341,6 +464,7 @@ export default function ImagePreviewGroupedDnD({
                  
                       const uidsToRemove = items.map((it) => it.id); // it.id 就是 item.uid
                     onClearGroup?.(k, uidsToRemove);
+                    setCustomGroups((prev) => prev.filter((g) => g !== k));
                     }}
                     style={btnStyle()}
                   >
@@ -425,6 +549,20 @@ export default function ImagePreviewGroupedDnD({
                   </div>
                 ))}
               </div>
+
+              {!items.length && (
+                <div
+                  style={{
+                    border: "1px dashed rgba(0,0,0,0.18)",
+                    borderRadius: 10,
+                    padding: 12,
+                    color: "rgba(0,0,0,0.55)",
+                    fontSize: 12,
+                  }}
+                >
+                  Empty group. Drag images here.
+                </div>
+              )}
 
               {items.length > maxThumbsPerGroup && (
                 <div style={{ marginTop: 8, color: "rgba(0,0,0,0.55)", fontSize: 12 }}>
