@@ -53,8 +53,8 @@ export default function ImagePreviewGroupedDnD({
     if (!rel) return "Ungrouped";
 
     const parts = rel.split("/").filter(Boolean);
-    if (parts.length <= groupDepth) return "Ungrouped";
-    return parts[groupDepth] || "Ungrouped";
+    if (parts.length <= groupDepth + 1) return parts[0] || "Ungrouped";
+    return parts[groupDepth] || parts[0] || "Ungrouped";
   };
 
   const [itemGroupMap, setItemGroupMap] = useState<Record<string, string>>({}); // { [uid]: groupKey }

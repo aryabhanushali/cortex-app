@@ -58,7 +58,9 @@ const buildGroupKey = (f: FileWithPath, depth = 1) => {
   if (!rel) return "Ungrouped";
   const parts = rel.split("/").filter(Boolean);
   // 例：root/sub/file.jpg, depth=1 -> sub
-  return parts[depth] || "Ungrouped";
+  // 如果没有 subfolder（root/file.jpg），则按 root 分组，避免每张图单独成组
+  if (parts.length <= depth + 1) return parts[0] || "Ungrouped";
+  return parts[depth] || parts[0] || "Ungrouped";
 };
 
 const getExt = (name: string) => {
