@@ -4,11 +4,25 @@ import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import { REGION_OPTIONS, MURTY185_INCLUDED_REGIONS } from "../constants";
+import {
+  REGION_OPTIONS,
+  MURTY185_INCLUDED_REGIONS,
+  NSD_1000_INCLUDED_REGIONS,
+} from "../constants";
 
 const RegionSelector = ({ region, setRegion, dataset }) => {
   const isEnabled = (option) => {
-    return dataset !== "murty185" || MURTY185_INCLUDED_REGIONS.includes(option.value);
+    const value = (option?.value || "").toLowerCase();
+
+    if (dataset === "murty185") {
+      return MURTY185_INCLUDED_REGIONS.includes(value);
+    }
+
+    if (dataset === "nsd_1000") {
+      return NSD_1000_INCLUDED_REGIONS.includes(value);
+    }
+
+    return true;
   };
 
   return (

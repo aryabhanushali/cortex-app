@@ -832,11 +832,11 @@ export const REGION_OPTIONS = [
   { value: 'ffa', label: 'FFA' },
   { value: 'eba', label: 'EBA' },
   { value: 'ppa', label: 'PPA' },
-  // { value: 'fba', label: 'FBA'},
-  // { value: 'ofa', label: 'OFA'},
-  // { value: 'opa', label: 'OPA'},
-  // { value: 'rsc', label: 'RSC'},
-  // { value: 'vwfa', label: 'VWFA'},
+  { value: 'fba', label: 'FBA'},
+  { value: 'ofa', label: 'OFA'},
+  { value: 'opa', label: 'OPA'},
+  { value: 'rsc', label: 'RSC'},
+  { value: 'vwfa', label: 'VWFA'},
 ];
   
 export const VOXEL_OPTIONS = [
@@ -852,6 +852,7 @@ export const PAPER_OPTIONS = [
 
 //Regions included in each dataset
 export const MURTY185_INCLUDED_REGIONS = ['ffa', 'eba', 'ppa'];
+export const NSD_1000_INCLUDED_REGIONS = ['ffa', 'eba', 'ppa'];
 
 //Modelcard info
 export const MODELCARD_INFO_LOOKUP = {
