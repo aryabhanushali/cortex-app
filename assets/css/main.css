@@ -16,7 +16,7 @@
   --accent-color: #6b6358; /* #4655dd Accent color that represents your brand on the website. It's used for buttons, links, and other elements that need to stand out */
   --accent-gradient: linear-gradient(135deg, #7d7469 0%, #6b6358 100%);
   --accent-muted: rgba(107, 99, 88, 0.14);
-  --solid-pink: #b8a4bc;
+  --solid-pink: #b192b7;
   --surface-color: #f7f7f4; /* The surface color is used as a background of boxed elements within sections, such as cards, icon boxes, or other elements that require a visual separation from the global background. */
   --contrast-color: #ffffff; /* Contrast color for text, ensuring readability against backgrounds of accent, heading, or default colors. */
   --highlight-color: linear-gradient(135deg, #b66072 0%, #875e8f 50%, #8b669f 100%); /* Highlight color for important elements, such as active navigation links, call-to-action buttons, or other elements that require extra emphasis. */

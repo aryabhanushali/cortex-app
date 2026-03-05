@@ -464,7 +464,7 @@ const renameGroupKey = (oldKey: string, newKey: string) => {
 
           <ImagePreviewGroupedDnD
             files={files}
-            title="Uploaded Images Preview (Grouped)"
+            title="Uploaded Images Preview"
             groupDepth={1}
             onMoveItemToGroup={moveItemToGroup}
             onRenameGroupKey={renameGroupKey}

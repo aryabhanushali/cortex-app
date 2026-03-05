@@ -342,7 +342,7 @@ export default function ImagePreviewGroupedDnD({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gridTemplateColumns: orderedKeys.length <= 1 ? "minmax(0, 1fr)" : "repeat(2, minmax(0, 1fr))",
           gap: 12,
           alignItems: "start",
         }}
@@ -372,7 +372,7 @@ export default function ImagePreviewGroupedDnD({
                 border: isOver ? "2px solid var(--highlight-color-button, #7aa7ff)" : "1px solid rgba(0,0,0,0.10)",
                 borderRadius: 12,
                 padding: 10,
-                background: "white",
+                background: "var(--background-color)",
               }}
             >
                           <div

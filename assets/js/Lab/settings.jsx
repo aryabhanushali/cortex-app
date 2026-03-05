@@ -28,6 +28,58 @@ const Settings = ({
   participantName,
   setParticipantName,
 }) => {
+  const sharedSelectSx = {
+    backgroundColor: 'var(--background-color)',
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'rgba(0,0,0,0.2)',
+    },
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--solid-pink)',
+    },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--solid-pink)',
+      borderWidth: '1px',
+    },
+  };
+
+  const sharedLabelSx = {
+    backgroundColor: 'var(--background-color)',
+    '&.Mui-focused': {
+      color: 'var(--solid-pink)',
+    },
+  };
+
+  const sharedMenuProps = {
+    PaperProps: {
+      sx: {
+        '& .MuiMenuItem-root.Mui-selected': {
+          backgroundColor: 'color-mix(in srgb, var(--solid-pink), transparent 80%)',
+          color: 'var(--text-main)',
+        },
+        '& .MuiMenuItem-root.Mui-selected:hover': {
+          backgroundColor: 'color-mix(in srgb, var(--solid-pink), transparent 72%)',
+        },
+      },
+    },
+  };
+
+  const sharedTextFieldSx = {
+    marginTop: 2,
+    backgroundColor: 'var(--background-color)',
+    borderRadius: '4px',
+    '& .MuiOutlinedInput-root': {
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: 'rgba(0,0,0,0.2)',
+      },
+      '&:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: 'var(--solid-pink)',
+      },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: 'var(--solid-pink)',
+      },
+    },
+  };
+
   return (
     <FormGroup
       sx={{
@@ -35,7 +87,7 @@ const Settings = ({
         padding: 0,
         margintop: 2,
         marginLeft: 0,
-        backgroundColor: 'white',
+        backgroundColor: 'var(--background-color)',
         borderRadius: '8px',
         // width: { xs: '90%', sm: '50%', md: '30%', lg: '30%', xl: '30%' },
         width: '100%',
@@ -50,9 +102,7 @@ const Settings = ({
       {/* Model Selection */}
       <FormControl sx={{ m: 1, minWidth: 120, textAlign: 'left'}} fullWidth size="small">
         <InputLabel
-          sx={{
-            backgroundColor: 'white',
-          }}
+          sx={sharedLabelSx}
           id="model-select-label"
         >
           Select a base-model architecture
@@ -62,9 +112,8 @@ const Settings = ({
           id="model-select"
           value={model}
           onChange={(e) => setModel(e.target.value)}
-          sx={{
-            backgroundColor: 'white',
-          }}
+          sx={sharedSelectSx}
+          MenuProps={sharedMenuProps}
         >
           <MenuItem value="">
             <em>None</em>
@@ -80,9 +129,7 @@ const Settings = ({
       {/* Dataset Selection */}
       <FormControl sx={{ m: 1, minWidth: 120, textAlign: 'left'}} fullWidth size="small">
         <InputLabel
-          sx={{
-            backgroundColor: 'white',
-          }}
+          sx={sharedLabelSx}
           id="dataset-select-label"
         >
           Select the fMRI mapping dataset
@@ -92,6 +139,8 @@ const Settings = ({
           id="dataset-select"
           value={dataset}
           onChange={(e) => setDataset(e.target.value)}
+          sx={sharedSelectSx}
+          MenuProps={sharedMenuProps}
         >
           <MenuItem value="">
             <em>None</em>
@@ -107,9 +156,7 @@ const Settings = ({
       {/* Voxel Selection */}
       <FormControl sx={{ m: 1, minWidth: 120, textAlign: 'left'}} fullWidth size="small">
         <InputLabel
-          sx={{
-            backgroundColor: 'white',
-          }}
+          sx={sharedLabelSx}
           id="voxel-select-label"
         >
           Select Voxels
@@ -119,6 +166,8 @@ const Settings = ({
           id="voxel-select"
           value={voxelOption}
           onChange={(e) => setVoxelOption(e.target.value)}
+          sx={sharedSelectSx}
+          MenuProps={sharedMenuProps}
         >
           <MenuItem value="">
             <em>None</em>
@@ -137,11 +186,7 @@ const Settings = ({
             placeholder="Enter number of voxels"
             value={voxelNumber}
             onChange={(e) => setVoxelNumber(e.target.value)}
-            sx={{
-              marginTop: 2,
-              backgroundColor: 'white',
-              borderRadius: '4px',
-            }}
+            sx={sharedTextFieldSx}
           />
         )}
 
@@ -152,11 +197,7 @@ const Settings = ({
             placeholder="Enter participant name (e.g., p1)"
             value={participantName}
             onChange={(e) => setParticipantName(e.target.value)}
-            sx={{
-              marginTop: 2,
-              backgroundColor: 'white',
-              borderRadius: '4px',
-            }}
+            sx={sharedTextFieldSx}
           />
         )}
       </FormControl>
