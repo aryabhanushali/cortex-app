@@ -22,7 +22,6 @@ type PreviewFile = {
   uid: string;       
   blobURL: string;
   file: FileWithPath;
-
   label: string;     
   groupKey: string;  
   serverKey?: string; 
@@ -57,8 +56,6 @@ const buildGroupKey = (f: FileWithPath, depth = 1) => {
   const rel = normalizePath(f.webkitRelativePath || "");
   if (!rel) return "Ungrouped";
   const parts = rel.split("/").filter(Boolean);
-  // 例：root/sub/file.jpg, depth=1 -> sub
-  // 如果没有 subfolder（root/file.jpg），则按 root 分组，避免每张图单独成组
   if (parts.length <= depth + 1) return parts[0] || "Ungrouped";
   return parts[depth] || parts[0] || "Ungrouped";
 };
@@ -70,14 +67,6 @@ const getExt = (name: string) => {
 
 const safe = (s: string) =>
   s.replaceAll("\\", "/").replaceAll("/", "__").replaceAll(" ", "_");
-
-const toRenamedUploadFile = (orig: FileWithPath, uniqueId: string) => {
-  const ext = getExt(orig.name);                  
-  const newName = `${safe(uniqueId)}${ext}`;     
-  return new File([orig], newName, { type: orig.type });
-};
-
-
 
 const { Step } = Steps;
 const SERVER_BASE_URL = SERVER_URL;
@@ -202,7 +191,6 @@ const addIncomingFiles = (newFiles: File[]) => {
         const uid = buildOrgName(ff); 
         const label = ff.webkitRelativePath || ff.name;
         const groupKey = buildGroupKey(ff, 1);
-
         return {
           uid,
           label,
@@ -238,7 +226,6 @@ const removeOne = (uid: string) => {
     if (next.length === 0) {
       setUploaderKey((k) => k + 1); 
     }
-
     return next;
   });
 };
@@ -318,51 +305,53 @@ const renameGroupKey = (oldKey: string, newKey: string) => {
 
   // ✅ Ensure only the actual file is sent to Gradio
   const handlePrediction = async () => {
-  if (files.length === 0) {
-    message.error("No files uploaded. Please upload files first.");
-    return;
-  }
+    console.log("📦 handlePrediction received files:");
+    console.log(files);
+    if (files.length === 0) {
+      message.error("No files uploaded. Please upload files first.");
+      return;
+    }
 
-  setPredictionLoading(true);
+    setPredictionLoading(true);
 
-  try {
+    try {
+      
+      const uploadFiles = files.map((x) => {
+        const ext = getExt(x.file.name);
+        const newName = `${safe(x.uid)}${ext}`;          
+        return new File([x.file], newName, { type: x.file.type });
+      });
+
+      const serverKeys = uploadFiles.map((f) => f.name);
+
     
-    const uploadFiles = files.map((x) => {
-      const ext = getExt(x.file.name);
-      const newName = `${safe(x.uid)}${ext}`;          
-      return new File([x.file], newName, { type: x.file.type });
-    });
-
-    const serverKeys = uploadFiles.map((f) => f.name);
-
-   
-    setFiles((prev) => prev.map((x, i) => ({ ...x, serverKey: serverKeys[i] })));
-    setFileMappings((prev) => prev.map((x, i) => ({ ...x, serverKey: serverKeys[i] })));
+      setFiles((prev) => prev.map((x, i) => ({ ...x, serverKey: serverKeys[i] })));
+      setFileMappings((prev) => prev.map((x, i) => ({ ...x, serverKey: serverKeys[i] })));
 
 
-    const paths: string[] = await uploadImages(uploadFiles);
+      const paths: string[] = await uploadImages(uploadFiles);
 
-  
-    const items = paths.map((path, i) => ({
-      path,
-      org_name: serverKeys[i],
-    }));
+    
+      const items = paths.map((path, i) => ({
+        path,
+        org_name: serverKeys[i],
+      }));
 
-    const result = await axios.post(`${SERVER_BASE_URL}/api/predict`, {
-      data: [items, region, dataset, model, true, true, true],
-    });
+      const result = await axios.post(`${SERVER_BASE_URL}/api/predict`, {
+        data: [items, region, dataset, model, true, true, true],
+      });
 
-    setPredictionResult(result.data.data);
-    message.success("Prediction complete!");
-  } catch (e) {
-    console.error(e);
-    message.error("Prediction failed. Check server connection.");
-  } finally {
-    setPredictionLoading(false);
-    setLoading(false);
-    setPredictstep(2);
-  }
-};
+      setPredictionResult(result.data.data);
+      message.success("Prediction complete!");
+    } catch (e) {
+      console.error(e);
+      message.error("Prediction failed. Check server connection.");
+    } finally {
+      setPredictionLoading(false);
+      setLoading(false);
+      setPredictstep(2);
+    }
+  };
 
   const barchartData = useBarchartData(predictionResult);
 
