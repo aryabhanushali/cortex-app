@@ -851,8 +851,8 @@ export const PAPER_OPTIONS = [
 ];
 
 //Regions included in each dataset
-export const MURTY185_INCLUDED_REGIONS = ['ffa', 'eba', 'ppa'];
-export const NSD_1000_INCLUDED_REGIONS = ['ffa', 'eba', 'ppa'];
+export const MURTY185_INCLUDED_REGIONS = ['ffa', 'eba', 'ppa', 'fba', 'ofa', 'opa', 'rsc'];
+export const NSD_1000_INCLUDED_REGIONS = ['ffa', 'eba', 'ppa', 'fba', 'ofa', 'opa', 'rsc', 'vwfa'];
 
 //Modelcard info
 export const MODELCARD_INFO_LOOKUP = {
