@@ -6,7 +6,7 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
   const svgRef = useRef(null);
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
-  const [order, setOrder] = useState("name");
+  const [order, setOrder] = useState("group");
 
   // Build a lookup map using serverKey first, since prediction results
   // usually come back with the renamed/uploaded filename.
@@ -65,14 +65,6 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
   const getSortedData = useMemo(() => {
     if (!barChartData || !Array.isArray(barChartData)) return [];
 
-    if (order === "name") {
-      return [...barChartData].sort((a, b) => {
-        const labelA = getDisplayLabel(a.filename);
-        const labelB = getDisplayLabel(b.filename);
-        return labelA.localeCompare(labelB);
-      });
-    }
-
     if (order === "ranking") {
       return [...barChartData].sort((a, b) => b.mean - a.mean);
     }
@@ -85,15 +77,22 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
         if (groupA === groupB) {
           const labelA = getDisplayLabel(a.filename);
           const labelB = getDisplayLabel(b.filename);
-          return labelA.localeCompare(labelB);
+
+          return labelA.localeCompare(labelB, undefined, {
+            numeric: true,
+            sensitivity: "base",
+          });
         }
 
-        return groupA.localeCompare(groupB);
+        return groupA.localeCompare(groupB, undefined, {
+          numeric: true,
+          sensitivity: "base",
+        });
       });
     }
 
     return [...barChartData];
-  }, [barChartData, order, fileMap]);
+}, [barChartData, order, fileMap]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -325,7 +324,6 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
       <div className="controls" style={{ position: 'absolute', top: 0, left: 10, zIndex: 2 }}>
         <label htmlFor="order">Order by: </label>
         <select id="order" value={order} onChange={(e) => setOrder(e.target.value)}>
-          <option value="name">Image Name</option>
           <option value="group">Group</option>
           <option value="ranking">Rank</option>
         </select>

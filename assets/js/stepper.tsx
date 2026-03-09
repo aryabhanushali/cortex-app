@@ -514,7 +514,7 @@ const renameGroupKey = (oldKey: string, newKey: string) => {
           />
 
           {predictionLoading && <LinearIndeterminate />} {/* add progress bar when predictionLoading is true */}
-            <h3 style={{ textAlign: "left", color:"black", fontSize: "18px", marginBottom: "50px", marginTop: "40px"}}>
+            <h3 style={{ textAlign: "left", color:"black", fontSize: "18px", marginBottom: "10px", marginTop: "40px"}}>
             <b>Univariate Analysis:</b> Predicted voxel average responses
             </h3>
           <BarChart barChartData={barchartData} height={600} fileMappings={fileMappings}/>
