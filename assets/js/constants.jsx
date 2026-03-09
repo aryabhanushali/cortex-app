@@ -832,11 +832,11 @@ export const REGION_OPTIONS = [
   { value: 'ffa', label: 'FFA' },
   { value: 'eba', label: 'EBA' },
   { value: 'ppa', label: 'PPA' },
-  { value: 'fba', label: 'FBA'},
-  { value: 'ofa', label: 'OFA'},
-  { value: 'opa', label: 'OPA'},
-  { value: 'rsc', label: 'RSC'},
-  { value: 'vwfa', label: 'VWFA'},
+  // { value: 'fba', label: 'FBA'},
+  // { value: 'ofa', label: 'OFA'},
+  // { value: 'opa', label: 'OPA'},
+  // { value: 'rsc', label: 'RSC'},
+  // { value: 'vwfa', label: 'VWFA'},
 ];
   
 export const VOXEL_OPTIONS = [
