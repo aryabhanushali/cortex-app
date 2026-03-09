@@ -448,12 +448,9 @@ const renameGroupKey = (oldKey: string, newKey: string) => {
           content: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <Uploader  key={uploaderKey} onAddFiles={(newFiles) => addIncomingFiles(newFiles)} />
-
-        
-
           <ImagePreviewGroupedDnD
             files={files}
-            title="Uploaded Images Preview"
+            title="Uploaded Images"
             groupDepth={1}
             onMoveItemToGroup={moveItemToGroup}
             onRenameGroupKey={renameGroupKey}
@@ -495,11 +492,27 @@ const renameGroupKey = (oldKey: string, newKey: string) => {
       content: (
         <div style={{ display: 'flex', flexDirection: 'column'}}>
           <RegionSelector region={region} setRegion={setRegion} dataset={dataset} />
+          
+
           <ModelCard
             region={region}
             dataset={dataset}
             model={model}
           />
+
+           <ImagePreviewGroupedDnD
+            files={files}
+            title="Uploaded Images Preview"
+            groupDepth={1}
+            onMoveItemToGroup={moveItemToGroup}
+            onRenameGroupKey={renameGroupKey}
+            onRemove={(uid: string) => removeOne(uid)}
+            onClear={() => clearAll()}
+            onClearGroup={(groupKey, uids) => clearGroup(uids)}
+            onGroupOrderChange={(order: string[]) => console.log("Group order:", order)}
+            foldable={true}
+          />
+
           {predictionLoading && <LinearIndeterminate />} {/* add progress bar when predictionLoading is true */}
             <h3 style={{ textAlign: "left", color:"black", fontSize: "18px", marginBottom: "50px", marginTop: "40px"}}>
             <b>Univariate Analysis:</b> Predicted voxel average responses
