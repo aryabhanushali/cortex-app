@@ -189,7 +189,7 @@ const addIncomingFiles = (newFiles: File[]) => {
       .map((f) => {
         const ff = f as FileWithPath;
         const uid = buildOrgName(ff); 
-        const label = ff.webkitRelativePath || ff.name;
+        const label =   ff.webkitRelativePath?.split("/").pop() || ff.name;
         const groupKey = buildGroupKey(ff, 1);
         return {
           uid,
