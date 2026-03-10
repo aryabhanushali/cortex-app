@@ -9,6 +9,7 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
   const [order, setOrder] = useState("group");
   const [selectedGroups, setSelectedGroups] = useState([]);
 
+
   
 
   // Build a lookup map using serverKey first, since prediction results
@@ -103,6 +104,8 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
       hsl.s = hsl.s * factor; 
       return hsl.toString();
     };
+  
+
 
   const getSortedData = useMemo(() => {
     if (!barChartData || !Array.isArray(barChartData)) return [];
@@ -154,6 +157,31 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
 
   useEffect(() => {
     const sortedData = getSortedData;
+    const groupSpans = [];
+
+    if (order === "group" && sortedData.length > 0) {
+      let startIndex = 0;
+
+      while (startIndex < sortedData.length) {
+        const currentGroup = getGroupForFilename(sortedData[startIndex].filename);
+        let endIndex = startIndex;
+
+        while (
+          endIndex + 1 < sortedData.length &&
+          getGroupForFilename(sortedData[endIndex + 1].filename) === currentGroup
+        ) {
+          endIndex++;
+        }
+
+        groupSpans.push({
+          group: currentGroup,
+          startDatum: sortedData[startIndex],
+          endDatum: sortedData[endIndex],
+        });
+
+        startIndex = endIndex + 1;
+      }
+    }
 
     if (!sortedData || sortedData.length === 0 || !containerWidth) {
       const svg = d3.select(svgRef.current);
@@ -165,7 +193,7 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
     svg.selectAll("*").remove();
 
     const margin = barchartStyles?.margin || {
-      top: 40,
+      top: 60,
       right: 30,
       bottom: 80,
       left: 80,
@@ -352,6 +380,77 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
       .attr("stroke", "grey")
       .attr("stroke-width", adjustedBandwidth / 10)
       .attr("opacity", (d) => (isGroupHighlighted(d.filename) ? 1 : 0.2));
+
+
+
+
+
+    if (order === "group" && groupSpans.length > 0) {
+      const groupLabelY = -8;       
+      const tickHeight = 8;        
+      const textOffsetY = -12;    
+      const groupLabelG = g.append("g").attr("class", "group-labels");
+
+      groupSpans.forEach(({ group, startDatum, endDatum }) => {
+        const startX =
+          shiftX(xScale(startDatum.filename) + (xScale.bandwidth() - adjustedBandwidth) / 2);
+
+        const endX =
+          shiftX(xScale(endDatum.filename) + (xScale.bandwidth() - adjustedBandwidth) / 2) +
+          adjustedBandwidth;
+
+        const centerX = (startX + endX) / 2;
+
+  
+        groupLabelG
+          .append("line")
+          .attr("x1", startX)
+          .attr("x2", endX)
+          .attr("y1", groupLabelY)
+          .attr("y2", groupLabelY)
+          .attr("stroke", "#888")
+          .attr("stroke-width", 1.2);
+
+        groupLabelG
+          .append("line")
+          .attr("x1", startX)
+          .attr("x2", startX)
+          .attr("y1", groupLabelY)
+          .attr("y2", groupLabelY + tickHeight)
+          .attr("stroke", "#888")
+          .attr("stroke-width", 1.2);
+
+        
+        groupLabelG
+          .append("line")
+          .attr("x1", endX)
+          .attr("x2", endX)
+          .attr("y1", groupLabelY)
+          .attr("y2", groupLabelY + tickHeight)
+          .attr("stroke", "#888")
+          .attr("stroke-width", 1.2);
+
+  
+   
+      groupLabelG
+        .append("rect")
+        .attr("x", centerX - 28)
+        .attr("y", textOffsetY - 10)
+        .attr("width", 56)
+        .attr("height", 16)
+        .attr("fill", "var(--background-color)");
+
+  
+      groupLabelG
+        .append("text")
+        .attr("x", centerX)
+        .attr("y", textOffsetY + 2)
+        .attr("text-anchor", "middle")
+        .style("font-size", "12px")
+        .style("fill", "#666")
+        .text(group);
+            });
+          }
 
     return () => {
       d3.select(containerRef.current).select(".tooltip").remove();
