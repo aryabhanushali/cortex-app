@@ -7,6 +7,9 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [order, setOrder] = useState("group");
+  const [selectedGroups, setSelectedGroups] = useState([]);
+
+  
 
   // Build a lookup map using serverKey first, since prediction results
   // usually come back with the renamed/uploaded filename.
@@ -61,6 +64,45 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
     const mapping = getMappingForFilename(filename);
     return mapping?.label || filename;
   };
+
+  const allGroups = useMemo(() => {
+    if (!barChartData || !Array.isArray(barChartData)) return [];
+
+    const groups = Array.from(
+      new Set(barChartData.map((d) => getGroupForFilename(d.filename)))
+    );
+
+    return groups.sort((a, b) =>
+      a.localeCompare(b, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      })
+    );
+  }, [barChartData, fileMap]);
+
+  const toggleGroupSelection = (group) => {
+    setSelectedGroups((prev) =>
+      prev.includes(group)
+        ? prev.filter((g) => g !== group)
+        : [...prev, group]
+    );
+  };
+
+  const isGroupHighlighted = (filename) => {
+    if (order !== "ranking") return true;
+
+    const group = getGroupForFilename(filename);
+
+    if (selectedGroups.length === 0) return true;
+
+    return selectedGroups.includes(group);
+  };
+
+  const desaturateColor = (color, factor = 0.1) => {
+      const hsl = d3.hsl(color);
+      hsl.s = hsl.s * factor; 
+      return hsl.toString();
+    };
 
   const getSortedData = useMemo(() => {
     if (!barChartData || !Array.isArray(barChartData)) return [];
@@ -196,7 +238,13 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
       .attr("y", (d) => (d.mean >= 0 ? yScale(d.mean) : yScale(0)))
       .attr("width", adjustedBandwidth)
       .attr("height", (d) => Math.abs(yScale(d.mean) - yScale(0)))
-      .attr("fill", (d) => colorScale(d.mean))
+      .attr("fill", (d) => {
+        const color = colorScale(d.mean);
+        return isGroupHighlighted(d.filename)
+          ? color
+          : desaturateColor(color, 0.2);
+      })
+      .attr("opacity", (d) => (isGroupHighlighted(d.filename) ? 1 : 0.2))
       .on("mouseover", (event, d) => {
         d3.select(event.currentTarget).attr(
           "fill",
@@ -278,7 +326,8 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
       .attr("y1", (d) => yScale(d.mean - d.sem))
       .attr("y2", (d) => yScale(d.mean + d.sem))
       .attr("stroke", "grey")
-      .attr("stroke-width", adjustedBandwidth / 10);
+      .attr("stroke-width", adjustedBandwidth / 10)
+      .attr("opacity", (d) => (isGroupHighlighted(d.filename) ? 1 : 0.2));
 
     g.selectAll(".cap-top")
       .data(sortedData)
@@ -289,7 +338,8 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
       .attr("y1", (d) => yScale(d.mean + d.sem))
       .attr("y2", (d) => yScale(d.mean + d.sem))
       .attr("stroke", "grey")
-      .attr("stroke-width", adjustedBandwidth / 10);
+      .attr("stroke-width", adjustedBandwidth / 10)
+      .attr("opacity", (d) => (isGroupHighlighted(d.filename) ? 1 : 0.2));
 
     g.selectAll(".cap-bottom")
       .data(sortedData)
@@ -300,12 +350,13 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
       .attr("y1", (d) => yScale(d.mean - d.sem))
       .attr("y2", (d) => yScale(d.mean - d.sem))
       .attr("stroke", "grey")
-      .attr("stroke-width", adjustedBandwidth / 10);
+      .attr("stroke-width", adjustedBandwidth / 10)
+      .attr("opacity", (d) => (isGroupHighlighted(d.filename) ? 1 : 0.2));
 
     return () => {
       d3.select(containerRef.current).select(".tooltip").remove();
     };
-  }, [getSortedData, containerWidth, height, fileMap]);
+  }, [getSortedData, containerWidth, height, fileMap, selectedGroups, order]);
 
   return (
     <div
@@ -321,12 +372,81 @@ const BarChart = ({ barChartData, height, fileMappings }) => {
         paddingTop: '10px',
       }}
     >
-      <div className="controls" style={{ position: 'absolute', top: 0, left: 10, zIndex: 2 }}>
-        <label htmlFor="order">Order by: </label>
-        <select id="order" value={order} onChange={(e) => setOrder(e.target.value)}>
-          <option value="group">Group</option>
-          <option value="ranking">Rank</option>
-        </select>
+      <div
+        className="controls"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '16px',
+          padding: '6px 10px 0 10px',
+          flexWrap: 'wrap',
+          width: '100%',
+          boxSizing: 'border-box',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            flexShrink: 0,
+          }}
+        >
+          <label htmlFor="order">Order by:</label>
+          <select id="order" value={order} onChange={(e) => setOrder(e.target.value)}>
+            <option value="group">Group</option>
+            <option value="ranking">Rank</option>
+          </select>
+        </div>
+
+        {order === "ranking" && allGroups.length > 0 && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              flexWrap: 'wrap',
+              justifyContent: 'flex-end',
+            }}
+          >
+            <span style={{ fontWeight: 500, whiteSpace: 'nowrap' }}>
+              Highlight group:
+            </span>
+
+            {allGroups.map((group) => (
+              <label
+                key={group}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedGroups.includes(group)}
+                  onChange={() => toggleGroupSelection(group)}
+                />
+                {group}
+              </label>
+            ))}
+
+            <button
+              type="button"
+              onClick={() => setSelectedGroups([])}
+              style={{
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Clear
+            </button>
+          </div>
+        )}
       </div>
 
       <svg ref={svgRef} style={{ marginTop: '10px', width: '100%' }} />
