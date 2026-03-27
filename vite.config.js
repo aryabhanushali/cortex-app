@@ -48,7 +48,7 @@ export default defineConfig(() => {
         scoreboardLanding: 'scoreboardLanding/index.html',
         labLanding: 'labLanding/index.html',
         walkthrough: 'walkthrough/index.html',
-      
+
 
       },
     },

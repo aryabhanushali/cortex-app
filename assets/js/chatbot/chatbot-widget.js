@@ -31,9 +31,9 @@
       "What is the Scoreboard?",
     ],
     lab: [
-      "How do I upload my own stimuli?",
-      "What models can I test in the Lab?",
-      "Can I select specific brain regions for predictions?",
+      "How should I organize my image groups?",
+      "Which model should I use for my stimuli?",
+      "How do I interpret the prediction results?",
     ],
     scoreboard: [
       "Which AI models best predict brain activity across datasets?",
@@ -155,6 +155,50 @@
       "The website has three main sections: Home (overview and introduction), The Lab (for custom experiments with your own images), and The Scoreboard (for comparing model performance). Navigate using the top menu.",
     "How can I use this for research?":
       "You can use this platform to: 1) Test hypotheses about which model features predict brain activity, 2) Compare models to find the best brain-aligned architectures, 3) Run custom experiments with your own stimuli in the Lab, 4) Evaluate model generalization across datasets and brain regions, 5) Generate predictions for new images and analyze them.",
+
+    // Lab — Upload step
+    "How should I organize my image groups?":
+      "Groups represent your experimental conditions. For example, if you want to study face vs. scene processing, create two folders: one with face images and one with scene images. Each folder becomes a group. You can drag images between groups and rename them in the Lab interface. Good group names help you interpret results later (e.g., 'faces', 'places', 'objects').",
+    "How do I organize my stimuli into groups?":
+      "Upload images organized into subfolders — each subfolder becomes a group. For example, a folder structure like 'stimuli/faces/' and 'stimuli/places/' will create two groups. You can also drag individual images between groups and rename groups directly in the Lab interface.",
+    "How many groups should I have?":
+      "It depends on your hypothesis. Two groups (e.g., faces vs. scenes) make it easy to compare brain responses between conditions. More groups give richer data but can be harder to interpret. A good starting point is 2–4 groups representing distinct visual categories relevant to your hypothesis.",
+    "What stimuli should I upload?":
+      "Upload images that match your research hypothesis. For FFA (face processing), use face images. For PPA (scene processing), use landscape, indoor, or architectural images. For EBA (body processing), use body or body-part images. Images should be clear, varied within each group, and representative of the category you want to study.",
+    "Can you suggest a hypothesis?":
+      "Your hypothesis depends on your stimuli. If you have face images vs. scene images, a natural hypothesis is: 'FFA will show higher predicted responses to faces, while PPA will show higher responses to scenes.' If you have objects vs. bodies, try: 'EBA will respond more strongly to body images than to isolated objects.' Select the brain region that matches your expected response category.",
+    "How do I connect stimuli to a hypothesis?":
+      "Think about which brain region is specialized for your stimuli type: FFA for faces, PPA for places/scenes, EBA for bodies. Your hypothesis should predict that the matching region will show stronger neural responses. After running predictions, compare the bar chart responses across your image groups — images matching the region's specialty should show higher mean voxel responses.",
+
+    // Lab — Training Settings step
+    "Which model should I use?":
+      "It depends on your stimuli. For face images (FFA), CLIP variants and DINOv2 tend to perform well. For scene images (PPA), CLIP and ConvNeXt are strong. For body images (EBA), models with strong object recognition like ResNet or DINOv2 are reasonable choices. Check the Scoreboard for per-region rankings to pick the best-performing model for your target ROI.",
+    "Which model should I use for my stimuli?":
+      "Match the model to your stimuli type and target brain region. For faces (FFA): CLIP or DINOv2 are top performers. For scenes/places (PPA): CLIP and ConvNeXt work well. For bodies (EBA): DINOv2 or ResNet variants are good choices. You can always check the Scoreboard to find the highest-scoring model for your chosen region before running the Lab.",
+    "What is the difference between NSD and Murty185?":
+      "NSD (Natural Scenes Dataset) was collected from 8 subjects viewing 1,000 natural scene images — it gives broad coverage of model generalization. Murty185 was collected from 4 subjects viewing 185 stimuli with 20+ repetitions each — it has higher signal reliability per image. Use NSD if you want more subjects and diverse scenes; use Murty185 if you want high-repetition reliability in functionally-defined ROIs.",
+    "Which dataset should I use in the Lab?":
+      "If your images are natural scenes, NSD (Natural Scenes Dataset) is a natural choice since the training data matches well. If your images are from a controlled stimulus set with clear categories (faces, objects, scenes), Murty185 may generalize better due to its high-repetition reliability. When in doubt, try both and compare the results.",
+    "Which ROI should I select?":
+      "Choose the ROI that matches your stimuli and hypothesis. FFA (Fusiform Face Area) for faces, PPA (Parahippocampal Place Area) for scenes, places, and spatial layouts, EBA (Extrastriate Body Area) for bodies and body parts. If you are unsure, start with the region most likely to respond to your image category based on neuroscience literature.",
+    "What brain region should I use for faces?":
+      "Use FFA (Fusiform Face Area). It is the primary region for face processing in the visual cortex. Select FFA in the Region Selector on the Training Settings step.",
+    "What brain region should I use for scenes?":
+      "Use PPA (Parahippocampal Place Area). It responds strongly to scenes, places, and spatial layouts. Select PPA in the Region Selector on the Training Settings step.",
+
+    // Lab — Results step
+    "How do I interpret the prediction results?":
+      "The bar chart shows the mean predicted voxel response for each image — taller bars mean the model predicts stronger neural activity for that image. Images that match your target region's specialization (e.g., faces for FFA) should generally show higher bars. The RDM heatmap shows how similar or different the brain responses are across all your images — images with similar responses cluster together (low dissimilarity).",
+    "What does the bar chart show?":
+      "The bar chart shows the predicted mean voxel response for each uploaded image in your selected brain region. Higher bars mean the model predicts stronger neural activity. Error bars represent the standard error of the mean (SEM) across voxels. Compare bars across your image groups to see which category drives stronger predicted brain activity.",
+    "What does the heatmap show?":
+      "The RDM (Representational Dissimilarity Matrix) heatmap shows how different the predicted brain responses are between every pair of images. Dark cells mean two images produce similar predicted responses; bright cells mean they produce very different responses. Images from the same category often cluster together (similar responses), while images from different categories show high dissimilarity.",
+    "How do I find outliers?":
+      "Look at the bar chart for images with unusually high or low bars compared to the rest of their group. An outlier in a group would be an image whose bar is far above or below the group average. You can also hover over bars to see the exact image and value. Outliers may indicate images that are atypical for their category or that contain unexpected visual features (e.g., a 'face' image that contains a prominent background scene).",
+    "How do I locate outliers in the results?":
+      "In the bar chart, scan for bars that stand out from the typical range of their group — either much taller or much shorter. These are your outliers. Click or hover on a bar to see which image it corresponds to. Outlier images may have mixed features (e.g., a face partially occluded by a scene) causing unexpected neural responses. You can remove outliers and re-run predictions to see how they affect group-level results.",
+    "What is the RDM?":
+      "RDM stands for Representational Dissimilarity Matrix. It captures the pairwise neural dissimilarity between all your images based on predicted voxel responses. Two images that activate very different voxel patterns will have a high dissimilarity score. The RDM lets you see the structure of your stimuli as represented in the brain — do your groups form distinct clusters, or do they overlap?",
   };
 
   // ---- Normalized lookup map (built once from presetAnswers) ----------
@@ -259,6 +303,37 @@
       if (state.selectedModel) parts.push(`selected_model:${state.selectedModel}`);
       if (state.chartType) parts.push(`chart:${state.chartType}`);
       if (state.pageView && state.pageView !== "rank") parts.push(`view:${state.pageView}`);
+      return parts.join("|");
+    }
+    if (pageContext.type === "lab") {
+      const state = window.cortexLabState;
+      if (!state) return "lab";
+      const parts = ["lab"];
+      parts.push(`step:${state.step}`);
+      if (state.totalFiles) parts.push(`files:${state.totalFiles}`);
+      if (state.groupCount) parts.push(`groups:${state.groupCount}`);
+      if (state.groupNames && state.groupNames.length) parts.push(`groupNames:${state.groupNames.join(",")}`);
+      if (state.settings) {
+        if (state.settings.model) parts.push(`model:${state.settings.model}`);
+        if (state.settings.region) parts.push(`region:${state.settings.region}`);
+        if (state.settings.dataset) parts.push(`dataset:${state.settings.dataset}`);
+      }
+      if (state.hasResults) {
+        parts.push("hasResults:true");
+        if (state.resultSummary) {
+          const rs = state.resultSummary;
+          const san = (s) => String(s).replace(/[|:,=[\]]/g, "_");
+          parts.push(`overallMean:${rs.overallMean}`);
+          const groupMeans = Object.entries(rs.groupStats)
+            .map(([g, s]) => `${san(g)}=${s.mean}(n${s.count})`)
+            .join(",");
+          if (groupMeans) parts.push(`groupMeans:${groupMeans}`);
+          const outliers = Object.entries(rs.groupStats)
+            .map(([g, s]) => `${san(g)}[hi=${san(s.highest)};lo=${san(s.lowest)}]`)
+            .join(",");
+          if (outliers) parts.push(`groupOutliers:${outliers}`);
+        }
+      }
       return parts.join("|");
     }
     if (pageContext.type !== "home") return pageContext.type;
@@ -388,6 +463,13 @@
     toggleBtn.textContent = "Ask Cortex";
     document.body.appendChild(toggleBtn);
 
+    // ---- Resize handles -------------------------------------------
+    ["cortex-chatbot-resize-corner", "cortex-chatbot-resize-top", "cortex-chatbot-resize-left"].forEach(cls => {
+      const el = document.createElement("div");
+      el.className = cls;
+      container.appendChild(el);
+    });
+
     const messagesEl = document.getElementById("cortex-chatbot-messages");
     const suggestionsEl = document.getElementById("cortex-chatbot-suggestion-list");
     const inputEl = document.getElementById("cortex-chatbot-input");
@@ -425,6 +507,52 @@
     }
 
     header.addEventListener("mousedown", dragStart);
+
+    // ---- Resize functionality -----------------------------------------
+    let isResizing = false;
+    let resizeDir = "";   // "top", "left", or "corner"
+    let resizeStartX, resizeStartY, resizeStartW, resizeStartH;
+
+    function resizeStart(e, dir) {
+      e.preventDefault();
+      e.stopPropagation();
+      isResizing = true;
+      resizeDir = dir;
+      resizeStartX = e.clientX;
+      resizeStartY = e.clientY;
+      resizeStartW = container.offsetWidth;
+      resizeStartH = container.offsetHeight;
+      document.body.style.userSelect = "none";
+    }
+
+    function resizeMove(e) {
+      if (!isResizing) return;
+      const minW = 280, maxW = window.innerWidth * 0.9;
+      const minH = 300, maxH = window.innerHeight * 0.9;
+      const dx = resizeStartX - e.clientX; // dragging left = wider
+      const dy = resizeStartY - e.clientY; // dragging up = taller
+      if (resizeDir === "left" || resizeDir === "corner") {
+        const newW = Math.min(maxW, Math.max(minW, resizeStartW + dx));
+        container.style.width = newW + "px";
+      }
+      if (resizeDir === "top" || resizeDir === "corner") {
+        const newH = Math.min(maxH, Math.max(minH, resizeStartH + dy));
+        container.style.height = newH + "px";
+      }
+    }
+
+    function resizeEnd() {
+      if (!isResizing) return;
+      isResizing = false;
+      resizeDir = "";
+      document.body.style.userSelect = "";
+    }
+
+    container.querySelector(".cortex-chatbot-resize-corner").addEventListener("mousedown", e => resizeStart(e, "corner"));
+    container.querySelector(".cortex-chatbot-resize-top").addEventListener("mousedown", e => resizeStart(e, "top"));
+    container.querySelector(".cortex-chatbot-resize-left").addEventListener("mousedown", e => resizeStart(e, "left"));
+    document.addEventListener("mousemove", resizeMove);
+    document.addEventListener("mouseup", resizeEnd);
     document.addEventListener("mousemove", drag);
     document.addEventListener("mouseup", dragEnd);
 
@@ -481,26 +609,60 @@
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
+    // ---- Step-aware Lab suggestions ------------------------------------
+    const LAB_SUGGESTIONS_BY_STEP = {
+      1: [
+        "How should I organize my image groups?",
+        "What stimuli should I upload?",
+        "Can you suggest a hypothesis?",
+      ],
+      2: [
+        "Which model should I use for my stimuli?",
+        "Which ROI should I select?",
+        "What is the difference between NSD and Murty185?",
+      ],
+      3: [
+        "How do I interpret the prediction results?",
+        "How do I find outliers?",
+        "What does the RDM heatmap show?",
+      ],
+    };
+
+    function getLabSuggestions() {
+      const state = window.cortexLabState;
+      const step = state ? state.step : 1;
+      return LAB_SUGGESTIONS_BY_STEP[step] || LAB_SUGGESTIONS_BY_STEP[1];
+    }
+
+    function renderSuggestions(questions) {
+      suggestionsEl.innerHTML = "";
+      questions.forEach((q) => {
+        const btn = document.createElement("button");
+        btn.className = "cortex-chatbot-suggestion";
+        btn.textContent = q;
+        btn.addEventListener("click", () => {
+          let query = q;
+          if (pageContext.modelName) {
+            query = q.replace("this model", pageContext.modelName.replace(/_/g, " "));
+          }
+          handleUserQuery(query);
+        });
+        suggestionsEl.appendChild(btn);
+      });
+    }
+
     // ---- Initial welcome & suggestions --------------------------------
     const welcomeMsg = pageContext.type === "model_page" && pageContext.modelName
       ? `Hi! I can answer questions about the ${pageContext.modelName.replace(/_/g, " ")} model, or anything else about Cortex.`
+      : pageContext.type === "lab"
+      ? "Hi! I can help you upload stimuli, choose training settings, and interpret your prediction results."
       : "Hi! I can help you understand the Lab, Scoreboard, and visual brain regions like FFA and PPA.";
     addMessage(welcomeMsg, "bot");
 
-    (presetQuestions[pageContext.type] || presetQuestions.home).forEach((q) => {
-      const btn = document.createElement("button");
-      btn.className = "cortex-chatbot-suggestion";
-      btn.textContent = q;
-      btn.addEventListener("click", () => {
-        // Resolve "this model" to the actual model name for the API query
-        let query = q;
-        if (pageContext.modelName) {
-          query = q.replace("this model", pageContext.modelName.replace(/_/g, " "));
-        }
-        handleUserQuery(query);
-      });
-      suggestionsEl.appendChild(btn);
-    });
+    const initialQuestions = pageContext.type === "lab"
+      ? getLabSuggestions()
+      : (presetQuestions[pageContext.type] || presetQuestions.home);
+    renderSuggestions(initialQuestions);
 
     // ---- Input handlers -----------------------------------------------
     sendBtn.addEventListener("click", () => {
@@ -527,6 +689,10 @@
     toggleBtn.addEventListener("click", () => {
       container.style.display = "flex";
       toggleBtn.style.display = "none";
+      // Refresh Lab suggestions to reflect current step
+      if (pageContext.type === "lab") {
+        renderSuggestions(getLabSuggestions());
+      }
     });
 
     // Default: collapsed on page load

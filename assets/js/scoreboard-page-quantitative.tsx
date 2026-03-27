@@ -12,7 +12,6 @@ import DatasetSelect from './Scoreboard/Settings/datasetselect.jsx';
 
 
 import ChartSelect from './Scoreboard/Settings/chartselect.jsx';
-import PageSelect from './Scoreboard/Settings/pageselect.jsx';
 import QuestionSelect from './Scoreboard/Settings/questionselect.jsx';
 
 
@@ -387,11 +386,6 @@ const ScoreboardPageQuantitative: React.FC = () => {
               onChange={(val: string) => setActiveQuestion(val)}
             />
           )}
-
-          {/* view toggle */}
-          <div style={{ flex: '0 0 auto' }}>
-            <PageSelect value={pageView} onChange={(val: string) => setPageView(val)} />
-          </div>
 
           {/* chart: horizontal*/}
         <div

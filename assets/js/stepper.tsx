@@ -357,6 +357,58 @@ const renameGroupKey = (oldKey: string, newKey: string) => {
 
   const { heatmapData, originalFilenames, sortedFilenames } = useHeatmapData(predictionResult);
 
+  // Expose lab state globally for the chatbot (placed after barchartData is declared)
+  useEffect(() => {
+    const uniqueGroups = [...new Set(files.map((f) => f.groupKey))];
+
+    let resultSummary: {
+      groupStats: Record<string, { mean: number; count: number; highest: string; lowest: string }>;
+      overallMean: number;
+    } | null = null;
+
+    if (predictionResult && barchartData.length > 0) {
+      // Map serverKey → PreviewFile for group lookup
+      const keyToFile: Record<string, PreviewFile> = {};
+      fileMappings.forEach((f) => { if (f.serverKey) keyToFile[f.serverKey] = f; });
+
+      // Bucket barchart entries by group
+      const byGroup: Record<string, { label: string; mean: number }[]> = {};
+      barchartData.forEach((d) => {
+        const pf = keyToFile[d.filename];
+        const group = pf?.groupKey ?? "Ungrouped";
+        const label = pf?.label ?? d.filename;
+        if (!byGroup[group]) byGroup[group] = [];
+        byGroup[group].push({ label, mean: d.mean });
+      });
+
+      // Per-group stats
+      const groupStats: Record<string, { mean: number; count: number; highest: string; lowest: string }> = {};
+      Object.entries(byGroup).forEach(([group, items]) => {
+        const avg = items.reduce((s, i) => s + i.mean, 0) / items.length;
+        const sorted = [...items].sort((a, b) => b.mean - a.mean);
+        groupStats[group] = {
+          mean: +avg.toFixed(4),
+          count: items.length,
+          highest: sorted[0]?.label ?? "",
+          lowest: sorted[sorted.length - 1]?.label ?? "",
+        };
+      });
+
+      const overallMean = barchartData.reduce((s, d) => s + d.mean, 0) / barchartData.length;
+      resultSummary = { groupStats, overallMean: +overallMean.toFixed(4) };
+    }
+
+    (window as any).cortexLabState = {
+      step: current + 1,
+      totalFiles: files.length,
+      groupCount: uniqueGroups.length,
+      groupNames: uniqueGroups,
+      settings: { model, region, dataset, voxelOption },
+      hasResults: predictionResult !== null,
+      resultSummary,
+    };
+  }, [current, files, model, region, dataset, voxelOption, predictionResult, barchartData, fileMappings]);
+
   console.log("Extract Heatmap Data from predictionResult:", heatmapData);
 
   const contentStyle: React.CSSProperties = {

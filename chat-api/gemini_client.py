@@ -50,8 +50,40 @@ def get_gemini_reply(user_message: str, rule_context: str | None = None, page_co
                 if parts.get("view") == "2":
                     ctx_lines.append("The user is in the Advanced Insights view.")
                 page_ctx_str = "=== USER'S CURRENT PAGE ===\n" + " ".join(ctx_lines) + "\n\n"
-            elif page_context == "lab":
-                page_ctx_str = "=== USER'S CURRENT PAGE ===\nThe user is on the Lab page.\n\n"
+            elif page_context.startswith("lab"):
+                # Parse rich lab state: "lab|step:2|files:30|groups:3|groupNames:faces,scenes,objects|model:clip_rn50|region:ffa|dataset:nsd_1000|hasResults:true"
+                lab_parts = dict(p.split(":", 1) for p in page_context.split("|") if ":" in p)
+                step = lab_parts.get("step", "1")
+                step_names = {"1": "Upload Stimuli", "2": "Training Settings", "3": "Prediction Results"}
+                ctx_lines = [f"The user is on the Lab page — Step {step}: {step_names.get(step, step)}."]
+                files_count = lab_parts.get("files", "0")
+                groups_count = lab_parts.get("groups", "0")
+                if files_count != "0":
+                    ctx_lines.append(f"They have uploaded {files_count} images in {groups_count} group(s).")
+                group_names = lab_parts.get("groupNames", "")
+                if group_names:
+                    ctx_lines.append(f"Group names: {group_names.replace(',', ', ')}.")
+                model = lab_parts.get("model", "")
+                region = lab_parts.get("region", "")
+                dataset = lab_parts.get("dataset", "")
+                if model:
+                    ctx_lines.append(f"Selected model: {model.replace('_', ' ')}.")
+                if region:
+                    ctx_lines.append(f"Selected brain region: {region.upper()}.")
+                if dataset:
+                    ctx_lines.append(f"Selected training dataset: {dataset.replace('_', ' ')}.")
+                if lab_parts.get("hasResults") == "true":
+                    ctx_lines.append("Prediction results have been generated and are visible.")
+                    overall_mean = lab_parts.get("overallMean", "")
+                    if overall_mean:
+                        ctx_lines.append(f"Overall mean predicted voxel response: {overall_mean}.")
+                    group_means = lab_parts.get("groupMeans", "")
+                    if group_means:
+                        ctx_lines.append(f"Per-group mean predicted responses: {group_means}.")
+                    group_outliers = lab_parts.get("groupOutliers", "")
+                    if group_outliers:
+                        ctx_lines.append(f"Per-group highest and lowest responding images: {group_outliers}.")
+                page_ctx_str = "=== USER'S CURRENT PAGE ===\n" + " ".join(ctx_lines) + "\n\n"
 
         prompt = (
             "You are the friendly assistant for Virtual Visual Cortex, a platform that bridges neuroscience and AI. "
@@ -76,6 +108,40 @@ def get_gemini_reply(user_message: str, rule_context: str | None = None, page_co
             "BOLD5000 (5,254 images, 4 subjects), Bonner2021 (810 objects, 81 categories), "
             "BMD2024 (1,102 video clips, challenging), KingBaker2019 (diverse cognitive tasks), "
             "Wardle2020 (face pareidolia stimuli), NSD Synthetic (284 controlled out-of-distribution images).\n\n"
+            "=== LAB WORKFLOW GUIDANCE ===\n"
+            "The Lab has 3 steps: (1) Upload Stimuli → (2) Training Settings → (3) Prediction Results.\n"
+            "Step 1 — Upload Stimuli: Users upload images organized into groups (subfolders = groups). "
+            "Groups represent experimental conditions (e.g., faces vs. scenes). "
+            "Help users plan groups based on their hypothesis. "
+            "Suggest hypotheses: FFA responds to faces, PPA to scenes/places, EBA to bodies. "
+            "E.g., if they have face and scene images: 'FFA will respond more to faces; PPA will respond more to scenes.'\n"
+            "Step 2 — Training Settings: Help users choose: "
+            "(a) ROI — FFA for faces, PPA for scenes, EBA for bodies. "
+            "(b) Model — CLIP and DINOv2 are top performers across regions; check Scoreboard for best per region. "
+            "(c) Dataset — NSD (8 subjects, 1000 scenes, broader) vs. Murty185 (4 subjects, 185 stimuli, 20+ reps, high reliability). "
+            "Based on their stimuli + group names + hypothesis, suggest specific model/ROI/dataset combinations.\n"
+            "Step 3 — Prediction Results: When the user has results, you have access to their actual data "
+            "(group means, per-group highest/lowest responding images). USE THESE NUMBERS in your answer.\n"
+            "Bar chart: each bar = one image's mean predicted voxel response in the selected brain region. "
+            "Higher bar = the model predicts the brain responds more strongly to that image. "
+            "Error bars = standard error of the mean (SEM) across voxels — smaller bars = more reliable signal.\n"
+            "RDM heatmap: shows pairwise neural dissimilarity across all images. "
+            "Dark cell = two images activate similar voxel patterns. Bright cell = very different patterns. "
+            "Images from the same category tend to cluster (dark blocks along the diagonal).\n"
+            "Interpreting group differences: if group A has a higher mean than group B in region X, "
+            "it suggests the model predicts X responds more strongly to group A's image category. "
+            "E.g., faces group higher in FFA → expected, since FFA is specialized for faces.\n"
+            "Outliers: an outlier is an image whose bar is far above or below the rest of its group. "
+            "To find them: look for the tallest or shortest bar within a group — "
+            "the per-group highest/lowest images are available in context when results exist. "
+            "Outliers may have mixed visual features (e.g., a face image with a strong background scene).\n"
+            "Score calibration: mean responses are Pearson correlations (range ~0–1). "
+            "Values around 0.3–0.5 are typical for good models. Below 0.2 may indicate poor fit. "
+            "Always compare relative differences across groups, not just absolute values.\n"
+            "TONE: explain results at two levels — first a plain-English summary ('your face images drove "
+            "stronger predicted brain activity than scenes'), then optionally a technical note for experts "
+            "('the mean Pearson correlation for the faces group was X vs Y for scenes'). "
+            "If the user seems like a beginner, keep it plain. If they use technical terms, go deeper.\n\n"
             "=== METHODOLOGY ===\n"
             "Model activations extracted → ridge regression maps activations to voxel responses → "
             "performance = Pearson correlation (predicted vs actual fMRI). "

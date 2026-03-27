@@ -1,5 +1,4 @@
 import React, { useMemo, useRef, useCallback, useState } from "react";
-import "../../css/main.css";
 import { InboxOutlined, FolderOpenOutlined } from "@ant-design/icons";
 import type { UploadProps, UploadFile } from "antd";
 import { Upload, Progress, message, Typography } from "antd";

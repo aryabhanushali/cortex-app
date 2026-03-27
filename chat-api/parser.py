@@ -94,7 +94,7 @@ def _parse_query_inner(normalized: str, store: DataStore) -> ParsedQuery:
         "are",
     }
 
-    # Greeting / help
+    # Greeting
     if re.search(r"\b(hi|hello|hey|help|what can you do)\b", normalized):
         if "help" in normalized or "what can you do" in normalized:
             return ParsedQuery(intent=Intent.HELP, normalized_raw=normalized)

@@ -19,9 +19,7 @@ MODELS_META_PATH = REPO_ROOT / "cortex-web-app" / "public" / "assets" / "data" /
 # - Compute a per-model "global_score" as the mean over all *available* datasets
 #   excluding the training datasets shown in the UI ("murty185" and "nsd_1000").
 # - Compute "overall" as the mean across ROIs (PPA/FFA/EBA) and datasets.
-#
-# This mirrors the logic in `assets/js/Scoreboard/Visualizations/heatmapDetail.jsx`.
-EXCLUDED_DATASETS = {"murty185", "nsd_1000"}
+EXCLUDED_DATASETS = {"murty185", "nsd_1000"} # These are training so won't test on them
 ROIS = ["ppa", "ffa", "eba"]
 ROI_ALIASES = {"ppa": ["ppa", "parahippocampal", "place"], "ffa": ["ffa", "fusiform", "face"], "eba": ["eba", "extrastriate", "body"]}
 
